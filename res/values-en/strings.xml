@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="show_messages_text">TÃ­tulo Show messages?</string>
+    <string name="view_message_title_string">Title:</string>
+    <string name="view_message_data_title">Message:</string>
+    <string name="language_text">Language:</string>
+    <string name="message_text">Message:</string>
+    <string name="title_text">Title</string>
+    <string name="app_name">Fluid Nexus</string>
+    <string name="settings_title">Fluid Nexus Settings</string>
+    <string name="menu_add_message">Add Outgoing</string>
+    <string name="menu_view_outgoing">View Outgoing</string>
+    <string name="menu_settings">Settings</string>
+</resources>
