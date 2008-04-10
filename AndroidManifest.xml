@@ -8,5 +8,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".FluidNexusSettings"></activity>
+        <activity android:name=".FluidNexusViewMessage"></activity>
+        <activity android:name=".FluidNexusViewOutgoing"></activity>
+        <activity android:name=".FluidNexusAddOutgoing"></activity>
     </application>
 </manifest> 

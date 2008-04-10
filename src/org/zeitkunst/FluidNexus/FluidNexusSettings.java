@@ -13,6 +13,7 @@ public class FluidNexusSettings extends Activity {
     @Override
     protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);
+        setTheme(android.R.style.Theme_Dialog);
         setContentView(R.layout.settings);
         setTitle(R.string.settings_title);
     }

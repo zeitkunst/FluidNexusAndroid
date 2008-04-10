@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
-android:id="@+id/widget27"
+android:id="@+id/widget33"
 android:layout_width="fill_parent"
 android:layout_height="fill_parent"
 xmlns:android="http://schemas.android.com/apk/res/android"
@@ -28,7 +28,7 @@ android:layout_alignParentLeft="true"
 android:id="@+id/view_message_data_title"
 android:layout_width="wrap_content"
 android:layout_height="wrap_content"
-android:text="@string/view_message_data_title"
+android:text="@string/view_message_data_string"
 android:textStyle="bold"
 android:layout_below="@+id/view_message_title"
 android:layout_alignParentLeft="true"
@@ -50,4 +50,13 @@ android:text="TextView"
 >
 </TextView>
 </ScrollView>
+<Button
+android:id="@+id/view_message_back"
+android:layout_width="wrap_content"
+android:layout_height="36sp"
+android:text="@string/view_message_back"
+android:layout_alignParentBottom="true"
+android:layout_alignParentRight="true"
+>
+</Button>
 </RelativeLayout>
