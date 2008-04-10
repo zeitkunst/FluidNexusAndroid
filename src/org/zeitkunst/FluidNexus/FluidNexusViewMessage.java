@@ -18,6 +18,7 @@ public class FluidNexusViewMessage extends Activity {
     protected void onCreate(Bundle icicle) {
 
         super.onCreate(icicle);
+        setTheme(android.R.style.Theme_Dialog);
         setContentView(R.layout.message_view);
         setTitle(R.string.message_view_title);
         Bundle extras = getIntent().getExtras();

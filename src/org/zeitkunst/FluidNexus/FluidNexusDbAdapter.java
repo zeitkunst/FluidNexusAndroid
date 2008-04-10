@@ -146,7 +146,12 @@ public class FluidNexusDbAdapter {
         return db.insert(DATABASE_TABLE, null, values);
     }
 
-
+    /**
+     * Delete an item by the hash
+     */
+    public boolean deleteByHash(String hash) {
+        return db.delete(DATABASE_TABLE, KEY_HASH + "=" + hash, null) > 0;
+    }
     /**
      * Return all of the items in the database
      */

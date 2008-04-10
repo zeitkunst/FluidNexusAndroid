@@ -12,6 +12,7 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.util.Log;
 
 public class FluidNexusAndroid extends ListActivity {
@@ -29,6 +30,7 @@ public class FluidNexusAndroid extends ListActivity {
     private static final int MENU_VIEW_ID = Menu.FIRST + 1;
     private static final int MENU_SETTINGS_ID = Menu.FIRST + 2;
     private static final int MENU_ALL_ID = Menu.FIRST + 3;
+    private static final int MENU_DELETE_ID = Menu.FIRST + 4;
 
     private Cursor dbCursor;
 
@@ -54,6 +56,7 @@ public class FluidNexusAndroid extends ListActivity {
         menuItem = menu.add(0, MENU_ALL_ID, R.string.menu_view_all);
         menuItem = menu.add(0, MENU_VIEW_ID, R.string.menu_view_outgoing);
         menuItem.setIcon(R.drawable.menu_view);
+        menuItem = menu.add(0, MENU_DELETE_ID, R.string.menu_delete);
         menu.add(0, MENU_SETTINGS_ID, R.string.menu_settings);
         return result;
     }
@@ -69,6 +72,9 @@ public class FluidNexusAndroid extends ListActivity {
                 return true;
             case MENU_VIEW_ID:
                 fillListView(1);
+                return true;
+            case MENU_DELETE_ID:
+                Toast.makeText(this, "Not implmented yet...", Toast.LENGTH_LONG);
                 return true;
             case MENU_SETTINGS_ID:
                 editSettings();

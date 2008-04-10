@@ -48,21 +48,22 @@ public final class R {
     }
     public static final class string {
         public static final int app_name=0x7f040006;
-        public static final int discard_message_button=0x7f040011;
+        public static final int discard_message_button=0x7f040012;
         public static final int language_text=0x7f040003;
         public static final int menu_add_message=0x7f04000b;
-        public static final int menu_settings=0x7f04000e;
+        public static final int menu_delete=0x7f04000e;
+        public static final int menu_settings=0x7f04000f;
         public static final int menu_view_all=0x7f04000c;
         public static final int menu_view_outgoing=0x7f04000d;
         public static final int message_add_outgoing_title=0x7f040009;
         public static final int message_text=0x7f040004;
         public static final int message_view_outgoing_title=0x7f04000a;
         public static final int message_view_title=0x7f040008;
-        public static final int save_message_button=0x7f040010;
+        public static final int save_message_button=0x7f040011;
         public static final int settings_title=0x7f040007;
         public static final int show_messages_text=0x7f040000;
         public static final int title_text=0x7f040005;
-        public static final int view_message_back=0x7f04000f;
+        public static final int view_message_back=0x7f040010;
         public static final int view_message_data_string=0x7f040002;
         public static final int view_message_title_string=0x7f040001;
     }
