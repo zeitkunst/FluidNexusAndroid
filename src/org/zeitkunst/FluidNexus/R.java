@@ -13,14 +13,15 @@ public final class R {
     public static final class drawable {
         public static final int fluid_nexus_help_icon=0x7f020000;
         public static final int fluid_nexus_icon=0x7f020001;
-        public static final int menu_add=0x7f020002;
-        public static final int menu_all=0x7f020003;
-        public static final int menu_all_list_icon=0x7f020004;
-        public static final int menu_delete=0x7f020005;
-        public static final int menu_help=0x7f020006;
-        public static final int menu_settings=0x7f020007;
-        public static final int menu_view=0x7f020008;
-        public static final int menu_view_list_icon=0x7f020009;
+        public static final int fluid_nexus_icon_status=0x7f020002;
+        public static final int menu_add=0x7f020003;
+        public static final int menu_all=0x7f020004;
+        public static final int menu_all_list_icon=0x7f020005;
+        public static final int menu_delete=0x7f020006;
+        public static final int menu_help=0x7f020007;
+        public static final int menu_settings=0x7f020008;
+        public static final int menu_view=0x7f020009;
+        public static final int menu_view_list_icon=0x7f02000a;
     }
     public static final class id {
         public static final int discard_message_button=0x7f05000f;

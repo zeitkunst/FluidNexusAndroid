@@ -106,7 +106,7 @@ public class FluidNexusAndroid extends ListActivity {
         menu.add(0, MENU_VIEW_ID, R.string.menu_view_outgoing, R.drawable.menu_view);
         menu.add(0, MENU_DELETE_ID, R.string.menu_delete, R.drawable.menu_delete);
         menu.add(0, MENU_SETTINGS_ID, R.string.menu_settings, R.drawable.menu_settings);
-        menu.add(0, MENU_HELP_ID, R.string.menu_help, R.drawable.menu_help);
+        menu.add(0, MENU_HELP_ID, R.string.menu_help, R.drawable.menu_help).setAlphabeticShortcut('h');
         return result;
     }
 

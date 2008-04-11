@@ -21,18 +21,18 @@ import android.os.IBinder;
 import android.os.Parcel;
 import android.widget.Toast;
 
-public class FluidNexusClient extends Service {
+public class FluidNexusServer extends Service {
     private Socket clientSocket;
     private ServerSocket serverSocket;
     PrintWriter out;
     BufferedReader in;
 
     private NotificationManager nm;
-    private static FluidNexusLogger log = FluidNexusLogger.getLogger("FluidNexusClient"); 
+    private static FluidNexusLogger log = FluidNexusLogger.getLogger("FluidNexusServer"); 
 
-    public class FluidNexusClientBinder extends Binder {
-        FluidNexusClient getService() {
-            return FluidNexusClient.this;
+    public class FluidNexusServerBinder extends Binder {
+        FluidNexusServer getService() {
+            return FluidNexusServer.this;
         }
     }
 
@@ -88,7 +88,7 @@ public class FluidNexusClient extends Service {
         return binder;
     }
 
-    private final IBinder binder = new FluidNexusClientBinder();
+    private final IBinder binder = new FluidNexusServerBinder();
 
     private void showNotification() {
         Intent contentIntent = new Intent(this, FluidNexusAndroid.class);
