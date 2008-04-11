@@ -12,5 +12,6 @@
         <activity android:name=".FluidNexusViewOutgoing"></activity>
         <activity android:name=".FluidNexusAddOutgoing"></activity>
         <activity android:name=".FluidNexusHelp"></activity>
+        <service android:name=".FluidNexusClient" />
     </application>
 </manifest> 

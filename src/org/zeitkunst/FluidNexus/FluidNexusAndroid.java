@@ -3,6 +3,8 @@ package org.zeitkunst.FluidNexus;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.Menu;
@@ -17,9 +19,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.util.Log;
 
+import org.bluez.Adapter;
+import org.bluez.Manager;
+
 public class FluidNexusAndroid extends ListActivity {
     private FluidNexusDbAdapter dbHelper;
     private Toast toast;
+    
+    private FluidNexusBtSimulator btSim;
+
+    private SharedPreferences prefs;
+    private Editor prefsEditor;
 
     private static FluidNexusLogger log = FluidNexusLogger.getLogger("FluidNexus"); 
 
@@ -61,9 +71,30 @@ public class FluidNexusAndroid extends ListActivity {
         dbHelper = new FluidNexusDbAdapter(this);
         dbHelper.open();
         fillListView(VIEW_MODE);
-        //toast = Toast.makeText(this, "Not implmented yet...", Toast.LENGTH_LONG);
-        //toast.show();
         log.verbose("starting up...");
+       
+        btSim = new FluidNexusBtSimulator();
+        btSim.startDiscovery();
+
+        toast = Toast.makeText(this, "Starting Bluetooth simulator", Toast.LENGTH_LONG);
+        toast.show();
+
+        startService(new Intent(FluidNexusAndroid.this, FluidNexusClient.class), null);
+
+        setupPreferences();
+    }
+
+    private void setupPreferences() {
+        prefs = getSharedPreferences("FluidNexusPreferences", 0);
+        boolean firstRun = prefs.getBoolean("FirstRun", true);
+
+        if (firstRun == true) {
+            prefsEditor = prefs.edit();
+            prefsEditor.putBoolean("FirstRun", false);
+
+            prefsEditor.putBoolean("ShowMessages", true);
+            prefsEditor.commit();
+        }
     }
 
     @Override
@@ -206,7 +237,6 @@ public class FluidNexusAndroid extends ListActivity {
                 if (i == cursor.getColumnIndex(FluidNexusDbAdapter.KEY_DATA)) {
                     String fullMessage = cursor.getString(i);
                     TextView tv = (TextView) view;
-                    log.info(fullMessage);
                     int stringLen = fullMessage.length();
                     if (stringLen < 20) {
                         tv.setText(fullMessage + " ...");
