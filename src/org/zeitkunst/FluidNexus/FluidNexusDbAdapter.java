@@ -152,6 +152,14 @@ public class FluidNexusDbAdapter {
     public boolean deleteByHash(String hash) {
         return db.delete(DATABASE_TABLE, KEY_HASH + "=" + hash, null) > 0;
     }
+
+    /**
+     * Delete an item by the id 
+     */
+    public boolean deleteById(long id) {
+        return db.delete(DATABASE_TABLE, KEY_ID + "=" + id, null) > 0;
+    }
+
     /**
      * Return all of the items in the database
      */

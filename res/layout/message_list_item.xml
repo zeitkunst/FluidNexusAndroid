@@ -5,6 +5,14 @@ android:layout_width="fill_parent"
 android:layout_height="fill_parent"
 xmlns:android="http://schemas.android.com/apk/res/android"
 >
+<RelativeLayout
+android:id="@+id/list_item_layout"
+android:layout_width="fill_parent"
+android:layout_height="wrap_content"
+android:padding="5px"
+xmlns:android="http://schemas.android.com/apk/res/android"
+>
+
 <ImageView
 android:id="@+id/message_list_item_icon"
 android:layout_width="wrap_content"
@@ -27,9 +35,9 @@ android:layout_toRight="@+id/message_list_item_icon"
 android:id="@+id/message_list_data"
 android:layout_width="wrap_content"
 android:layout_height="wrap_content"
-android:text="TextView"
 android:layout_below="@+id/message_list_item"
-android:layout_toRight="@+id/message_list_item_icon"
+android:layout_alignLeft="@+id/message_list_item"
 >
 </TextView>
+</RelativeLayout>
 </RelativeLayout>
