@@ -1,3 +1,21 @@
+/*
+ *  This file is part of Fluid Nexus.
+ *
+ *  Fluid Nexus is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Fluid Nexus is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Fluid Nexus.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 package org.zeitkunst.FluidNexus;
 
 import java.math.BigInteger;
@@ -66,16 +84,20 @@ public class FluidNexusDbAdapter {
                 db = ctx.createDatabase(DATABASE_NAME, DATABASE_VERSION, 0, null);
                 db.execSQL(DATABASE_CREATE); 
                 add_received(0,
-                    "Mobilize to dine",
-                    "CT delegation @ Maison (7th Ave. & 53rd).  Outdoor dining      area.  Try to get people there.",
+                   "Schedule a meeting",
+                    "We need to schedule a meeting soon.  Send a message around with the title [S] and good times to meet.  (This is an example of using the system to surreptitiously spread information about covert meetings.)",
                     "(123,123,123,123)");
                 add_received(0,
-                    "Run",
-                    "Run against Bush in progress (just went through times sq).     media march starts at 7, 52nd and broadway",
+                    "Building materials",
+                    "Some 2x4's and other sundry items seen around Walker Terrace.  (In the aftermath of a disaster, knowing where there might be temporary sources of material is very important.)",
                     "(123,123,123,123)");
                 add_received(0,
-                    "Federal agents",
-                    "Video dispatch. Federal agents trailing activists at 6th Ave   and 9th St. Situation tense.  In sem. Vestibulum condimentum pulvinar quam. Donec dignissim eros non felis condimentum eleifend. Fusce vulputate orci quis diam. Mauris vel risus eget tortor congue elementum. Quisque lectus turpis, sagittis sit amet, auctor ac, euismod sit amet, tellus. Nam hendrerit tristique justo. Cras hendrerit, quam nec ornare dignissim, ipsum dui interdum velit, id condimentum turpis augue quis sem. Vestibulum ac libero at ligula pharetra accumsan. Mauris nulla odio, consequat blandit, blandit id, feugiat non, risus. Morbi purus tortor, pellentesque ut, posuere ut, dapibus gravida, arcu. Curabitur libero odio, semper vitae, imperdiet egestas, auctor non, sem. In hac habitasse platea dictumst.",
+                    "Universal Declaration of Human Rights",
+                    "All human beings are born free and equal in dignity and rights.They are endowed with reason and conscience and should act towards one another in a spirit of brotherhood.  (In repressive regimes the system could be used to spread texts or other media that would be considered subversive.).  Everyone is entitled to all the rights and freedoms set forth in this Declaration, without distinction of any kind, such as race, colour, sex, language, religion, political or other opinion, national or social origin, property, birth or other status. Furthermore, no distinction shall be made on the basis of the political, jurisdictional or international status of the country or territory to which a person belongs, whether it be independent, trust, non-self-governing or under any other limitation of sovereignty....",
+                    "(123,123,123,123)");
+                add_new(0,
+                    "Witness to the event",
+                    "I saw them being taken away in the car--just swooped up like that.  (This is an example of a message we have created that is just marked as 'outgoing'.  The system can be easily used for spreading personal testimonials like this one.)",
                     "(123,123,123,123)");
 
             } catch (FileNotFoundException e1) {

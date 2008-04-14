@@ -299,26 +299,28 @@ public class FluidNexusServer extends Service {
                 // TODO
                 // write better messages for testing purposes :-)
                 Thread.sleep(20000);
-                String title = "Server add test";
-                dbHelper.add_received(0, title, "This is a new messaged added by the server.", "(123,123,123,123)");
+                String title = "[S]";
+                dbHelper.add_received(0, title, "Tues, evening, at the loft?  (An example of a message being received in response to the earlier one about scheduling.)", "(123,123,123,123)");
                 showNotification(title); 
                 sendNewMessageIntent();
 
                 long sleepTime = 0;
                 sleepTime += rand.nextFloat() * (2 * 60000);
                 Thread.sleep(sleepTime);
-                title = "A second message";
-                dbHelper.add_received(0, title, "Just adding something new here as a test.  This would be more interesting if it were actually being used..", "(123,123,123,123)");
+                title = "River concerns";
+                dbHelper.add_received(0, title, "Stay away from the river; there's a huge number of bugs there, and who know's what they're carrying.  (An example of hyper-local messaging when other networks are non-functional.)", "(123,123,123,123)");
                 showNotification(title); 
                 sendNewMessageIntent();
 
                 sleepTime += rand.nextFloat() * (3 * 60000);
                 Thread.sleep(sleepTime);
-                title = "Third message";
-                dbHelper.add_received(0, title, "Are we going to say anything interesting?  Or just put stupid info here?", "(123,123,123,123)");
+                title = "What do we do now?";
+                dbHelper.add_received(0, title, "Where do we go from here?  (Long-running, slower-paced conversations can take place easily.)", "(123,123,123,123)");
                 showNotification(title); 
                 sendNewMessageIntent();
-   
+  
+                Thread.sleep(10000);
+
             } catch (InterruptedException e) {
                 log.error(e.getMessage());
             }

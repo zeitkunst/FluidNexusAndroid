@@ -41,6 +41,7 @@ android:layout_height="wrap_content"
 xmlns:android="http://schemas.android.com/apk/res/android"
 android:layout_below="@+id/view_message_data_title"
 android:layout_alignParentLeft="true"
+android:fadingEdgeLength="18sp"
 >
 <TextView
 android:id="@+id/view_message_data"
@@ -53,10 +54,11 @@ android:text="TextView"
 <Button
 android:id="@+id/view_message_back"
 android:layout_width="wrap_content"
-android:layout_height="36sp"
+android:layout_height="32sp"
 android:text="@string/view_message_back"
 android:layout_alignParentBottom="true"
 android:layout_alignParentRight="true"
+android:textSize="11sp"
 >
 </Button>
 </RelativeLayout>

@@ -26,6 +26,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.ScrollView;
 
 public class FluidNexusHelp extends Activity {
 
@@ -44,7 +45,8 @@ public class FluidNexusHelp extends Activity {
         Button conceptButton = (Button) findViewById(R.id.help_concept_button);
         Button helpButton = (Button) findViewById(R.id.help_help_button);
         tv = (TextView) findViewById(R.id.help_text);
-        
+        ScrollView sv = (ScrollView) findViewById(R.id.help_scroll_view);
+
         okButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 Bundle bundle = new Bundle();

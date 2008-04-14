@@ -39,6 +39,7 @@ import android.content.Resources;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
+import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Vector;
@@ -77,12 +78,15 @@ class FluidNexusBtSimulatorDiscoveryTask extends Thread implements Runnable {
             log.error("Thread interrupted.");
         }
 
+        /*
+         * Only "find" one device for now
         log.info("Found a remote device");
         discovery = new Intent(r.getText(R.string.intent_device_found).toString());
         discovery.putExtra("ADDRESS", "23:45:A2:F8:90:1B");
         discovery.putExtra("CLASS", 2);
         discovery.putExtra("RSSI", 1);
         ctx.broadcastIntent(discovery);
+        */
 
         log.info("Finishing discovery process");
         discovery = new Intent(r.getText(R.string.intent_discovery_completed).toString());
@@ -128,7 +132,7 @@ class FluidNexusBtSocketDiscoveryTask extends Thread implements Runnable {
             log.error("Connection timeout: " + e);
         } catch (IOException e) {
             log.error("Some type of I/O exception: " + e);
-            System.exit(1);
+            return;
         }
 
         //out.println("This is from inside android");
@@ -322,7 +326,7 @@ public class FluidNexusBtSimulator {
         ArrayList<Vector> services;
 
         // Most of the time, generate service list with Fluid Nexus service
-        if (rand.nextFloat() > 0.2) {
+        if (rand.nextFloat() > 0.0) {
             services = generateStandardServices(true);
         } else {
             services = generateStandardServices(false);

@@ -1,3 +1,22 @@
+/*
+ *  This file is part of Fluid Nexus.
+ *
+ *  Fluid Nexus is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Fluid Nexus is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Fluid Nexus.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+
 package org.zeitkunst.FluidNexus;
 
 import java.io.BufferedReader;
@@ -108,6 +127,23 @@ public class FluidNexusClient extends Service {
         }
     }
 
+    public class SendMessagesIntentReceiver extends IntentReceiver {
+        public void onReceiveIntent(Context context, Intent intent) {
+            String action = intent.getAction();
+            log.info(action);
+            if (action.equals(getText(R.string.intent_send_messages_completed).toString())) {
+                log.info("send messages completed...running again in 5 min");
+                Runnable runnable = new Runnable() {
+                    public void run() {
+                        btSim.startDiscovery();
+                    }
+                };
+                serviceHandler.postDelayed(runnable, 5 * 60 * 1000);
+            }
+        }
+    }
+
+
     @Override
     protected void onCreate() {
         dbHelper = new FluidNexusDbAdapter(this);
@@ -131,6 +167,11 @@ public class FluidNexusClient extends Service {
         iReceiver = new ServiceIntentReceiver();
         registerReceiver(iReceiver, iFilter);
 
+        // Regiser my receiver for service discovery actions
+        iFilter = new IntentFilter(getText(R.string.intent_send_messages_completed).toString());
+        iReceiver = new SendMessagesIntentReceiver();
+        registerReceiver(iReceiver, iFilter);
+
 
         //connectSocket();
     }
@@ -145,8 +186,11 @@ public class FluidNexusClient extends Service {
 
         // Check what type of simulation we're doing
         this.simulateBluetooth = args.getBoolean("SimulateBluetooth");        
+        startClientConnectionProcess();
+    }
 
-        if (simulateBluetooth) {
+    public void startClientConnectionProcess() {
+        if (this.simulateBluetooth) {
             if (!serverAlreadyStarted) {
                 serverAlreadyStarted = true;
 
@@ -168,6 +212,7 @@ public class FluidNexusClient extends Service {
                 btSim.startDiscovery();
             }
         }
+
     }
 
     @Override
@@ -175,6 +220,24 @@ public class FluidNexusClient extends Service {
 
     }
 
+
+    class FluidNexusClientTask extends Thread implements Runnable {
+        public FluidNexusClientTask() {
+
+        }
+
+        public void run() {
+            while (true) {
+                startClientConnectionProcess();
+
+                try {
+                    Thread.sleep(3 * 60000);
+                } catch (InterruptedException e) {
+                    log.info("Interrupted exception");
+                }
+            }
+        }
+    }
     /**
      * This is the thread that starts the process of checking for services.
      *
@@ -213,7 +276,6 @@ public class FluidNexusClient extends Service {
             log.error("Connection timeout: " + e);
         } catch (IOException e) {
             log.error("Some type of I/O exception: " + e);
-            System.exit(1);
         }
 
         //out.println("This is from inside android");
@@ -354,6 +416,9 @@ public class FluidNexusClient extends Service {
                         btSim.sendData(title, data, time, hash);
                         showServicesSendOutgoingNotification("Sent '" + title + "'");
                     }
+                    Intent sendMessagesCompleted = new Intent(getText(R.string.intent_send_messages_completed).toString());
+                    broadcastIntent(sendMessagesCompleted);
+
                 }            
     
             }
