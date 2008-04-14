@@ -264,12 +264,6 @@ public class FluidNexusAndroid extends ListActivity {
         startSubActivity(intent, ACTIVITY_SETTINGS);
     }
 
-    private void viewOutgoingMessages() {
-        Intent intent = new Intent(this, FluidNexusViewOutgoing.class);
-        startSubActivity(intent, ACTIVITY_VIEW_OUTGOING);
-    }
-
-
     private void addOutgoingMessage() {
         Intent intent = new Intent(this, FluidNexusAddOutgoing.class);
         startSubActivity(intent, ACTIVITY_ADD_OUTGOING);
