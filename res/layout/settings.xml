@@ -9,7 +9,7 @@ xmlns:android="http://schemas.android.com/apk/res/android"
 android:id="@+id/show_messages_check"
 android:layout_width="wrap_content"
 android:layout_height="wrap_content"
-android:text="@string/show_messages_text"
+android:text="@string/show_messages_check"
 android:checked="true"
 android:layout_alignParentTop="true"
 android:layout_alignParentLeft="true"
@@ -33,4 +33,14 @@ android:layout_alignParentBottom="true"
 android:layout_toRight="@+id/settings_save_button"
 >
 </Button>
+<CheckBox
+android:id="@+id/simulate_bluetooth_check"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="@string/simulate_bluetooth_check"
+android:checked="true"
+android:layout_below="@+id/show_messages_check"
+android:layout_alignParentLeft="true"
+>
+</CheckBox>
 </RelativeLayout>

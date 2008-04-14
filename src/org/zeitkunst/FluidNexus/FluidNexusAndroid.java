@@ -1,8 +1,29 @@
+/*
+ *  This file is part of Fluid Nexus.
+ *
+ *  Fluid Nexus is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Fluid Nexus is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Fluid Nexus.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+
 package org.zeitkunst.FluidNexus;
 
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.IntentReceiver;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
@@ -26,10 +47,13 @@ public class FluidNexusAndroid extends ListActivity {
     private FluidNexusDbAdapter dbHelper;
     private Toast toast;
     
-    private FluidNexusBtSimulator btSim;
 
     private SharedPreferences prefs;
     private Editor prefsEditor;
+
+    // just for testing
+    private IntentReceiver iReceiver;
+    private IntentFilter iFilter;
 
     private static FluidNexusLogger log = FluidNexusLogger.getLogger("FluidNexus"); 
 
@@ -49,7 +73,18 @@ public class FluidNexusAndroid extends ListActivity {
     private static final int MENU_DELETE_ID = Menu.FIRST + 4;
     private static final int MENU_HELP_ID = Menu.FIRST + 5;
 
+    private boolean showMessages = true;
+
     private Cursor dbCursor;
+
+    private class NewMessageIntentReceiver extends IntentReceiver {
+        public void onReceiveIntent(Context context, Intent intent) {
+            String action = intent.getAction();
+            log.info(action);
+            log.info("received new message intent.");
+            fillListView(VIEW_MODE);
+        }
+    }
 
     /** Called when the activity is first created. */
     @Override
@@ -72,16 +107,41 @@ public class FluidNexusAndroid extends ListActivity {
         dbHelper.open();
         fillListView(VIEW_MODE);
         log.verbose("starting up...");
-       
-        btSim = new FluidNexusBtSimulator();
-        btSim.startDiscovery();
-
-        toast = Toast.makeText(this, "Starting Bluetooth simulator", Toast.LENGTH_LONG);
-        toast.show();
-
-        startService(new Intent(FluidNexusAndroid.this, FluidNexusClient.class), null);
+      
+        // Regiser my receiver to NEW_MESSAGE action
+        iFilter = new IntentFilter(getText(R.string.intent_new_message).toString());
+        iReceiver = new NewMessageIntentReceiver();
+        registerReceiver(iReceiver, iFilter);
 
         setupPreferences();
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        unregisterReceiver(iReceiver);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(iReceiver, iFilter);
+        startServices();
+    }
+
+    private void startServices() {
+        prefs = getSharedPreferences("FluidNexusPreferences", 0);
+        boolean simulateBluetooth = prefs.getBoolean("SimulateBluetooth", true);
+
+        // Start the client that receives data from other phones
+        Bundle args = new Bundle();
+        args.putBoolean("SimulateBluetooth", simulateBluetooth);
+
+        startService(new Intent(FluidNexusAndroid.this, FluidNexusClient.class), args);
+        startService(new Intent(FluidNexusAndroid.this, FluidNexusServer.class), args);
+
     }
 
     private void setupPreferences() {
@@ -93,19 +153,22 @@ public class FluidNexusAndroid extends ListActivity {
             prefsEditor.putBoolean("FirstRun", false);
 
             prefsEditor.putBoolean("ShowMessages", true);
+            prefsEditor.putBoolean("SimulateBluetooth", true);
             prefsEditor.commit();
         }
+        
+        this.showMessages = prefs.getBoolean("ShowMessages", true);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         Item menuItem;
         boolean result = super.onCreateOptionsMenu(menu);
-        menu.add(0, MENU_ADD_ID, R.string.menu_add_message, R.drawable.menu_add);
-        menu.add(0, MENU_ALL_ID, R.string.menu_view_all, R.drawable.menu_all);
-        menu.add(0, MENU_VIEW_ID, R.string.menu_view_outgoing, R.drawable.menu_view);
-        menu.add(0, MENU_DELETE_ID, R.string.menu_delete, R.drawable.menu_delete);
-        menu.add(0, MENU_SETTINGS_ID, R.string.menu_settings, R.drawable.menu_settings);
+        menu.add(0, MENU_ADD_ID, R.string.menu_add_message, R.drawable.menu_add).setAlphabeticShortcut('a');
+        menu.add(0, MENU_ALL_ID, R.string.menu_view_all, R.drawable.menu_all).setAlphabeticShortcut('v');
+        menu.add(0, MENU_VIEW_ID, R.string.menu_view_outgoing, R.drawable.menu_view).setAlphabeticShortcut('o');
+        menu.add(0, MENU_DELETE_ID, R.string.menu_delete, R.drawable.menu_delete).setAlphabeticShortcut('x');
+        menu.add(0, MENU_SETTINGS_ID, R.string.menu_settings, R.drawable.menu_settings).setAlphabeticShortcut('s');
         menu.add(0, MENU_HELP_ID, R.string.menu_help, R.drawable.menu_help).setAlphabeticShortcut('h');
         return result;
     }
@@ -178,11 +241,20 @@ public class FluidNexusAndroid extends ListActivity {
 
         switch(requestCode) {
             case(ACTIVITY_VIEW_MESSAGE):
+                fillListView(VIEW_MODE);
                 break;
             case(ACTIVITY_ADD_OUTGOING):
                 fillListView(VIEW_MODE);
                 break;
             case(ACTIVITY_SETTINGS):
+                if (!extras.isEmpty()) {
+                    boolean bluetoothChanged = extras.getBoolean("bluetoothChanged", false);
+                    if (bluetoothChanged) {
+                        toast = Toast.makeText(this, R.string.toast_bluetooth_settings_changed, Toast.LENGTH_LONG);
+                        toast.show();
+
+                    }
+                }
                 break;
         }
     }
@@ -209,9 +281,9 @@ public class FluidNexusAndroid extends ListActivity {
     }
 
     private void fillListView(int viewType) {
-        // TODO
-        // Get the CursorAdapter to work like it does on the Series 60, where we only show an excerpt of the message
-
+        if (!this.showMessages) {
+            return;
+        }
 
         if (viewType == 0) {
             dbCursor = dbHelper.all();

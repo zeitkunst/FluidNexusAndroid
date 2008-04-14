@@ -186,4 +186,32 @@ public class FluidNexusDbAdapter {
                 KEY_TIME + " DESC");
     }
 
+    /**
+     * Return an item based on a hash
+     */
+    public Cursor returnItemBasedOnHash(String hash) {
+        return db.query(DATABASE_TABLE, 
+                new String [] {KEY_ID, KEY_SOURCE, KEY_TIME, KEY_TYPE, KEY_TITLE, KEY_DATA, KEY_HASH, KEY_CELLID, KEY_MINE},
+                KEY_HASH + "='" + hash + "'",
+                null,
+                null,
+                null,
+                KEY_TIME + " DESC");
+    }
+
+
+    /**
+     * Return id and hash for messages
+     */
+    public Cursor services() {
+        return db.query(DATABASE_TABLE, 
+                new String [] {KEY_ID, KEY_HASH},
+                null,
+                null,
+                null,
+                null,
+                KEY_TIME + " DESC");
+    }
+
+
 }

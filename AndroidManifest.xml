@@ -13,5 +13,6 @@
         <activity android:name=".FluidNexusAddOutgoing"></activity>
         <activity android:name=".FluidNexusHelp"></activity>
         <service android:name=".FluidNexusClient" />
+        <service android:name=".FluidNexusServer" />
     </application>
 </manifest> 

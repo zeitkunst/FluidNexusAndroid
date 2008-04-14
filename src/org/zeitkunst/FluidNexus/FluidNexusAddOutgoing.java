@@ -14,6 +14,7 @@ public class FluidNexusAddOutgoing extends Activity {
     private EditText titleEditText;
     private EditText messageEditText;
     private FluidNexusDbAdapter dbHelper;  
+
     @Override
     protected void onCreate(Bundle icicle) {
 

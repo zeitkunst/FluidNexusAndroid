@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="show_messages_text">Show messages?</string>
+    <string name="show_messages_check">Show messages?</string>
+    <string name="simulate_bluetooth_check">Simulate Bluetooth?</string>
     <string name="view_message_title_string">Title:</string>
     <string name="view_message_data_string">Message:</string>
     <string name="language_text">Language:</string>
@@ -25,8 +26,23 @@
     <string name="discard_message_button">Discard</string>
     <string name="settings_save_button">Save</string>
     <string name="settings_cancel_button">Cancel</string>
-    <string name="ok_button">OK</string>
-    <string name="help_text">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Sed ullamcorper, ipsum vel accumsan consectetuer, nibh turpis aliquet mi, \n\n\n\n\nsed cursus est augue sit amet sapien. Nam porttitor sem vel purus. Nullam placerat, lectus non commodo vestibulum, diam mi semper diam, sed hendrerit magna leo quis magna. Aenean metus velit, dignissim sit amet, porttitor vitae, tincidunt at, odio. Nam eros mi, gravida ut, vestibulum id, tempor nec, arcu. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Morbi tincidunt. Vestibulum mollis dignissim mi. Donec id purus quis magna pulvinar tempus. Integer non lorem. Nullam luctus euismod odio. Donec porttitor, sem sit amet pulvinar mollis, enim dolor auctor nulla, eu dignissim sapien sapien nec libero. Nulla venenatis nisl ac nunc. Nulla volutpat molestie turpis. Vestibulum leo odio, gravida sed, tincidunt ac, pulvinar ac, eros.
-    
-    </string>
+    <string name="button_help">Help</string>
+    <string name="button_concept">Concept</string>
+    <string name="button_return">Return</string>
+    <string name="notification">Fluid Nexus Notification</string>
+    <string name="notification_bluetooth">Fluid Nexus Bluetooth Notification</string>
+    <string name="notification_title_new_message">New Message</string>
+    <string name="notification_fluid_nexus_device_found">Fluid Nexus device found</string>
+    <string name="notification_fluid_nexus_discovery_complete">Device discovery complete</string>
+    <string name="notification_fluid_nexus_services_complete">Services discovery complete</string>
+    <string name="notification_fluid_nexus_send_outgoing_complete">Sending outgoing message</string>
+    <string name="toast_bluetooth_settings_changed">Bluetooth simulator       settings changed; please restart the emulator and Fluid Nexus.</string>
+    <string name="intent_new_message">org.zeitkunst.FluidNexus.NEW_MESSAGE</string>
+    <string name="intent_discovery_started">org.zeitkunst.FluidNexus.DISCOVERY_STARTED</string>
+    <string name="intent_device_found">org.zeitkunst.FluidNexus.REMOTE_DEVICE_FOUND</string>
+    <string name="intent_discovery_completed">org.zeitkunst.FluidNexus.DISCOVERY_COMPLETED</string>
+    <string name="intent_service_discovery_completed">org.zeitkunst.FluidNexus.SERVICE_DISCOVERY_COMPLETED</string>
+    <string name="help_help_text">This is some help text.    </string>
+    <string name="help_concept_text">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Sed ullamcorper, ipsum vel accumsan consectetuer, nibh turpis aliquet mi, \n\n\n\n\nsed cursus est augue sit amet sapien. Nam porttitor sem vel purus. Nullam placerat, lectus non commodo vestibulum, diam mi semper diam, sed hendrerit magna leo quis magna. Aenean metus velit, dignissim sit amet, porttitor vitae, tincidunt at, odio. Nam eros mi, gravida ut, vestibulum id, tempor nec, arcu. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Morbi tincidunt. Vestibulum mollis dignissim mi. Donec id purus quis magna pulvinar tempus. Integer non lorem. Nullam luctus euismod odio. Donec porttitor, sem sit amet pulvinar mollis, enim dolor auctor nulla, eu dignissim sapien sapien nec libero. Nulla venenatis nisl ac nunc. Nulla volutpat molestie turpis. Vestibulum leo odio, gravida sed, tincidunt ac, pulvinar ac, eros.</string>
+
 </resources>

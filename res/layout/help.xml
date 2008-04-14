@@ -68,7 +68,7 @@ xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:padding="5px"
-    android:text="@string/help_text"
+    android:text="@string/help_help_text"
     android:textSize="10sp"
     >
     </TextView>
@@ -82,12 +82,32 @@ android:layout_below="@id/help_text_layout"
 xmlns:android="http://schemas.android.com/apk/res/android"
 >
     <Button
-    android:id="@+id/help_ok_button"
+    android:id="@+id/help_help_button"
     android:layout_width="wrap_content"
     android:layout_height="36sp"
-    android:text="@string/ok_button"
+    android:text="@string/button_help"
     android:layout_alignParentBottom="true"
-    android:layout_alignParentRight="true"
+
+    >
+    </Button>
+
+    <Button
+    android:id="@+id/help_concept_button"
+    android:layout_width="wrap_content"
+    android:layout_height="36sp"
+    android:text="@string/button_concept"
+    android:layout_alignParentBottom="true"
+    android:layout_toRight="@id/help_help_button"
+    >
+    </Button>
+
+    <Button
+    android:id="@+id/help_return_button"
+    android:layout_width="wrap_content"
+    android:layout_height="36sp"
+    android:text="@string/button_return"
+    android:layout_toRight="@id/help_concept_button"
+    android:layout_alignParentBottom="true"
     >
     </Button>
 </RelativeLayout>

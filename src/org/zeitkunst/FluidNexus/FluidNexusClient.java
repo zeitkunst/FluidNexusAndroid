@@ -11,42 +11,184 @@ import java.net.ServerSocket;
 import java.net.SocketAddress;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Vector;
 
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.IntentReceiver;
+import android.database.Cursor;
 import android.os.Binder;
+import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.Parcel;
 import android.widget.Toast;
 
+
 public class FluidNexusClient extends Service {
+    private FluidNexusDbAdapter dbHelper;
+    private FluidNexusBtSimulator btSim;
+
     private Socket clientSocket;
     private ServerSocket serverSocket;
     PrintWriter out;
     BufferedReader in;
 
+    private Handler serviceHandler = new Handler();
+
+    private IntentReceiver iReceiver;
+    private IntentFilter iFilter;
+
+    Vector<String> addresses = new Vector<String>();
+    ArrayList<Vector> currentServiceList;
+    String currentAddress;
+
+    private boolean discoveryCompleted = false;
+    private boolean simulateBluetooth;
+    int id;
+    boolean serverAlreadyStarted = false;
+
     private NotificationManager nm;
     private static FluidNexusLogger log = FluidNexusLogger.getLogger("FluidNexusClient"); 
 
+    /**
+     * Dummy binder.
+     *
+     */
     public class FluidNexusClientBinder extends Binder {
         FluidNexusClient getService() {
             return FluidNexusClient.this;
         }
     }
 
+    /**
+     * This is the intent receiver for our simulated bluetooth events.
+     *
+     */
+    private class DeviceIntentReceiver extends IntentReceiver {
+        public void onReceiveIntent(Context context, Intent intent) {
+            String action = intent.getAction();
+            log.info(action);
+            if (action.equals(getText(R.string.intent_discovery_started).toString())) {
+                log.info("discovery started");
+            } else if (action.equals(getText(R.string.intent_device_found).toString())) {
+                Bundle extras = intent.getExtras();
+                String address = extras.getString("ADDRESS");
+                String classID = extras.getString("CLASS");
+                addresses.addElement(address);
+
+                log.info("device found");
+                log.info(address);
+            } else if (action.equals(getText(R.string.intent_discovery_completed).toString())) {
+                log.info("discovery complete");
+                showDiscoveryNotification("Found devices.");
+                discoveryCompleted = true;
+
+                checkServices();
+            }
+        }
+    }
+
+    /**
+     * This is our intent receiver for the service discovery events.
+     *
+     */
+    private class ServiceIntentReceiver extends IntentReceiver {
+        public void onReceiveIntent(Context context, Intent intent) {
+            String action = intent.getAction();
+            log.info(action);
+            if (action.equals(getText(R.string.intent_service_discovery_completed).toString())) {
+                log.info("service discovery completed");
+            }
+        }
+    }
+
     @Override
     protected void onCreate() {
+        dbHelper = new FluidNexusDbAdapter(this);
+        dbHelper.open();
+
         nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         log.info("starting fluid nexus client");
-        showNotification();
-        connectSocket();
+        //addNewMessageTest();
+        //sendIntentTest();
+
+        // Regiser my receiver to device discovery actions
+        iFilter = new IntentFilter(getText(R.string.intent_discovery_started).toString());
+        iFilter.addAction((getText(R.string.intent_device_found).toString()));
+        iFilter.addAction((getText(R.string.intent_discovery_completed).toString()));
+        iReceiver = new DeviceIntentReceiver();
+        registerReceiver(iReceiver, iFilter);
+
+
+        // Regiser my receiver for service discovery actions
+        iFilter = new IntentFilter(getText(R.string.intent_service_discovery_completed).toString());
+        iReceiver = new ServiceIntentReceiver();
+        registerReceiver(iReceiver, iFilter);
+
+
+        //connectSocket();
+    }
+
+    /**
+     * Start our tasks if they haven't been started already
+     *
+     */
+    @Override
+    protected void onStart(int id, Bundle args) {
+        this.id = id;
+
+        // Check what type of simulation we're doing
+        this.simulateBluetooth = args.getBoolean("SimulateBluetooth");        
+
+        if (simulateBluetooth) {
+            if (!serverAlreadyStarted) {
+                serverAlreadyStarted = true;
+
+                // HACK
+                // We should never have to pass the context this way, but in order
+                // to create a simulated bluetooth "service", we have to pass
+                // a context to allow our simulator to broadcast intents
+                btSim = new FluidNexusBtSimulator(true, (Context) this, getResources());
+                btSim.startDiscovery();
+            }
+        } else {
+            if (!serverAlreadyStarted) {
+                serverAlreadyStarted = true;
+                // HACK
+                // We should never have to pass the context this way, but in order
+                // to create a simulated bluetooth "service", we have to pass
+                // a context to allow our simulator to broadcast intents
+                btSim = new FluidNexusBtSimulator(false, (Context) this, getResources());
+                btSim.startDiscovery();
+            }
+        }
     }
 
     @Override
     protected void onDestroy() {
 
+    }
+
+    /**
+     * This is the thread that starts the process of checking for services.
+     *
+     */
+    private void checkServices() {
+        FluidNexusServiceCheckTask task = new FluidNexusServiceCheckTask(addresses, btSim, dbHelper);
+        Thread thr = new Thread(task);
+        thr.start();
+    }
+
+    public void sendIntentTest() {
+        Intent newMessage = new Intent(getText(R.string.intent_new_message).toString());
+
+        broadcastIntent(newMessage);
     }
 
     public void connectSocket() {
@@ -90,22 +232,171 @@ public class FluidNexusClient extends Service {
 
     private final IBinder binder = new FluidNexusClientBinder();
 
-    private void showNotification() {
+    private void showDiscoveryNotification(String messageTitle) {
         Intent contentIntent = new Intent(this, FluidNexusAndroid.class);
         Intent appIntent = new Intent(this, FluidNexusAndroid.class);
 
-        CharSequence text = "this is a test.";
-
-        nm.notify(2341234,
+        nm.notify(R.string.notification_bluetooth,
                 new Notification(this,
-                    R.drawable.fluid_nexus_icon_status,
-                    text,
+                    R.drawable.menu_view_status,
+                    getText(R.string.notification_fluid_nexus_discovery_complete),
                     System.currentTimeMillis(),
-                    "This is a label",
-                    text,
+                    getText(R.string.notification_fluid_nexus_discovery_complete),
+                    messageTitle,
                     contentIntent,
-                    R.drawable.fluid_nexus_icon_status,
+                    R.drawable.fluid_nexus_icon,
                     "Fluid Nexus",
                     appIntent));
     }
+
+    private void showServicesNotification(String messageTitle) {
+        Intent contentIntent = new Intent(this, FluidNexusAndroid.class);
+        Intent appIntent = new Intent(this, FluidNexusAndroid.class);
+        
+        nm.cancel(R.string.notification_bluetooth);
+        nm.notify(R.string.notification_bluetooth,
+                new Notification(this,
+                    R.drawable.menu_view_status,
+                    getText(R.string.notification_fluid_nexus_services_complete),
+                    System.currentTimeMillis(),
+                    getText(R.string.notification_fluid_nexus_services_complete),
+                    messageTitle,
+                    contentIntent,
+                    R.drawable.fluid_nexus_icon,
+                    "Fluid Nexus",
+                    appIntent));
+    }
+
+    private void showServicesSendOutgoingNotification(String messageTitle) {
+        Intent contentIntent = new Intent(this, FluidNexusAndroid.class);
+        Intent appIntent = new Intent(this, FluidNexusAndroid.class);
+
+        nm.cancel(R.string.notification_bluetooth);
+        nm.notify(R.string.notification_bluetooth,
+                new Notification(this,
+                    R.drawable.menu_view_status,
+                    getText(R.string.notification_fluid_nexus_send_outgoing_complete),
+                    System.currentTimeMillis(),
+                    getText(R.string.notification_fluid_nexus_send_outgoing_complete),
+                    messageTitle,
+                    contentIntent,
+                    R.drawable.fluid_nexus_icon,
+                    "Fluid Nexus",
+                    appIntent));
+    }
+
+
+    class FluidNexusServiceCheckTask extends Thread implements Runnable {
+        private FluidNexusLogger log = FluidNexusLogger.getLogger("FluidNexus"); 
+        Vector<String> addresses;
+        String currentAddress;
+        ArrayList<Vector> currentServiceList;
+        FluidNexusBtSimulator btSim;
+        FluidNexusDbAdapter dbHelper;
+    
+        public FluidNexusServiceCheckTask(Vector<String> addresses, FluidNexusBtSimulator btSim, FluidNexusDbAdapter dbHelper) {
+            this.addresses = addresses;
+            this.btSim = btSim;
+            this.dbHelper = dbHelper;
+    
+        }
+    
+        public void run() {
+            // TODO
+            // Split this off into threads...
+            // BUT, perhaps we can't do this with real bluetooth devices
+            log.info("checking services");
+            for (int currentPhoneIndex = 0; currentPhoneIndex < this.addresses.size(); ++currentPhoneIndex) {
+                this.currentAddress = addresses.get(currentPhoneIndex);
+                log.info(this.currentAddress);
+                this.currentServiceList = this.btSim.getServices(this.currentAddress);
+    
+                boolean found = false;
+                for (int serviceIndex = 0; serviceIndex < this.currentServiceList.size(); ++serviceIndex) {
+                    Vector service = this.currentServiceList.get(serviceIndex);
+                    String currentService = (String) service.get(1);
+                    log.info(currentService);
+                    if (currentService.equals("FluidNexus")) {
+                        showServicesNotification("Found Fluid Nexus.");
+                        found = true;
+                        break;
+                    } else {
+                        continue;
+                    }
+    
+                }
+    
+                if (found) {
+                    Vector<String> serverMessageHashes = getServerMessageHashes(currentServiceList);
+                    Vector<String> ourMessageHashes = getOurMessageHashes();
+    
+                    for (int serverHashIndex = 0; serverHashIndex < serverMessageHashes.size(); ++serverHashIndex) {
+                        if (ourMessageHashes.contains(serverMessageHashes.get(serverHashIndex))) {
+                            ourMessageHashes.remove(serverMessageHashes.get(serverHashIndex));
+                        }
+                    }
+    
+                    for (int hashIndex = 0; hashIndex < ourMessageHashes.size(); ++hashIndex) {
+                        log.info("sending a hash");
+                        String hash = ourMessageHashes.get(hashIndex);
+                        Cursor result = dbHelper.returnItemBasedOnHash(hash);
+                        result.first();
+    
+                        int index = result.getColumnIndex(FluidNexusDbAdapter.KEY_TITLE);
+                        String title = result.getString(index);
+    
+                        index = result.getColumnIndex(FluidNexusDbAdapter.KEY_DATA);
+                        String data = result.getString(index);
+    
+                        index = result.getColumnIndex(FluidNexusDbAdapter.KEY_TIME);
+                        String time = result.getString(index);
+    
+                        btSim.sendData(title, data, time, hash);
+                        showServicesSendOutgoingNotification("Sent '" + title + "'");
+                    }
+                }            
+    
+            }
+    
+        }
+    
+        private Vector<String> getServerMessageHashes(ArrayList<Vector> services) {
+            Vector<String> serverMessageHashes = new Vector<String>();
+    
+            for (int serviceIndex = 0; serviceIndex < services.size(); ++serviceIndex) {
+                Vector service = services.get(serviceIndex);
+                String serviceName = (String) service.get(1);
+    
+                if (serviceName.charAt(0) == ':') {
+                    log.info(serviceName);
+                    serverMessageHashes.add(serviceName);
+                }
+            }
+    
+            return serverMessageHashes;
+        }
+    
+    
+        private Vector<String> getOurMessageHashes() {
+            Vector<String> ourMessageHashes = new Vector<String>();
+    
+            Cursor outgoing = dbHelper.outgoing();
+            
+            int index = outgoing.getColumnIndex(FluidNexusDbAdapter.KEY_HASH);
+            outgoing.first();
+            for (int i = 0; i < outgoing.count(); ++i) {
+                log.info(outgoing.getString(index));
+                ourMessageHashes.add(outgoing.getString(index));
+                
+                if (i == outgoing.count()) {
+                    break;
+                } else {
+                    outgoing.next();
+                }
+            }
+            return ourMessageHashes;
+        }
+    }
 }
+
+
