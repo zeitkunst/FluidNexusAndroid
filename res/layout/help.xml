@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+android:id="@+id/widget27"
+android:layout_width="fill_parent"
+android:layout_height="fill_parent"
+xmlns:android="http://schemas.android.com/apk/res/android"
+>
+    <RelativeLayout
+    android:id="@+id/top_relative_layout"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+    
+    <TextView
+    android:id="@+id/widget29"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Fluid Nexus"
+    android:textSize="24sp"
+    android:textStyle="bold"
+    android:layout_alignParentTop="true"
+    android:layout_alignParentRight="true"
+    >
+    </TextView>
+    <TextView
+    android:id="@+id/widget30"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:autoLink="web"
+    android:text="http://fluidnexus.net"
+    android:textSize="14sp"
+    android:textStyle="bold"
+    android:layout_below="@+id/widget29"
+    android:layout_alignParentRight="true"
+    >
+    </TextView>
+    <ImageView
+    android:id="@+id/help_icon"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:src="@drawable/fluid_nexus_help_icon"
+    android:adjustViewBounds="true"
+    android:maxHeight="75sp"
+    android:maxWidth="75sp"
+    android:layout_alignParentTop="true"
+    android:layout_alignParentLeft="true"
+    >
+    </ImageView>
+</RelativeLayout>
+<LinearLayout
+android:id="@+id/help_text_layout"
+android:layout_width="fill_parent"
+android:layout_height="150sp"
+android:layout_below="@id/top_relative_layout"
+android:layout_alignParentLeft="true"
+xmlns:android="http://schemas.android.com/apk/res/android"
+>
+    <ScrollView
+    android_layout_weight="1"
+    android:id="@+id/help_scroll_view"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_alignParentLeft="true"
+    android:scrollbars="vertical"
+    android:fadingEdgeLength="10sp"
+    android:focusType="weak"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:scrollbarDefaultDelayBeforeFade="5000"
+    android:padding="5px"
+    android:orientation="vertical"
+    >
+    <TextView
+    android_layout_weight="1"
+    android:id="@+id/help_text"
+    android:autoLink="web"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:padding="5px"
+    android:text="@string/help_help_text"
+    android:textSize="11sp"
+    android:scrollHorizontally="false"
+    >
+    </TextView>
+    </ScrollView>
+</LinearLayout>
+<RelativeLayout
+android:id="@+id/help_button_layout"
+android:layout_width="fill_parent"
+android:layout_height="wrap_content"
+android:layout_below="@id/help_text_layout"
+xmlns:android="http://schemas.android.com/apk/res/android"
+>
+    <Button
+    android:id="@+id/help_help_button"
+    android:layout_width="wrap_content"
+    android:layout_height="36sp"
+    android:text="@string/button_help"
+    android:layout_alignParentBottom="true"
+
+    >
+    </Button>
+
+    <Button
+    android:id="@+id/help_concept_button"
+    android:layout_width="wrap_content"
+    android:layout_height="36sp"
+    android:text="@string/button_concept"
+    android:layout_alignParentBottom="true"
+    android:layout_toRight="@id/help_help_button"
+    >
+    </Button>
+
+    <Button
+    android:id="@+id/help_return_button"
+    android:layout_width="wrap_content"
+    android:layout_height="36sp"
+    android:text="@string/button_return"
+    android:layout_toRight="@id/help_concept_button"
+    android:layout_alignParentBottom="true"
+    >
+    </Button>
+</RelativeLayout>
+</RelativeLayout>

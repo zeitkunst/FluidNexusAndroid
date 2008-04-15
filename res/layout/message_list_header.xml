@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+android:id="@+id/message_list_header_relative"
+android:layout_width="fill_parent"
+android:layout_height="fill_parent"
+android:paddingBottom="10px"
+xmlns:android="http://schemas.android.com/apk/res/android"
+>
+    <org.zeitkunst.FluidNexus.TransparentPanel
+    android:id="@+id/transparent_panel" 
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="5px"
+    android:paddingLeft="5px"
+    android:paddingBottom="5px"
+    android:paddingRight="5px">
+        <TextView
+        android:id="@+id/message_list_header_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ALL MESSAGES"
+        android:textStyle="bold"
+        android:layout_alignParentTop="true"
+        android:paddingTop="5px"
+        android:paddingLeft="5px"
+        android:paddingBottom="5px"
+        android:paddingRight="5px">
+
+        >
+    </TextView>
+    </org.zeitkunst.FluidNexus.TransparentPanel>
+</LinearLayout>
