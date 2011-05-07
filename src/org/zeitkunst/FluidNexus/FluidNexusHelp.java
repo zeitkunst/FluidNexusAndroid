@@ -50,7 +50,8 @@ public class FluidNexusHelp extends Activity {
         okButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 Bundle bundle = new Bundle();
-                setResult(RESULT_OK, null, bundle);
+                /*setResult(RESULT_OK, null, bundle);*/
+                setResult(RESULT_OK);
                 finish();
             }
         });

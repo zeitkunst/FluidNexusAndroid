@@ -99,8 +99,10 @@ xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="36sp"
     android:text="@string/button_concept"
     android:layout_alignParentBottom="true"
-    android:layout_toRight="@id/help_help_button"
     >
+    <!-- 
+    android:layout_toRight="@id/help_help_button"
+    -->
     </Button>
 
     <Button
@@ -108,9 +110,11 @@ xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="36sp"
     android:text="@string/button_return"
-    android:layout_toRight="@id/help_concept_button"
     android:layout_alignParentBottom="true"
     >
+    <!--
+    android:layout_toRight="@id/help_concept_button"
+    -->
     </Button>
 </RelativeLayout>
 </RelativeLayout>

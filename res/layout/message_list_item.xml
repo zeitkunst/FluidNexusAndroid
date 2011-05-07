@@ -28,8 +28,10 @@ android:layout_height="wrap_content"
 android:text="ListItem"
 android:textStyle="bold"
 android:layout_alignParentTop="true"
-android:layout_toRight="@+id/message_list_item_icon"
 >
+<!-- 
+android:layout_toRight="@+id/message_list_item_icon"
+-->
 </TextView>
 <TextView
 android:id="@+id/message_list_data"

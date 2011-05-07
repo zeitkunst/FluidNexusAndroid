@@ -65,13 +65,17 @@ xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_alignParentLeft="true"
     android:scrollbars="vertical"
     android:fadingEdgeLength="10sp"
-    android:focusType="weak"
     android:focusable="true"
     android:focusableInTouchMode="true"
-    android:scrollbarDefaultDelayBeforeFade="5000"
     android:padding="5px"
     android:orientation="vertical"
+
     >
+    <!-- 
+    android:scrollbarDefaultDelayBeforeFade="5000"
+
+    android:focusType="weak"
+    -->
     <TextView
     android_layout_weight="1"
     android:id="@+id/help_text"
@@ -109,16 +113,16 @@ xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="36sp"
     android:text="@string/button_concept"
     android:layout_alignParentBottom="true"
-    android:layout_toRight="@id/help_help_button"
     >
     </Button>
-
+    <!-- 
+    android:layout_toRight="@id/help_help_button"
+    android:layout_toRight="@id/help_concept_button" -->
     <Button
     android:id="@+id/help_return_button"
     android:layout_width="wrap_content"
     android:layout_height="36sp"
     android:text="@string/button_return"
-    android:layout_toRight="@id/help_concept_button"
     android:layout_alignParentBottom="true"
     >
     </Button>

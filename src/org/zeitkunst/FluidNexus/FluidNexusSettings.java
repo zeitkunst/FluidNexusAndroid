@@ -51,7 +51,8 @@ public class FluidNexusSettings extends Activity {
                 boolean bluetoothChanged = saveSettings();
                 Bundle bundle = new Bundle();
                 bundle.putBoolean("bluetoothChanged", bluetoothChanged);
-                setResult(RESULT_OK, null, bundle);
+                /*setResult(RESULT_OK, null, bundle);*/
+                setResult(RESULT_OK);
                 finish();
             }
         });
@@ -60,7 +61,8 @@ public class FluidNexusSettings extends Activity {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 Bundle bundle = new Bundle();
-                setResult(RESULT_OK, null, bundle);
+                /*setResult(RESULT_OK, null, bundle);*/
+                setResult(RESULT_OK);
                 finish();
             }
         });

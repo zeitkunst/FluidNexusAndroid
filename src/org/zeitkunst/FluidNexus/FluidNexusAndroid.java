@@ -23,7 +23,7 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.IntentReceiver;
+import android.content.BroadcastReceiver;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
@@ -32,7 +32,8 @@ import android.view.Menu;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.Menu.Item;
+/*import android.view.Menu.Item;*/
+import android.view.MenuItem;
 import android.widget.SimpleCursorAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -40,8 +41,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.util.Log;
 
+/*
 import org.bluez.Adapter;
 import org.bluez.Manager;
+*/
 
 public class FluidNexusAndroid extends ListActivity {
     private FluidNexusDbAdapter dbHelper;
@@ -52,7 +55,7 @@ public class FluidNexusAndroid extends ListActivity {
     private Editor prefsEditor;
 
     // just for testing
-    private IntentReceiver iReceiver;
+    private BroadcastReceiver iReceiver;
     private IntentFilter iFilter;
 
     private static FluidNexusLogger log = FluidNexusLogger.getLogger("FluidNexus"); 
@@ -77,8 +80,8 @@ public class FluidNexusAndroid extends ListActivity {
 
     private Cursor dbCursor;
 
-    private class NewMessageIntentReceiver extends IntentReceiver {
-        public void onReceiveIntent(Context context, Intent intent) {
+    private class NewMessageIntentReceiver extends BroadcastReceiver {
+        public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             log.info(action);
             log.info("received new message intent.");
@@ -91,6 +94,7 @@ public class FluidNexusAndroid extends ListActivity {
     public void onCreate(Bundle icicle)
     {
         super.onCreate(icicle);
+        log.verbose("unfreezing...");
         // TODO
         // The following are supposed to make the window be somewhat blurry
         // but the compositing is bad, as it makes the background be simply
@@ -139,8 +143,10 @@ public class FluidNexusAndroid extends ListActivity {
         Bundle args = new Bundle();
         args.putBoolean("SimulateBluetooth", simulateBluetooth);
 
+        /*
         startService(new Intent(FluidNexusAndroid.this, FluidNexusClient.class), args);
         startService(new Intent(FluidNexusAndroid.this, FluidNexusServer.class), args);
+        */
 
     }
 
@@ -155,6 +161,7 @@ public class FluidNexusAndroid extends ListActivity {
             prefsEditor.putBoolean("ShowMessages", true);
             prefsEditor.putBoolean("SimulateBluetooth", true);
             prefsEditor.commit();
+            dbHelper.initialPopulate();
         }
         
         this.showMessages = prefs.getBoolean("ShowMessages", true);
@@ -162,7 +169,7 @@ public class FluidNexusAndroid extends ListActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Item menuItem;
+        MenuItem menuItem;
         boolean result = super.onCreateOptionsMenu(menu);
         menu.add(0, MENU_ADD_ID, R.string.menu_add_message, R.drawable.menu_add).setAlphabeticShortcut('a');
         menu.add(0, MENU_ALL_ID, R.string.menu_view_all, R.drawable.menu_all).setAlphabeticShortcut('v');
@@ -174,10 +181,10 @@ public class FluidNexusAndroid extends ListActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(Item item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         TextView tv;
 
-        switch (item.getId()) {
+        switch (item.getItemId()) {
             case MENU_ADD_ID:
                 addOutgoingMessage();
                 return true;
@@ -214,7 +221,8 @@ public class FluidNexusAndroid extends ListActivity {
                 return true;
             case MENU_HELP_ID:
                 Intent i = new Intent(this, FluidNexusHelp.class);
-                startSubActivity(i, ACTIVITY_HELP);
+                /*startSubActivity(i, ACTIVITY_HELP);*/
+                startActivityForResult(i, ACTIVITY_HELP);
                 return true;
         }
 
@@ -226,18 +234,18 @@ public class FluidNexusAndroid extends ListActivity {
         // We will need to be careful later here about the different uses of position and rowID
         super.onListItemClick(l, v, position, id);
         Cursor localCursor = dbCursor;
-        localCursor.moveTo(position);
+        localCursor.move(position);
 
         Intent i = new Intent(this, FluidNexusViewMessage.class);
         i.putExtra(FluidNexusDbAdapter.KEY_ID, id);
         i.putExtra(FluidNexusDbAdapter.KEY_TITLE, localCursor.getString(localCursor.getColumnIndex(FluidNexusDbAdapter.KEY_TITLE)));
         i.putExtra(FluidNexusDbAdapter.KEY_DATA, localCursor.getString(localCursor.getColumnIndex(FluidNexusDbAdapter.KEY_DATA)));
-        startSubActivity(i, ACTIVITY_VIEW_MESSAGE);
+        startActivityForResult(i, ACTIVITY_VIEW_MESSAGE);
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, String     data, Bundle extras) {
-        super.onActivityResult(requestCode, resultCode, data, extras);
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
         switch(requestCode) {
             case(ACTIVITY_VIEW_MESSAGE):
@@ -247,6 +255,7 @@ public class FluidNexusAndroid extends ListActivity {
                 fillListView(VIEW_MODE);
                 break;
             case(ACTIVITY_SETTINGS):
+                /*
                 if (!extras.isEmpty()) {
                     boolean bluetoothChanged = extras.getBoolean("bluetoothChanged", false);
                     if (bluetoothChanged) {
@@ -255,18 +264,19 @@ public class FluidNexusAndroid extends ListActivity {
 
                     }
                 }
+                */
                 break;
         }
     }
 
     private void editSettings() {
         Intent intent = new Intent(this, FluidNexusSettings.class);
-        startSubActivity(intent, ACTIVITY_SETTINGS);
+        startActivityForResult(intent, ACTIVITY_SETTINGS);
     }
 
     private void addOutgoingMessage() {
         Intent intent = new Intent(this, FluidNexusAddOutgoing.class);
-        startSubActivity(intent, ACTIVITY_ADD_OUTGOING);
+        startActivityForResult(intent, ACTIVITY_ADD_OUTGOING);
     }
 
 
