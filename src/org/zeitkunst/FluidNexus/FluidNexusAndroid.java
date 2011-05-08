@@ -32,7 +32,6 @@ import android.view.Menu;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-/*import android.view.Menu.Item;*/
 import android.view.MenuItem;
 import android.widget.SimpleCursorAdapter;
 import android.widget.ImageView;
@@ -40,11 +39,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.util.Log;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 
-/*
-import org.bluez.Adapter;
-import org.bluez.Manager;
-*/
 
 public class FluidNexusAndroid extends ListActivity {
     private FluidNexusDbAdapter dbHelper;
@@ -66,6 +63,7 @@ public class FluidNexusAndroid extends ListActivity {
     private static final int ACTIVITY_SETTINGS = 3;
     private static final int ACTIVITY_VIEW_MESSAGE = 4;
     private static final int ACTIVITY_HELP = 5;
+    private static final int REQUEST_ENABLE_BT = 6;
 
     private static int VIEW_MODE = 0;
 
@@ -79,6 +77,8 @@ public class FluidNexusAndroid extends ListActivity {
     private boolean showMessages = true;
 
     private Cursor dbCursor;
+
+    private BluetoothAdapter bluetoothAdapter = null;
 
     private class NewMessageIntentReceiver extends BroadcastReceiver {
         public void onReceive(Context context, Intent intent) {
@@ -117,8 +117,30 @@ public class FluidNexusAndroid extends ListActivity {
         iReceiver = new NewMessageIntentReceiver();
         registerReceiver(iReceiver, iFilter);
 
+        // setup bluetooth adapter
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        // if it's not available, let user know
+        if (bluetoothAdapter == null) {
+            Toast.makeText(this, "Bluetooth is not available, sorry", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
+
         setupPreferences();
 
+    }
+
+    @Override 
+    public void onStart() {
+        super.onStart();
+        log.info("In onStart");
+        if (!bluetoothAdapter.isEnabled()) {
+            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+        } else {
+            // we should start the services here
+        }
     }
 
     @Override
@@ -255,6 +277,8 @@ public class FluidNexusAndroid extends ListActivity {
                 break;
             case(ACTIVITY_SETTINGS):
                 /*
+                 * TODO
+                 * figure out why I don't get extras anymore...
                 if (!extras.isEmpty()) {
                     boolean bluetoothChanged = extras.getBoolean("bluetoothChanged", false);
                     if (bluetoothChanged) {
@@ -265,6 +289,14 @@ public class FluidNexusAndroid extends ListActivity {
                 }
                 */
                 break;
+            case(REQUEST_ENABLE_BT):
+                if (resultCode == ListActivity.RESULT_OK) {
+                    // setup services here
+                } else {
+                    log.warn("Bluetooth not enabled");
+                    Toast.makeText(this, "Bluetooth was not enabled, leaving", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
         }
     }
 
