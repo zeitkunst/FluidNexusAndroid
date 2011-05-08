@@ -30,9 +30,9 @@ android:layout_width="wrap_content"
 android:layout_height="36sp"
 android:text="@string/settings_cancel_button"
 android:layout_alignParentBottom="true"
+android:layout_toRightOf="@id/settings_save_button"
 >
 <!-- 
-android:layout_toRight="@id/settings_save_button"
 -->
 </Button>
 <CheckBox

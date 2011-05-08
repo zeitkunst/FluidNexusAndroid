@@ -48,6 +48,9 @@ xmlns:android="http://schemas.android.com/apk/res/android"
     >
     </ImageView>
 </RelativeLayout>
+<!-- TODO
+     figure out how to make text box not cover up the buttons
+-->
 <LinearLayout
 android:id="@+id/help_text_layout"
 android:layout_width="fill_parent"
@@ -113,18 +116,19 @@ xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="36sp"
     android:text="@string/button_concept"
     android:layout_alignParentBottom="true"
+    android:layout_toRightOf="@id/help_help_button" 
     >
     </Button>
-    <!-- 
-    android:layout_toRight="@id/help_help_button"
-    android:layout_toRight="@id/help_concept_button" -->
     <Button
     android:id="@+id/help_return_button"
     android:layout_width="wrap_content"
     android:layout_height="36sp"
     android:text="@string/button_return"
     android:layout_alignParentBottom="true"
+    android:layout_alignParentRight="true"
     >
+    <!--
+    -->
     </Button>
 </RelativeLayout>
 </RelativeLayout>

@@ -169,15 +169,13 @@ public class FluidNexusAndroid extends ListActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuItem menuItem;
-        boolean result = super.onCreateOptionsMenu(menu);
-        menu.add(0, MENU_ADD_ID, R.string.menu_add_message, R.drawable.menu_add).setAlphabeticShortcut('a');
-        menu.add(0, MENU_ALL_ID, R.string.menu_view_all, R.drawable.menu_all).setAlphabeticShortcut('v');
-        menu.add(0, MENU_VIEW_ID, R.string.menu_view_outgoing, R.drawable.menu_view).setAlphabeticShortcut('o');
-        menu.add(0, MENU_DELETE_ID, R.string.menu_delete, R.drawable.menu_delete).setAlphabeticShortcut('x');
-        menu.add(0, MENU_SETTINGS_ID, R.string.menu_settings, R.drawable.menu_settings).setAlphabeticShortcut('s');
-        menu.add(0, MENU_HELP_ID, R.string.menu_help, R.drawable.menu_help).setAlphabeticShortcut('h');
-        return result;
+        menu.add(0, MENU_ADD_ID, menu.NONE, R.string.menu_add_message).setIcon(R.drawable.menu_add).setAlphabeticShortcut('a');
+        menu.add(0, MENU_ALL_ID, menu.NONE, R.string.menu_view_all).setIcon(R.drawable.menu_all).setAlphabeticShortcut('v');
+        menu.add(0, MENU_VIEW_ID, menu.NONE, R.string.menu_view_outgoing).setIcon(R.drawable.menu_view).setAlphabeticShortcut('o');
+        menu.add(0, MENU_DELETE_ID, menu.NONE, R.string.menu_delete).setIcon(R.drawable.menu_delete).setAlphabeticShortcut('x');
+        menu.add(0, MENU_SETTINGS_ID, menu.NONE, R.string.menu_settings).setIcon(R.drawable.menu_settings).setAlphabeticShortcut('s');
+        menu.add(0, MENU_HELP_ID, menu.NONE, R.string.menu_help).setIcon(R.drawable.menu_help).setAlphabeticShortcut('h');
+        return true;
     }
 
     @Override
@@ -233,11 +231,12 @@ public class FluidNexusAndroid extends ListActivity {
     protected void onListItemClick(ListView l, View v, int position, long id) {
         // We will need to be careful later here about the different uses of position and rowID
         super.onListItemClick(l, v, position, id);
+        log.info("At position: " + position);
         Cursor localCursor = dbCursor;
-        localCursor.move(position);
+        localCursor.moveToPosition(position);
 
         Intent i = new Intent(this, FluidNexusViewMessage.class);
-        i.putExtra(FluidNexusDbAdapter.KEY_ID, id);
+        i.putExtra(FluidNexusDbAdapter.KEY_ID, localCursor.getInt(localCursor.getColumnIndex(FluidNexusDbAdapter.KEY_ID)));
         i.putExtra(FluidNexusDbAdapter.KEY_TITLE, localCursor.getString(localCursor.getColumnIndex(FluidNexusDbAdapter.KEY_TITLE)));
         i.putExtra(FluidNexusDbAdapter.KEY_DATA, localCursor.getString(localCursor.getColumnIndex(FluidNexusDbAdapter.KEY_DATA)));
         startActivityForResult(i, ACTIVITY_VIEW_MESSAGE);

@@ -46,10 +46,8 @@ android:layout_width="wrap_content"
 android:layout_height="36sp"
 android:text="@string/discard_message_button"
 android:layout_alignParentBottom="true"
+android:layout_toRightOf="@+id/save_message_button"
 >
-<!-- 
-android:layout_toRight="@+id/save_message_button"
--->
 </Button>
 <EditText
 android:id="@+id/message_edit"
