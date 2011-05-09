@@ -38,12 +38,12 @@
     <string name="notification_fluid_nexus_send_outgoing_complete">Sending outgoing message</string>
     <string name="toast_bluetooth_settings_changed">Bluetooth simulator       settings changed; please restart the emulator and Fluid Nexus.  If using the bridge, be sure it is running before you start Fluid Nexus in the emulator.</string>
     <string name="toast_bluetooth_server_simulator_complete">This is the end of the Bluetooth server (receive) simulator.  If you want to see the messages being added again, please restart the emulator.</string>
-    <string name="intent_new_message">org.zeitkunst.FluidNexus.NEW_MESSAGE</string>
-    <string name="intent_discovery_started">org.zeitkunst.FluidNexus.DISCOVERY_STARTED</string>
-    <string name="intent_device_found">org.zeitkunst.FluidNexus.REMOTE_DEVICE_FOUND</string>
-    <string name="intent_discovery_completed">org.zeitkunst.FluidNexus.DISCOVERY_COMPLETED</string>
-    <string name="intent_service_discovery_completed">org.zeitkunst.FluidNexus.SERVICE_DISCOVERY_COMPLETED</string>
-    <string name="intent_send_messages_completed">org.zeitkunst.FluidNexus.SEND_MESSAGES_COMPLETED</string>
+    <string name="intent_new_message">net.fluidnexus.FluidNexus.NEW_MESSAGE</string>
+    <string name="intent_discovery_started">net.fluidnexus.FluidNexus.DISCOVERY_STARTED</string>
+    <string name="intent_device_found">net.fluidnexus.FluidNexus.REMOTE_DEVICE_FOUND</string>
+    <string name="intent_discovery_completed">net.fluidnexus.FluidNexus.DISCOVERY_COMPLETED</string>
+    <string name="intent_service_discovery_completed">net.fluidnexus.FluidNexus.SERVICE_DISCOVERY_COMPLETED</string>
+    <string name="intent_send_messages_completed">net.fluidnexus.FluidNexus.SEND_MESSAGES_COMPLETED</string>
     <string name="help_help_text">Fluid Nexus unfortunately only works in simulated mode right now, since the m5 version of the emulator does not support Bluetooth natively.  Read on for more details about the different types of Bluetooth simulation.\n
 \n
 HELP\n

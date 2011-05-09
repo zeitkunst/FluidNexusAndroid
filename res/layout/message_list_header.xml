@@ -6,7 +6,7 @@ android:layout_height="fill_parent"
 android:paddingBottom="10px"
 xmlns:android="http://schemas.android.com/apk/res/android"
 >
-    <org.zeitkunst.FluidNexus.TransparentPanel
+    <net.fluidnexus.FluidNexus.TransparentPanel
     android:id="@+id/transparent_panel" 
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
@@ -28,5 +28,5 @@ xmlns:android="http://schemas.android.com/apk/res/android"
 
         >
     </TextView>
-    </org.zeitkunst.FluidNexus.TransparentPanel>
+    </net.fluidnexus.FluidNexus.TransparentPanel>
 </LinearLayout>
