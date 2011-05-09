@@ -54,6 +54,7 @@ public class FluidNexusAndroid extends ListActivity {
     // just for testing
     private BroadcastReceiver iReceiver;
     private IntentFilter iFilter;
+    private IntentFilter btFoundFilter;
 
     private static FluidNexusLogger log = FluidNexusLogger.getLogger("FluidNexus"); 
 
@@ -89,6 +90,19 @@ public class FluidNexusAndroid extends ListActivity {
         }
     }
 
+    private final BroadcastReceiver btDiscoveryReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                // get bluetoothdevice object from intent
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                // Print this info to the log, for now
+                log.info(device.getName() + " " + device.getAddress());
+            }
+        }
+    };
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle icicle)
@@ -117,14 +131,18 @@ public class FluidNexusAndroid extends ListActivity {
         iReceiver = new NewMessageIntentReceiver();
         registerReceiver(iReceiver, iFilter);
 
+        // Register receiver for bluetooth device found
+        btFoundFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        registerReceiver(btDiscoveryReceiver, btFoundFilter);
+
         // setup bluetooth adapter
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         // if it's not available, let user know
         if (bluetoothAdapter == null) {
-            Toast.makeText(this, "Bluetooth is not available, sorry", Toast.LENGTH_LONG).show();
-            finish();
-            return;
+            Toast.makeText(this, "Bluetooth is not available; sending and receiving messages will not be possible", Toast.LENGTH_LONG).show();
+        } {
+            bluetoothAdapter.startDiscovery();
         }
 
         setupPreferences();
@@ -135,11 +153,13 @@ public class FluidNexusAndroid extends ListActivity {
     public void onStart() {
         super.onStart();
         log.info("In onStart");
-        if (!bluetoothAdapter.isEnabled()) {
-            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
-        } else {
-            // we should start the services here
+        if (bluetoothAdapter != null) {
+            if (!bluetoothAdapter.isEnabled()) {
+                Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+            } else {
+                // we should start the services here
+            }
         }
     }
 
@@ -148,13 +168,22 @@ public class FluidNexusAndroid extends ListActivity {
         super.onPause();
 
         unregisterReceiver(iReceiver);
+        unregisterReceiver(btDiscoveryReceiver);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         registerReceiver(iReceiver, iFilter);
+        registerReceiver(btDiscoveryReceiver, btFoundFilter);
         startServices();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(iReceiver);
+        unregisterReceiver(btDiscoveryReceiver);
     }
 
     private void startServices() {
