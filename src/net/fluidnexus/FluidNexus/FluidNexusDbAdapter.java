@@ -16,7 +16,7 @@
  *
  */
 
-package org.zeitkunst.FluidNexus;
+package net.fluidnexus.FluidNexus;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;

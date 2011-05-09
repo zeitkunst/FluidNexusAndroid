@@ -3,7 +3,7 @@
  * http://groups.google.com/group/android-developers/tree/browse_frm/thread/fd7cb81eb02af048/4e81db23deb7391d?rnum=1&_done=%2Fgroup%2Fandroid-developers%2Fbrowse_frm%2Fthread%2Ffd7cb81eb02af048%2F%3F#doc_4e81db23deb7391d
  */
 
-package org.zeitkunst.FluidNexus;
+package net.fluidnexus.FluidNexus;
 
 import android.util.Log;
 

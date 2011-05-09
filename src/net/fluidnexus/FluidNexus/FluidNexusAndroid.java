@@ -17,7 +17,7 @@
  */
 
 
-package org.zeitkunst.FluidNexus;
+package net.fluidnexus.FluidNexus;
 
 import android.app.ListActivity;
 import android.content.Context;
