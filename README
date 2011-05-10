@@ -5,6 +5,15 @@ http://fluidnexus.net
 
 version 0.01
 
+THIS VERSION IS INCOMPLETE AND IS PRIMARILY A USER-INTERFACE TESTING GROUND.
+
 Conceptual information: http://fluidnexus.net/media/pdf/FluidNexusAndroid.pdf
 
 Fluid Nexus is an application for mobile phones that is primarily designed to enable activists or relief workers to send messages and data amongst themselves independent of a centralized cellular network.  The idea is to provide a means of communication between people when the centralized network has been shut down, either by the government during a time of unrest, or by nature due to a massive disaster.  During such times the use of the centralized network for voice or SMS is not possible.  Yet, if we can use the fact that people still must move about the world, then we can use ideas from sneaker-nets to turn people into carriers of data.  Given enough people, we can create fluid, temporary, ad-hoc networks that pass messages one person at a time, spreading out as a contagion and eventually reaching members of the group.  This enables surreptitious communication via daily activity and relies on a fluid view of reality.  Additionally, Fluid Nexus can be used as a hyperlocal message board, loosely attached to physical locations.
+
+TODO
+
+* Implement Bluetooth client functionality (searching for other devices, including laptops and Nokia phones that run Fluid Nexus)
+* Implement zeroconf server and client functionality
+* Implement SQLCipher database encryption
+* Implement wifi ad-hoc networking
