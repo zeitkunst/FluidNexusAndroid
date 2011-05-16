@@ -175,7 +175,7 @@ public class FluidNexusBluetoothService {
     }
 
     /**
-     * Get a list of services, in UUID form, for a given device
+     * Get a list of services, in UUID form, for a given device; taken from http://wiresareobsolete.com/wordpress/2010/11/android-bluetooth-rfcomm/
      */
     public ParcelUuid[] servicesFromDevice(BluetoothDevice device) {
         try {
@@ -193,7 +193,7 @@ public class FluidNexusBluetoothService {
     }
 
     /**
-     * Get a list of services, in UUID form, for a given device
+     * Get a list of services, in UUID form, for a given device; taken from http://wiresareobsolete.com/wordpress/2010/11/android-bluetooth-rfcomm/
      */
     public void servicesFromDeviceAsync(BluetoothDevice device) {
         try {
