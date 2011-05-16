@@ -28,6 +28,8 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
@@ -47,14 +49,12 @@ public class FluidNexusAndroid extends ListActivity {
     private FluidNexusDbAdapter dbHelper;
     private Toast toast;
     
-
     private SharedPreferences prefs;
     private Editor prefsEditor;
 
     // just for testing
     private BroadcastReceiver iReceiver;
     private IntentFilter iFilter;
-    private IntentFilter btFoundFilter;
 
     private static FluidNexusLogger log = FluidNexusLogger.getLogger("FluidNexus"); 
 
@@ -75,11 +75,16 @@ public class FluidNexusAndroid extends ListActivity {
     private static final int MENU_DELETE_ID = Menu.FIRST + 4;
     private static final int MENU_HELP_ID = Menu.FIRST + 5;
 
+    // messages from bluetooth service
+    public static final int MESSAGE_BT_STATE_CHANGED = 1;
+
     private boolean showMessages = true;
 
     private Cursor dbCursor;
 
     private BluetoothAdapter bluetoothAdapter = null;
+
+    private FluidNexusBluetoothService bluetoothService = null;
 
     private class NewMessageIntentReceiver extends BroadcastReceiver {
         public void onReceive(Context context, Intent intent) {
@@ -89,19 +94,6 @@ public class FluidNexusAndroid extends ListActivity {
             fillListView(VIEW_MODE);
         }
     }
-
-    private final BroadcastReceiver btDiscoveryReceiver = new BroadcastReceiver() {
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-
-            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                // get bluetoothdevice object from intent
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                // Print this info to the log, for now
-                log.info(device.getName() + " " + device.getAddress());
-            }
-        }
-    };
 
     /** Called when the activity is first created. */
     @Override
@@ -131,18 +123,12 @@ public class FluidNexusAndroid extends ListActivity {
         iReceiver = new NewMessageIntentReceiver();
         registerReceiver(iReceiver, iFilter);
 
-        // Register receiver for bluetooth device found
-        btFoundFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        registerReceiver(btDiscoveryReceiver, btFoundFilter);
-
         // setup bluetooth adapter
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         // if it's not available, let user know
         if (bluetoothAdapter == null) {
             Toast.makeText(this, "Bluetooth is not available; sending and receiving messages will not be possible", Toast.LENGTH_LONG).show();
-        } {
-            bluetoothAdapter.startDiscovery();
         }
 
         setupPreferences();
@@ -157,8 +143,12 @@ public class FluidNexusAndroid extends ListActivity {
             if (!bluetoothAdapter.isEnabled()) {
                 Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+                toast = Toast.makeText(this, "Restart application to use bluetooth.", Toast.LENGTH_LONG);
+                toast.show();
             } else {
-                // we should start the services here
+                if (bluetoothService == null) {
+                    setupFluidNexusBluetoothService();
+                }
             }
         }
     }
@@ -168,23 +158,40 @@ public class FluidNexusAndroid extends ListActivity {
         super.onPause();
 
         unregisterReceiver(iReceiver);
-        unregisterReceiver(btDiscoveryReceiver);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         registerReceiver(iReceiver, iFilter);
-        registerReceiver(btDiscoveryReceiver, btFoundFilter);
-        startServices();
+
+        if (bluetoothService != null) {
+            bluetoothService.start();
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (bluetoothService != null) bluetoothService.stop();
         unregisterReceiver(iReceiver);
-        unregisterReceiver(btDiscoveryReceiver);
     }
+
+    private void setupFluidNexusBluetoothService() {
+        bluetoothService = new FluidNexusBluetoothService(this, bluetoothServiceHandler);
+        bluetoothService.start();
+    }
+
+    private final Handler bluetoothServiceHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            /*
+            switch (msg.what) {
+
+            }
+            */
+        }
+    };
 
     private void startServices() {
         prefs = getSharedPreferences("FluidNexusPreferences", 0);
