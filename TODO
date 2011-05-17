@@ -1,0 +1,10 @@
+== Bluetooth ==
+
+* Setup UUID for FluidNexus services, implement (somehow) in Lightblue so that we can see it in Android
+* Setup new version of FluidNexus protocol to allow for transmission of message hashes via sockets rather than in service list
+
+== Zeroconf ==
+
+* Write test case in Python and avahi, try out with laptops
+* Probably can use existing FluidNexus protocol via zeroconf sockets (but need to check on this)
+* Use existing Android libraries to implement on phone
