@@ -1,6 +1,6 @@
 == Bluetooth ==
 
-* Setup UUID for FluidNexus services, implement (somehow) in Lightblue so that we can see it in Android
+* Setup UUID for FluidNexus services, implement (somehow) in Lightblue so that we can see it in Android (Possibly bd547e68-952b-11e0-a6c7-0023148b3104)
 * Setup new version of FluidNexus protocol to allow for transmission of message hashes via sockets rather than in service list
 
 == Zeroconf ==

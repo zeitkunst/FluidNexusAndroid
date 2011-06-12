@@ -61,12 +61,21 @@ public class FluidNexusBluetoothService {
 
     private BluetoothServiceThread serviceThread = null;
 
+    // Threads
+    private ConnectThread connectThread;
+    private ConnectedThread connectedThread;
+
+    // UUID
+    private static final UUID FluidNexusUUID = UUID.fromString("bd547e68-952b-11e0-a6c7-0023148b3104");
+    
     private int state;
 
     public static final int STATE_NONE = 0;       // we're doing nothing
     public static final int STATE_DISCOVERY = 1; // we're discovering things
     public static final int STATE_DISCOVERY_FINISHED = 2; // we're done discovering things and can now move on
     public static final int STATE_SERVICES = 3; // we're discovering services
+    public static final int STATE_CONNECTING = 4; // we're connecting other devices
+    public static final int STATE_CONNECTED = 5; // we're connected and sending data
     public static final int STATE_QUIT = 100; // we're done with everything
 
     /**
@@ -175,6 +184,82 @@ public class FluidNexusBluetoothService {
     }
 
     /**
+     * Start a thread for connection to remove FluidNexus device
+     * @param device BluetoothDevice to connect to
+     * @param secure Socket security type
+     */
+    public synchronized void connect(BluetoothDevice device, boolean secure) {
+        log.debug("Connecting to: " + device);
+
+        // cancel any thread trying to connect
+        if (state == STATE_CONNECTING) {
+            if (connectThread != null) {
+                connectThread.cancel();
+                connectThread = null;
+            }
+        }
+
+        // cancel any thread sending data
+        // TODO do we want to do this?
+        if (connectedThread != null) {
+            connectedThread.cancel();
+            connectedThread = null;
+        }
+
+        // State the thread that connects to the remove device
+        connectThread = new ConnectThread(device, true);
+        connectThread.start();
+        setState(STATE_CONNECTING);
+    }
+
+    /**
+     * Start a thread for sending data to remote FluidNexus device
+     * @param socket BluetoothSocket on which the connection was made
+     * @param device BluetoothDevice that has been connected
+     * @param socketType type of socket being used
+     */
+    public synchronized void connected(BluetoothSocket socket, BluetoothDevice device, final String socketType) {
+        log.debug("Connected with socketype: " + socketType);
+
+        // Cancel thread that completed the connection
+        if (connectThread != null) {
+            connectThread.cancel();
+            connectThread = null;
+        }
+
+        // Cancel any thread currently running a connection
+        if (connectedThread != null) {
+            connectedThread.cancel();
+            connectedThread = null;
+        }
+
+        connectedThread = new ConnectedThread(socket, socketType);
+        connectedThread.start();
+
+        setState(STATE_CONNECTED);
+    }
+
+    /**
+     * Write to the connected thread in an unsynchronized manner
+     * @param out Bytes to write
+     * @see ConnectedThread#write(byte[])
+     */
+    public void write(byte[] out) {
+        // Create temporary thread object
+        ConnectedThread r;
+
+        // Synchronize a copy of this thread
+        synchronized (this) {
+            if (state != STATE_CONNECTED) return;
+
+            r = connectedThread;
+        }
+
+        // Perform write
+        r.write(out);
+    }
+
+    /**
      * Get a list of services, in UUID form, for a given device; taken from http://wiresareobsolete.com/wordpress/2010/11/android-bluetooth-rfcomm/
      */
     public ParcelUuid[] servicesFromDevice(BluetoothDevice device) {
@@ -246,16 +331,29 @@ public class FluidNexusBluetoothService {
                     continue;
                 }
 
-                // If the discovery is finished, then start the services discovery
+                // If the discovery is finished, start trying to connect to remote devices
                 if (state == STATE_DISCOVERY_FINISHED) {
-                    setState(STATE_SERVICES);
-                    doServiceDiscovery();
+                    for (Vector currentDevice : devices) {
+                        String name = (String) currentDevice.get(0);
+                        String address = (String) currentDevice.get(1);
+                        log.debug("Working on device " + name + " with address " + address);
+                        BluetoothDevice btDevice = bluetoothAdapter.getRemoteDevice(address);
+
+                        connect(btDevice, true);
+                    }
+
+                    // After this is all done, start the cycle again
+                    setState(STATE_NONE);
                 }
 
                 // If we're in services discovery, just continue
                 if (state == STATE_SERVICES) {
                     continue;
 
+                }
+
+                if (state == STATE_CONNECTING) {
+                    continue;
                 }
 
                 /*
@@ -350,6 +448,124 @@ public class FluidNexusBluetoothService {
          */
         public void cancel() {
 
+        }
+    }
+
+    /**
+     * This thread tries to connect to a remote device and send data
+     */
+    private class ConnectThread extends Thread {
+        private final BluetoothSocket socket;
+        private final BluetoothDevice device;
+        private String socketType;
+
+        public ConnectThread(BluetoothDevice remoteDevice, boolean secure) {
+            device = remoteDevice;
+            BluetoothSocket tmp = null;
+            socketType = secure ? "Secure" : "Insecure";
+
+            // get a socket for connection to the device
+            try {
+                if (secure) {
+                    tmp = device.createRfcommSocketToServiceRecord(FluidNexusUUID);
+                } else {
+                    //tmp = device.createInsecureRfcommSocketToServiceRecord(FluidNexusUUID);
+
+                }
+            } catch (IOException e) {
+                log.error("Socket Type: " + socketType + "create() failed: " + e);
+            }
+
+            socket = tmp;
+        }
+
+        public void run() {
+            log.info("Begin connect thread");
+            // TODO: cancel discovery
+            
+            try {
+                socket.connect();
+            } catch (IOException e) {
+                // Try to close the socket
+                try {
+                    socket.close();
+                } catch (IOException e2) {
+                    log.error("unable to close() socket during connection failure: " + e2);
+                }
+
+                // TODO: enable connectionFailed
+                return;
+            }
+
+            synchronized (FluidNexusBluetoothService.this) {
+                connectThread = null;
+            }
+
+            connected(socket, device, socketType);
+        }
+
+        public void cancel() {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                log.error("close() of connect socket failed: " + e);
+            }
+        }
+    }
+
+    /**
+     * Thread that actually sends data to a connected device
+     */
+    private class ConnectedThread extends Thread {
+        private final BluetoothSocket socket;
+        private final InputStream inputStream;
+        private final OutputStream outputStream;
+
+        public ConnectedThread(BluetoothSocket remoteSocket, String socketType) {
+            log.debug("Created ConnectedThread: " + socketType);
+            socket = remoteSocket;
+            InputStream tmpIn = null;
+            OutputStream tmpOut = null;
+
+            try {
+                tmpIn = socket.getInputStream();
+                tmpOut = socket.getOutputStream();
+            } catch (IOException e) {
+                log.error("Temp stream sockets no created");
+            }
+
+            inputStream = tmpIn;
+            outputStream = tmpOut;
+        }
+
+        public void run() {
+            log.info("Begin ConnectedThread");
+
+            // TODO
+            // Enable reading from the connected device
+            String message = "Hello from the phone!";
+            byte[] send = message.getBytes();
+            write(send);
+        }
+
+        /**
+         * Write to the connected device via an OutputStream
+         * @param buffer Bytes to write
+         */
+        public void write(byte[] buffer) {
+            try {
+                outputStream.write(buffer);
+            } catch (IOException e) {
+                log.error("Exception during writing to outputStream: " + e);
+            }
+        }
+
+        public void cancel() {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                log.error("close() of ConnectedThread socket failed: " + e);
+            }
         }
     }
 }
