@@ -84,8 +84,6 @@ public class FluidNexusAndroid extends ListActivity {
 
     private BluetoothAdapter bluetoothAdapter = null;
 
-    private FluidNexusBluetoothService bluetoothService = null;
-
     private class NewMessageIntentReceiver extends BroadcastReceiver {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -132,7 +130,9 @@ public class FluidNexusAndroid extends ListActivity {
         }
 
         setupPreferences();
-
+        
+        log.info("Starting bluetooth service");        
+        startService(new Intent(FluidNexusBluetoothService.class.getName()));
     }
 
     @Override 
@@ -146,9 +146,11 @@ public class FluidNexusAndroid extends ListActivity {
                 toast = Toast.makeText(this, "Restart application to use bluetooth.", Toast.LENGTH_LONG);
                 toast.show();
             } else {
+                /*
                 if (bluetoothService == null) {
                     setupFluidNexusBluetoothService();
                 }
+                */
             }
         }
     }
@@ -164,34 +166,14 @@ public class FluidNexusAndroid extends ListActivity {
     protected void onResume() {
         super.onResume();
         registerReceiver(iReceiver, iFilter);
-
-        if (bluetoothService != null) {
-            bluetoothService.start();
-        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (bluetoothService != null) bluetoothService.stop();
         unregisterReceiver(iReceiver);
     }
 
-    private void setupFluidNexusBluetoothService() {
-        bluetoothService = new FluidNexusBluetoothService(this, bluetoothServiceHandler);
-        bluetoothService.start();
-    }
-
-    private final Handler bluetoothServiceHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            /*
-            switch (msg.what) {
-
-            }
-            */
-        }
-    };
 
     private void startServices() {
         prefs = getSharedPreferences("FluidNexusPreferences", 0);

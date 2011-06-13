@@ -25,10 +25,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import android.app.NotificationManager;
+import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
@@ -37,22 +41,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.BroadcastReceiver;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.os.Parcelable;
 import android.os.ParcelUuid;
 import android.util.Log;
 import android.widget.Toast;
 
-public class FluidNexusBluetoothService {
+public class FluidNexusBluetoothService extends Service {
     private static final String TAG = "FluidNexusBluetoothService";
     private static final String SERVICE_NAME = "FluidNexus";
     private static FluidNexusLogger log = FluidNexusLogger.getLogger("FluidNexus"); 
 
-    private final BluetoothAdapter bluetoothAdapter;
-
-    private final Handler handler;
+    private BluetoothAdapter bluetoothAdapter;
 
     private ArrayList<Vector> devices = new ArrayList<Vector>();
     private Vector<String> device = new Vector<String>();
@@ -80,6 +84,14 @@ public class FluidNexusBluetoothService {
     public static final int STATE_CONNECTED = 5; // we're connected and sending data
     public static final int STATE_QUIT = 100; // we're done with everything
 
+    private NotificationManager nm;
+    private int NOTIFICATION = R.string.service_started;
+    
+    // Timers
+    // TODO
+    // implement timers :-)
+    private Timer timer;
+    
     /**
      * BroadcastReceiver for the bluetooth discovery responses
      */
@@ -115,32 +127,59 @@ public class FluidNexusBluetoothService {
             BluetoothDevice deviceExtra = intent.getParcelableExtra("android.bluetooth.device.extra.DEVICE");
             Parcelable[] uuidExtra = intent.getParcelableArrayExtra("android.bluetooth.device.extra.UUID");
             log.debug("doing service discovery...");
-            for (Parcelable uuid: uuidExtra) {
-                log.debug("Found: " + uuid.toString());
+
+            if (uuidExtra != null) {
+                for (Parcelable uuid: uuidExtra) {
+                    log.debug("Found: " + uuid.toString());
+                }
+
             }
         }
     };
 
-    /**
-     * Constructor for the bluetooth service
-     * @param context The originating activity context
-     * @param handler A handler for messages sent back to the original activity
-     */
-    public FluidNexusBluetoothService(Context context, Handler givenHandler) {
-        ctx = context;
+    public class FluidNexusBluetoothBinder extends Binder {
+        FluidNexusBluetoothService getService() {
+            return FluidNexusBluetoothService.this;
+        }
+    }
+
+    // This is the object that receives interactions from clients
+    private final IBinder binder = new FluidNexusBluetoothBinder();
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return binder;
+    }
+
+    @Override
+    public void onCreate() {
+        log.debug("Service creating...");
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         state = STATE_NONE;
-        handler = givenHandler;
 
         btFoundFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         btFoundFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
         btFoundFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        ctx.registerReceiver(btDiscoveryReceiver, btFoundFilter);
+        this.registerReceiver(btDiscoveryReceiver, btFoundFilter);
 
         String action = "android.bleutooth.device.action.UUID";
         IntentFilter sdpFilter = new IntentFilter(action);
-        ctx.registerReceiver(sdpReceiver, sdpFilter);
+        this.registerReceiver(sdpReceiver, sdpFilter);
 
+        if (serviceThread == null) {
+            serviceThread = new BluetoothServiceThread();
+            log.debug("Starting our bluetooth service thread...");
+            serviceThread.start();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        log.debug("Service destroying...");
+        if (serviceThread != null) {
+            serviceThread.cancel();
+        }
     }
 
     /**
@@ -150,7 +189,6 @@ public class FluidNexusBluetoothService {
     private synchronized void setState(int newState) {
         log.debug("Changing state from " + state + " to " + newState);
         state = newState;
-        handler.obtainMessage(FluidNexusAndroid.MESSAGE_BT_STATE_CHANGED, state, -1).sendToTarget();
     }
 
     /**
@@ -158,31 +196,6 @@ public class FluidNexusBluetoothService {
      */
     private synchronized int getState() {
         return state;
-    }
-
-    /**
-     * Start the bluetooth service that enters into the main loop
-     */
-    public synchronized void start() {
-        // for the moment, only go through a single pass
-
-
-        if (serviceThread == null) {
-            serviceThread = new BluetoothServiceThread();
-            log.debug("Starting our bluetooth service thread...");
-            serviceThread.start();
-        }
-    }
-
-    /**
-     * Stop everything
-     */
-    public synchronized void stop() {
-        log.debug("Stopping FluidNexus bluetooth service threads...");
-
-        if (serviceThread != null) {
-            serviceThread.cancel();
-        }
     }
 
     /**
@@ -263,6 +276,7 @@ public class FluidNexusBluetoothService {
 
     /**
      * Get a list of services, in UUID form, for a given device; taken from http://wiresareobsolete.com/wordpress/2010/11/android-bluetooth-rfcomm/
+     * @param device The BluetoothDevice we're inspecting
      */
     public ParcelUuid[] servicesFromDevice(BluetoothDevice device) {
         try {
@@ -533,7 +547,7 @@ public class FluidNexusBluetoothService {
                 tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
             } catch (IOException e) {
-                log.error("Temp stream sockets no created");
+                log.error("Temp stream sockets not created");
             }
 
             inputStream = tmpIn;
@@ -617,7 +631,6 @@ public class FluidNexusBluetoothService {
      */
     public static String makeMD5(String inputString) {
         try {
-            /*HexDump dump = new HexDump();*/
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] messageDigest = md.digest(inputString.getBytes());
 
