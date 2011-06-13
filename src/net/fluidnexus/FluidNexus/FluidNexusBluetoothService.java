@@ -31,7 +31,9 @@ import java.util.Vector;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -154,6 +156,8 @@ public class FluidNexusBluetoothService extends Service {
     @Override
     public void onCreate() {
         log.debug("Service creating...");
+        nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         state = STATE_NONE;
 
@@ -166,6 +170,9 @@ public class FluidNexusBluetoothService extends Service {
         IntentFilter sdpFilter = new IntentFilter(action);
         this.registerReceiver(sdpReceiver, sdpFilter);
 
+        // Show a notification regarding the service
+        showNotification();
+
         if (serviceThread == null) {
             serviceThread = new BluetoothServiceThread();
             log.debug("Starting our bluetooth service thread...");
@@ -177,9 +184,29 @@ public class FluidNexusBluetoothService extends Service {
     public void onDestroy() {
         super.onDestroy();
         log.debug("Service destroying...");
+        nm.cancel(NOTIFICATION);
         if (serviceThread != null) {
             serviceThread.cancel();
         }
+    }
+
+    /**
+     * Show a notification while the service is running
+     */
+    private void showNotification() {
+        log.debug("Showing notification...");
+        CharSequence text = getText(R.string.service_started);
+
+        // Set icon, scrolling text, and timestamp
+        Notification notification = new Notification(R.drawable.fluid_nexus_icon, text, System.currentTimeMillis());
+
+        // The PendingIntent to launch the activity of the user selects this notification
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, FluidNexusAndroid.class), 0);
+
+        // Set the info for the view that show in the notification panel
+        notification.setLatestEventInfo(this, getText(R.string.service_label), text, contentIntent);
+
+        nm.notify(NOTIFICATION, notification);
     }
 
     /**

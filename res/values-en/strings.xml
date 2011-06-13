@@ -46,6 +46,7 @@
     <string name="intent_send_messages_completed">net.fluidnexus.FluidNexus.SEND_MESSAGES_COMPLETED</string>
     <string name="service_started">Fluid Nexus service started</string>
     <string name="service_stopped">Fluid Nexus service stopped</string>
+    <string name="service_label">Fluid Nexus Bluetooth service</string>
     <string name="help_help_text">Fluid Nexus unfortunately only works in simulated mode right now, since the m5 version of the emulator does not support Bluetooth natively.  Read on for more details about the different types of Bluetooth simulation.\n
 \n
 HELP\n
