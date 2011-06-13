@@ -26,6 +26,8 @@ import java.io.OutputStream;
 import java.util.UUID;
 import java.util.ArrayList;
 import java.util.Vector;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -543,8 +545,44 @@ public class FluidNexusBluetoothService {
 
             // TODO
             // Enable reading from the connected device
-            String message = "Hello from the phone!";
-            byte[] send = message.getBytes();
+            // This is just a test using version 01 of the protocol
+            String version = "01";
+            String title = "This is a testing title.";
+            String message = "This is just a test of a message.\nThere should be multiple lines in this message.\n\nNothing else to see here.";
+            Long now = new Long(System.currentTimeMillis());
+            String hash = makeMD5(title + message);
+            log.debug("Time now is: " + now);
+            log.debug("Hash is: " + hash);
+
+            // VERSION
+            byte[] send = version.getBytes();
+            write(send);
+
+            // TITLE LENGTH
+            String titleLength = String.format("%03d", title.length());
+            send = titleLength.getBytes();
+            write(send);
+
+            // MESSAGE LENGTH
+            String messageLength = String.format("%06d", message.length());
+            send = messageLength.getBytes();
+            write(send);
+
+            // TIMESTAMP 
+            String nowString = now.toString();
+            send = nowString.getBytes();
+            write(send);
+
+            // HASH
+            send = hash.getBytes();
+            write(send);
+
+            // TITLE
+            send = title.getBytes();
+            write(send);
+
+            // MESSAGE
+            send = message.getBytes();
             write(send);
         }
 
@@ -568,4 +606,44 @@ public class FluidNexusBluetoothService {
             }
         }
     }
+
+    /*
+     * Auxilliary methods that probably should be moved to a utility class somewhere
+     */
+
+    /**
+     * Make a MD5 hash of the input string
+     * @param inputString Input string to create an MD5 hash of
+     */
+    public static String makeMD5(String inputString) {
+        try {
+            /*HexDump dump = new HexDump();*/
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] messageDigest = md.digest(inputString.getBytes());
+
+            String md5 = toHexString(messageDigest);
+            return md5;
+        } catch(NoSuchAlgorithmException e) {
+            log.error("MD5" + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Take a byte array and turn it into a hex string
+     * @param bytes Array of bytes to convert
+     * @note Taken from http://stackoverflow.com/questions/332079/in-java-how-do-i-convert-a-byte-array-to-a-string-of-hex-digits-while-keeping-le
+     */
+    public static String toHexString(byte[] bytes) {
+        char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+        char[] hexChars = new char[bytes.length * 2];
+        int v;
+        for ( int j = 0; j < bytes.length; j++ ) {
+            v = bytes[j] & 0xFF;
+            hexChars[j*2] = hexArray[v/16];
+            hexChars[j*2 + 1] = hexArray[v%16];
+        }
+        return new String(hexChars);
+    }
+
 }

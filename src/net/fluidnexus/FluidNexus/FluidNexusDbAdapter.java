@@ -141,6 +141,10 @@ public class FluidNexusDbAdapter {
 
     }
 
+    /**
+     * Make a MD5 hash of the input string
+     * @param inputString Input string to create an MD5 hash of
+     */
     public static String makeMD5(String inputString) {
         try {
             /*HexDump dump = new HexDump();*/

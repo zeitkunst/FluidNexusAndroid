@@ -1,0 +1,15 @@
+= Fluid Nexus Protocol =
+
+== Version 1 ==
+
+* 2 byte version
+** For Version 1, this is 01
+* 3 byte length of title
+* 6 byte length of message
+* 13 byte timestamp
+* 32 byte md5 hash of title and message
+* title
+* message
+
+
+
