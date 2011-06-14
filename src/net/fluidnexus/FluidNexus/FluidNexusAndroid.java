@@ -238,7 +238,8 @@ public class FluidNexusAndroid extends ListActivity {
         super.onCreateContextMenu(menu, v, menuInfo);
         AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
         currentRowID = info.id;
-        menu.setHeaderTitle(getString(R.string.menu_message_list_context_title));
+        Cursor c = dbAdapter.returnItemByID(currentRowID);
+        menu.setHeaderTitle(c.getString(c.getColumnIndexOrThrow(FluidNexusDbAdapter.KEY_TITLE)));
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.message_list_context, menu);
     }
