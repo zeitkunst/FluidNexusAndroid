@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/preferences_category_interface">
+        <CheckBoxPreference
+            android:title="@string/preferences_show_messages"
+            android:defaultValue="true"
+            android:summary="@string/preferences_show_messages_summary"
+            android:key="showMessagesPref" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/preferences_category_network">
+        <CheckBoxPreference
+            android:title="@string/preferences_enabled_bluetooth_service"
+            android:defaultValue="true"
+            android:summary="@string/preferences_enabled_bluetooth_service_summary"
+            android:key="enableBluetoothServicePref" />
+    </PreferenceCategory>
+</PreferenceScreen>

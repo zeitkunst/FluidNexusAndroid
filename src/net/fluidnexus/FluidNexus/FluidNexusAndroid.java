@@ -35,6 +35,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -70,7 +71,7 @@ public class FluidNexusAndroid extends ListActivity {
     private static final int ACTIVITY_HOME = 0;
     private static final int ACTIVITY_VIEW_OUTGOING = 1;
     private static final int ACTIVITY_ADD_OUTGOING = 2;
-    private static final int ACTIVITY_SETTINGS = 3;
+    private static final int ACTIVITY_PREFERENCES= 3;
     private static final int ACTIVITY_VIEW_MESSAGE = 4;
     private static final int ACTIVITY_HELP = 5;
     private static final int REQUEST_ENABLE_BT = 6;
@@ -144,7 +145,6 @@ public class FluidNexusAndroid extends ListActivity {
             Toast.makeText(this, "Bluetooth is not available; sending and receiving messages will not be possible", Toast.LENGTH_LONG).show();
         }
 
-        setupPreferences();
 
         /*        
         log.info("Starting bluetooth service");        
@@ -195,6 +195,8 @@ public class FluidNexusAndroid extends ListActivity {
     public void onStart() {
         super.onStart();
         log.info("In onStart");
+
+        setupPreferences();
         if (bluetoothAdapter != null) {
             if (!bluetoothAdapter.isEnabled()) {
                 Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -278,7 +280,7 @@ public class FluidNexusAndroid extends ListActivity {
     }
 
     private void setupPreferences() {
-        prefs = getSharedPreferences("FluidNexusPreferences", 0);
+        prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         boolean firstRun = prefs.getBoolean("FirstRun", true);
 
         if (firstRun == true) {
@@ -299,16 +301,6 @@ public class FluidNexusAndroid extends ListActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.message_list_options, menu);
         return true;
-        
-        /*
-        menu.add(0, MENU_ADD_ID, menu.NONE, R.string.menu_add_message).setIcon(R.drawable.menu_add).setAlphabeticShortcut('a');
-        menu.add(0, MENU_ALL_ID, menu.NONE, R.string.menu_view_all).setIcon(R.drawable.menu_all).setAlphabeticShortcut('v');
-        menu.add(0, MENU_VIEW_ID, menu.NONE, R.string.menu_view_outgoing).setIcon(R.drawable.menu_view).setAlphabeticShortcut('o');
-        menu.add(0, MENU_DELETE_ID, menu.NONE, R.string.menu_delete).setIcon(R.drawable.menu_delete).setAlphabeticShortcut('x');
-        menu.add(0, MENU_SETTINGS_ID, menu.NONE, R.string.menu_settings).setIcon(R.drawable.menu_settings).setAlphabeticShortcut('s');
-        menu.add(0, MENU_HELP_ID, menu.NONE, R.string.menu_help).setIcon(R.drawable.menu_help).setAlphabeticShortcut('h');
-        return true;
-        */
     }
 
     @Override
@@ -376,7 +368,7 @@ public class FluidNexusAndroid extends ListActivity {
             case(ACTIVITY_ADD_OUTGOING):
                 fillListView(VIEW_MODE);
                 break;
-            case(ACTIVITY_SETTINGS):
+            case(ACTIVITY_PREFERENCES):
                 /*
                  * TODO
                  * figure out why I don't get extras anymore...
@@ -402,8 +394,8 @@ public class FluidNexusAndroid extends ListActivity {
     }
 
     private void editSettings() {
-        Intent intent = new Intent(this, FluidNexusSettings.class);
-        startActivityForResult(intent, ACTIVITY_SETTINGS);
+        Intent intent = new Intent(this, FluidNexusPreferences.class);
+        startActivityForResult(intent, ACTIVITY_PREFERENCES);
     }
 
     private void addOutgoingMessage() {
