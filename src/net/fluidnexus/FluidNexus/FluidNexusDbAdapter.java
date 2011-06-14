@@ -282,6 +282,14 @@ public class FluidNexusDbAdapter {
                 KEY_TIME + " DESC");
     }
 
+    /**
+     * Update an item based on an ID
+     * @param id ID of entry to update
+     * @param cv ContentValues to update for the given ID
+     */
+    public int updateItemByID(long id, ContentValues cv) {
+        return database.update(DATABASE_TABLE, cv, KEY_ID + "=" + id, null);
+    }
 
     /**
      * Return id and hash for messages

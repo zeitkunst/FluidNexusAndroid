@@ -74,6 +74,7 @@ public class FluidNexusAndroid extends ListActivity {
     private static final int ACTIVITY_VIEW_MESSAGE = 4;
     private static final int ACTIVITY_HELP = 5;
     private static final int REQUEST_ENABLE_BT = 6;
+    private static final int ACTIVITY_EDIT_MESSAGE = 7;
 
     private static int VIEW_MODE = 0;
 
@@ -253,10 +254,27 @@ public class FluidNexusAndroid extends ListActivity {
                 showDialog(DIALOG_REALLY_DELETE);
                 return true;
             case R.id.edit_message:
+                editMessage();
                 return true;
             default:
                 return super.onContextItemSelected(item);
         }
+    }
+
+    /**
+     * Open up a new activity to edit the message
+     * TODO
+     * Only edit messages that are outgoing
+     */
+    private void editMessage() {
+        Cursor c = dbAdapter.returnItemByID(currentRowID);
+
+        Intent i = new Intent(this, FluidNexusEditMessage.class);
+        i.putExtra(FluidNexusDbAdapter.KEY_ID, c.getInt(c.getColumnIndex(FluidNexusDbAdapter.KEY_ID)));
+        i.putExtra(FluidNexusDbAdapter.KEY_TITLE, c.getString(c.getColumnIndex(FluidNexusDbAdapter.KEY_TITLE)));
+        i.putExtra(FluidNexusDbAdapter.KEY_DATA, c.getString(c.getColumnIndex(FluidNexusDbAdapter.KEY_DATA)));
+        startActivityForResult(i, ACTIVITY_EDIT_MESSAGE);
+
     }
 
     private void setupPreferences() {
@@ -278,6 +296,11 @@ public class FluidNexusAndroid extends ListActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.message_list_options, menu);
+        return true;
+        
+        /*
         menu.add(0, MENU_ADD_ID, menu.NONE, R.string.menu_add_message).setIcon(R.drawable.menu_add).setAlphabeticShortcut('a');
         menu.add(0, MENU_ALL_ID, menu.NONE, R.string.menu_view_all).setIcon(R.drawable.menu_all).setAlphabeticShortcut('v');
         menu.add(0, MENU_VIEW_ID, menu.NONE, R.string.menu_view_outgoing).setIcon(R.drawable.menu_view).setAlphabeticShortcut('o');
@@ -285,6 +308,7 @@ public class FluidNexusAndroid extends ListActivity {
         menu.add(0, MENU_SETTINGS_ID, menu.NONE, R.string.menu_settings).setIcon(R.drawable.menu_settings).setAlphabeticShortcut('s');
         menu.add(0, MENU_HELP_ID, menu.NONE, R.string.menu_help).setIcon(R.drawable.menu_help).setAlphabeticShortcut('h');
         return true;
+        */
     }
 
     @Override
@@ -292,10 +316,10 @@ public class FluidNexusAndroid extends ListActivity {
         TextView tv;
 
         switch (item.getItemId()) {
-            case MENU_ADD_ID:
+            case R.id.menu_add:
                 addOutgoingMessage();
                 return true;
-            case MENU_ALL_ID:
+            case R.id.menu_view_all:
                 VIEW_MODE = 0;
                 fillListView(VIEW_MODE);
 
@@ -304,7 +328,7 @@ public class FluidNexusAndroid extends ListActivity {
                 tv.setText(R.string.message_list_header_text_all);
 
                 return true;
-            case MENU_VIEW_ID:
+            case R.id.menu_view_outgoing:
                 VIEW_MODE = 1;
                 fillListView(VIEW_MODE);
 
@@ -313,20 +337,10 @@ public class FluidNexusAndroid extends ListActivity {
                 tv.setText(R.string.message_list_header_text_outgoing);
 
                 return true;
-            case MENU_DELETE_ID:
-                // TODO
-                // Pop up a dialog confirming deletion, and then:
-                // * If OK, delete
-                // * If OK, deadvertise service
-                // * If Cancel, do nothing
-                dbAdapter.deleteById(getListView().getSelectedItemId());
-                fillListView(VIEW_MODE);
-
-                return true;
-            case MENU_SETTINGS_ID:
+            case R.id.menu_settings:
                 editSettings();
                 return true;
-            case MENU_HELP_ID:
+            case R.id.menu_help:
                 Intent i = new Intent(this, FluidNexusHelp.class);
                 /*startSubActivity(i, ACTIVITY_HELP);*/
                 startActivityForResult(i, ACTIVITY_HELP);
