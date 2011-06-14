@@ -55,7 +55,7 @@ import android.bluetooth.BluetoothDevice;
 
 
 public class FluidNexusAndroid extends ListActivity {
-    private FluidNexusDbAdapter dbHelper;
+    private FluidNexusDbAdapter dbAdapter;
     private Toast toast;
     
     private SharedPreferences prefs;
@@ -76,6 +76,8 @@ public class FluidNexusAndroid extends ListActivity {
     private static final int REQUEST_ENABLE_BT = 6;
 
     private static int VIEW_MODE = 0;
+
+    private long currentRowID = -1;
 
     private static final int DIALOG_REALLY_DELETE = 0;
 
@@ -123,8 +125,8 @@ public class FluidNexusAndroid extends ListActivity {
 
         setContentView(R.layout.message_list);
         registerForContextMenu(getListView());
-        dbHelper = new FluidNexusDbAdapter(this);
-        dbHelper.open();
+        dbAdapter = new FluidNexusDbAdapter(this);
+        dbAdapter.open();
         fillListView(VIEW_MODE);
         log.verbose("starting up...");
       
@@ -176,7 +178,12 @@ public class FluidNexusAndroid extends ListActivity {
             .setCancelable(false)
             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-
+                    log.debug("Row ID is: " + currentRowID);
+                    dbAdapter.deleteById(currentRowID);
+                    currentRowID = -1;
+                    fillListView(VIEW_MODE);
+                    toast = Toast.makeText(getApplicationContext(), "Message deleted.", Toast.LENGTH_LONG);
+                    toast.show();
                 }
             })
             .setNegativeButton("No", null);
@@ -229,6 +236,8 @@ public class FluidNexusAndroid extends ListActivity {
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
+        AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
+        currentRowID = info.id;
         menu.setHeaderTitle(getString(R.string.menu_message_list_context_title));
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.message_list_context, menu);
@@ -260,7 +269,7 @@ public class FluidNexusAndroid extends ListActivity {
             prefsEditor.putBoolean("ShowMessages", true);
             prefsEditor.putBoolean("SimulateBluetooth", true);
             prefsEditor.commit();
-            dbHelper.initialPopulate();
+            dbAdapter.initialPopulate();
         }
         
         this.showMessages = prefs.getBoolean("ShowMessages", true);
@@ -309,7 +318,7 @@ public class FluidNexusAndroid extends ListActivity {
                 // * If OK, delete
                 // * If OK, deadvertise service
                 // * If Cancel, do nothing
-                dbHelper.deleteById(getListView().getSelectedItemId());
+                dbAdapter.deleteById(getListView().getSelectedItemId());
                 fillListView(VIEW_MODE);
 
                 return true;
@@ -398,9 +407,9 @@ public class FluidNexusAndroid extends ListActivity {
         }
 
         if (viewType == 0) {
-            dbCursor = dbHelper.all();
+            dbCursor = dbAdapter.all();
         } else if (viewType == 1) {
-            dbCursor = dbHelper.outgoing();
+            dbCursor = dbAdapter.outgoing();
         }
         startManagingCursor(dbCursor);
 
