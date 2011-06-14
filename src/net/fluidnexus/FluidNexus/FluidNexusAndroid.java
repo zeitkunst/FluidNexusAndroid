@@ -225,7 +225,6 @@ public class FluidNexusAndroid extends ListActivity {
     protected void onPause() {
         super.onPause();
 
-        unregisterReceiver(iReceiver);
     }
 
     @Override
@@ -238,6 +237,7 @@ public class FluidNexusAndroid extends ListActivity {
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(iReceiver);
+        dbAdapter.close();
     }
 
     /*
