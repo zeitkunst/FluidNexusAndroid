@@ -685,6 +685,11 @@ public class FluidNexusBluetoothService extends Service {
                 send = message.getBytes();
                 write(send);
 
+                try {
+                    this.sleep(200);
+                } catch (InterruptedException e) {
+                    log.error("Thread sleeping interrupted: " + e);
+                }
             }
 
         }
@@ -698,6 +703,17 @@ public class FluidNexusBluetoothService extends Service {
                 outputStream.write(buffer);
             } catch (IOException e) {
                 log.error("Exception during writing to outputStream: " + e);
+            }
+        }
+
+        /**
+         * Flush the output stream
+         */
+        public void flush() {
+            try {
+                outputStream.flush();
+            } catch (IOException e) {
+                log.error("Exception when trying to flush outputStream: " + e);
             }
         }
 

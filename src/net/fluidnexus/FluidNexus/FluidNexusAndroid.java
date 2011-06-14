@@ -19,8 +19,13 @@
 
 package net.fluidnexus.FluidNexus;
 
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.BroadcastReceiver;
@@ -30,11 +35,15 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.MenuItem;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.SimpleCursorAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -67,6 +76,8 @@ public class FluidNexusAndroid extends ListActivity {
     private static final int REQUEST_ENABLE_BT = 6;
 
     private static int VIEW_MODE = 0;
+
+    private static final int DIALOG_REALLY_DELETE = 0;
 
     private static final int MENU_ADD_ID = Menu.FIRST;
     private static final int MENU_VIEW_ID = Menu.FIRST + 1;
@@ -111,6 +122,7 @@ public class FluidNexusAndroid extends ListActivity {
         */
 
         setContentView(R.layout.message_list);
+        registerForContextMenu(getListView());
         dbHelper = new FluidNexusDbAdapter(this);
         dbHelper.open();
         fillListView(VIEW_MODE);
@@ -130,9 +142,45 @@ public class FluidNexusAndroid extends ListActivity {
         }
 
         setupPreferences();
-        
+
+        /*        
         log.info("Starting bluetooth service");        
         startService(new Intent(FluidNexusBluetoothService.class.getName()));
+        */
+    }
+
+    /**
+     * Method of creating dialogs for this activity
+     * @param id ID of the dialog to create
+     */
+    protected Dialog onCreateDialog(int id) {
+        Dialog dialog;
+
+        switch (id) {
+            case DIALOG_REALLY_DELETE:
+                dialog = reallyDeleteDialog();
+                break;
+            default:
+                dialog = null;
+        }
+
+        return dialog;
+    }
+    
+    /**
+     * Method to create our really delete dialog
+     */
+    private AlertDialog reallyDeleteDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Are you sure you want to delete this message?")
+            .setCancelable(false)
+            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+
+                }
+            })
+            .setNegativeButton("No", null);
+        return builder.create();
     }
 
     @Override 
@@ -174,20 +222,31 @@ public class FluidNexusAndroid extends ListActivity {
         unregisterReceiver(iReceiver);
     }
 
+    /*
+     * Context menu code from:
+     * http://stackoverflow.com/questions/6205808/how-to-handle-long-tap-on-listview-item
+     */
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.setHeaderTitle(getString(R.string.menu_message_list_context_title));
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.message_list_context, menu);
+    }
 
-    private void startServices() {
-        prefs = getSharedPreferences("FluidNexusPreferences", 0);
-        boolean simulateBluetooth = prefs.getBoolean("SimulateBluetooth", true);
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
 
-        // Start the client that receives data from other phones
-        Bundle args = new Bundle();
-        args.putBoolean("SimulateBluetooth", simulateBluetooth);
-
-        /*
-        startService(new Intent(FluidNexusAndroid.this, FluidNexusClient.class), args);
-        startService(new Intent(FluidNexusAndroid.this, FluidNexusServer.class), args);
-        */
-
+        switch (item.getItemId()) {
+            case R.id.delete_message:
+                showDialog(DIALOG_REALLY_DELETE);
+                return true;
+            case R.id.edit_message:
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
     }
 
     private void setupPreferences() {
