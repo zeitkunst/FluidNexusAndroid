@@ -329,8 +329,8 @@ public class FluidNexusAndroid extends ListActivity {
                 tv.setText(R.string.message_list_header_text_outgoing);
 
                 return true;
-            case R.id.menu_settings:
-                editSettings();
+            case R.id.menu_preferences:
+                editPreferences();
                 return true;
             case R.id.menu_help:
                 Intent i = new Intent(this, FluidNexusHelp.class);
@@ -393,7 +393,7 @@ public class FluidNexusAndroid extends ListActivity {
         }
     }
 
-    private void editSettings() {
+    private void editPreferences() {
         Intent intent = new Intent(this, FluidNexusPreferences.class);
         startActivityForResult(intent, ACTIVITY_PREFERENCES);
     }
