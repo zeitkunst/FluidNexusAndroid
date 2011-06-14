@@ -54,8 +54,13 @@
     <string name="preferences_category_network">Network</string>
     <string name="preferences_show_messages">Show messages?</string>
     <string name="preferences_show_messages_summary">Whether or not to show messages in the interface.</string>
-    <string name="preferences_enabled_bluetooth_service">Enable Bluetooth service?</string>
-    <string name="preferences_enabled_bluetooth_service_summary">Whether or not the bluetooth service is enabled.  This service will run even when the application has ended.</string>
+    <string name="preferences_enable_bluetooth_service">Bluetooth Service</string>
+    <string name="preferences_enable_bluetooth_service_summary">Whether or not the bluetooth service is enabled.  This service will run even when the application has ended.</string>
+    <string name="preferences_enable_zeroconf_service">Zeroconf Service</string>
+    <string name="preferences_enable_zeroconf_service_summary">Whether or not the zeroconf service is enabled.  This service will run even when the application has ended.  This feature is under development.</string>
+    <string name="preferences_enable_adhocwifi_service">Ad-Hoc Wifi Service</string>
+    <string name="preferences_enable_adhocwifi_service_summary">Whether or not the Ad-Hoc Wifi service is enabled.  This service will run even when the application has ended.  This feature is under development.</string>
+
     <string name="help_help_text">Fluid Nexus unfortunately only works in simulated mode right now, since the m5 version of the emulator does not support Bluetooth natively.  Read on for more details about the different types of Bluetooth simulation.\n
 \n
 HELP\n

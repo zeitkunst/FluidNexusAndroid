@@ -11,9 +11,22 @@
     <PreferenceCategory
         android:title="@string/preferences_category_network">
         <CheckBoxPreference
-            android:title="@string/preferences_enabled_bluetooth_service"
+            android:title="@string/preferences_enable_bluetooth_service"
             android:defaultValue="true"
-            android:summary="@string/preferences_enabled_bluetooth_service_summary"
+            android:summary="@string/preferences_enable_bluetooth_service_summary"
             android:key="enableBluetoothServicePref" />
+        <CheckBoxPreference
+            android:title="@string/preferences_enable_zeroconf_service"
+            android:defaultValue="true"
+            android:enabled="false"
+            android:summary="@string/preferences_enable_zeroconf_service_summary"
+            android:key="enableZeroconfServicePref" />
+        <CheckBoxPreference
+            android:title="@string/preferences_enable_adhocwifi_service"
+            android:defaultValue="true"
+            android:enabled="false"
+            android:summary="@string/preferences_enable_adhocwifi_service_summary"
+            android:key="enableAdhocwifiServicePref" />
+
     </PreferenceCategory>
 </PreferenceScreen>

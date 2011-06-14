@@ -211,6 +211,14 @@ public class FluidNexusAndroid extends ListActivity {
                 */
             }
         }
+
+        boolean enableBluetoothServicePref = prefs.getBoolean("enableBluetoothServicePref", true);
+        if (enableBluetoothServicePref) {
+            // TODO
+            // be sure to start or stop the service if this pref changes
+            log.info("Starting Bluetooth Service");
+            startService(new Intent(FluidNexusBluetoothService.class.getName()));
+        }
     }
 
     @Override
@@ -286,10 +294,8 @@ public class FluidNexusAndroid extends ListActivity {
         if (firstRun == true) {
             prefsEditor = prefs.edit();
             prefsEditor.putBoolean("FirstRun", false);
-
-            prefsEditor.putBoolean("ShowMessages", true);
-            prefsEditor.putBoolean("SimulateBluetooth", true);
             prefsEditor.commit();
+
             dbAdapter.initialPopulate();
         }
         
