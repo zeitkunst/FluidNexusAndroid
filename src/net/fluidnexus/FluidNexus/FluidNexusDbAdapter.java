@@ -147,33 +147,32 @@ public class FluidNexusDbAdapter {
      */
     public static String makeMD5(String inputString) {
         try {
-            /*HexDump dump = new HexDump();*/
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] messageDigest = md.digest(inputString.getBytes());
-            /*String md5 = dump.dumpHexString(messageDigest);*/
-            /* Code below taken from here, since there is no "HexDump" anymore for some reason:
-             * http://www.androidsnippets.com/create-a-md5-hash-and-dump-as-a-hex-string
-             */
-            StringBuffer hexString = new StringBuffer();
-            for (int i = 0; i < messageDigest.length; i++) {
-                String h = Integer.toHexString(0xFF & messageDigest[i]);
-                while (h.length() < 2)
-                    h = "0" + h;
-                hexString.append(h);
-            }
-            String md5 = hexString.toString();
-            md5 = md5.replaceAll(" ", "");
-            md5 = md5.substring(11);
+
+            String md5 = toHexString(messageDigest);
             return md5;
         } catch(NoSuchAlgorithmException e) {
             log.error("MD5" + e.getMessage());
             return null;
         }
-        /*
-        MessageDigest md = MessageDigest.getInstance("MD5");
-        md.update(inputString.getBytes());
-        return dump.dumpHexString(md.digest());    
-        */
+    }
+
+    /**
+     * Take a byte array and turn it into a hex string
+     * @param bytes Array of bytes to convert
+     * @note Taken from http://stackoverflow.com/questions/332079/in-java-how-do-i-convert-a-byte-array-to-a-string-of-hex-digits-while-keeping-le
+     */
+    public static String toHexString(byte[] bytes) {
+        char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+        char[] hexChars = new char[bytes.length * 2];
+        int v;
+        for ( int j = 0; j < bytes.length; j++ ) {
+            v = bytes[j] & 0xFF;
+            hexChars[j*2] = hexArray[v/16];
+            hexChars[j*2 + 1] = hexArray[v%16];
+        }
+        return new String(hexChars);
     }
 
     public long add_new(int type,

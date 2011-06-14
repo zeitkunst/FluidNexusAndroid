@@ -43,6 +43,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.BroadcastReceiver;
+import android.database.Cursor;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
@@ -53,10 +54,25 @@ import android.os.ParcelUuid;
 import android.util.Log;
 import android.widget.Toast;
 
+/*
+ * TODO
+ * * Create cursors for getting hashes and items from database
+ * * Create intent in activity to notify service when a new item has been created
+ * * Update activity to allow for deletion
+ */
+
 public class FluidNexusBluetoothService extends Service {
     private static final String TAG = "FluidNexusBluetoothService";
     private static final String SERVICE_NAME = "FluidNexus";
     private static FluidNexusLogger log = FluidNexusLogger.getLogger("FluidNexus"); 
+
+    // For database access
+    private FluidNexusDbAdapter dbHelper;
+    private Cursor hashesCursor;
+    private Cursor dataCursor;
+    private ArrayList<String> currentHashes = new ArrayList<String>();
+    private ArrayList<Vector> currentData = new ArrayList<Vector>();
+    private Vector<String> currentItem = new Vector<String>();
 
     private BluetoothAdapter bluetoothAdapter;
 
@@ -150,7 +166,7 @@ public class FluidNexusBluetoothService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        return binder;
+        return null;
     }
 
     @Override
@@ -169,6 +185,12 @@ public class FluidNexusBluetoothService extends Service {
         String action = "android.bleutooth.device.action.UUID";
         IntentFilter sdpFilter = new IntentFilter(action);
         this.registerReceiver(sdpReceiver, sdpFilter);
+
+        // setup database object
+        dbHelper = new FluidNexusDbAdapter(this);
+        dbHelper.open();
+
+
 
         // Show a notification regarding the service
         showNotification();
@@ -361,6 +383,38 @@ public class FluidNexusBluetoothService extends Service {
                 // Go through our state machine
                 if (state == STATE_NONE) {
                     // If we're at the beginning state, then start the discovery process
+                    // TESTING
+                    // Try and get hashes from the database
+                    // TODO
+                    // Only update this on a new intent from the activity
+                    hashesCursor = dbHelper.services();
+                    hashesCursor.moveToFirst();
+                    currentHashes.clear();
+
+                    while (hashesCursor.isAfterLast() == false) {
+                        currentHashes.add(hashesCursor.getString(1));
+                        hashesCursor.moveToNext();
+                    }
+                    hashesCursor.close();
+
+                    dataCursor = dbHelper.outgoing();
+                    dataCursor.moveToFirst();
+                    currentData.clear();
+
+                    String[] fields = new String[] {FluidNexusDbAdapter.KEY_HASH, FluidNexusDbAdapter.KEY_TIME, FluidNexusDbAdapter.KEY_TITLE, FluidNexusDbAdapter.KEY_DATA};
+                    while (dataCursor.isAfterLast() == false) {
+                        // I'm still not sure why I have to instantiate a new vector each time here, rather than using the local vector from earlier
+                        // This is one of those things of java that just makes me want to pull my hair out...
+                        Vector<String> tempVector = new Vector<String>();
+                        for (int i = 0; i < fields.length; i++) {
+                            int index = dataCursor.getColumnIndex(fields[i]);
+                            tempVector.add(dataCursor.getString(index));
+                        }
+                        currentData.add(tempVector);
+                        dataCursor.moveToNext();
+                    }
+                    dataCursor.close();
+
                     try {
                         doDiscovery();
                     } catch (Exception e) {
@@ -423,7 +477,6 @@ public class FluidNexusBluetoothService extends Service {
         private void doServiceDiscovery() {
             UUID tempUUID = UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
 
-            //for (int i = 0; i < devices.size(); i++) {
             for (Vector currentDevice : devices) {
                 String name = (String) currentDevice.get(0);
                 String address = (String) currentDevice.get(1);
@@ -584,47 +637,56 @@ public class FluidNexusBluetoothService extends Service {
         public void run() {
             log.info("Begin ConnectedThread");
 
+            // Do sending process over all data
             // TODO
-            // Enable reading from the connected device
-            // This is just a test using version 01 of the protocol
-            String version = "01";
-            String title = "This is a testing title.";
-            String message = "This is just a test of a message.\nThere should be multiple lines in this message.\n\nNothing else to see here.";
-            Long now = new Long(System.currentTimeMillis());
-            String hash = makeMD5(title + message);
-            log.debug("Time now is: " + now);
-            log.debug("Hash is: " + hash);
+            // Only send if we need to...this is just for testing
+            
+            // TODO
+            // Need to figure out why only one item is being set at a time, even though we're looping through all of the values...
+            for (Vector item: currentData) {
+                // TODO
+                // Enable reading from the connected device
+                // This is just a test using version 01 of the protocol
+                String version = "01";
+                String hash = (String) item.get(0);
+                String timestamp = (String) item.get(1);
+                String title = (String) item.get(2);
+                String message = (String) item.get(3);
+                log.debug("Current title is: " + title);
+    
+                // VERSION
+                byte[] send = version.getBytes();
+                write(send);
+    
+                // TITLE LENGTH
+                String titleLength = String.format("%03d", title.length());
+                send = titleLength.getBytes();
+                write(send);
+    
+                // MESSAGE LENGTH
+                String messageLength = String.format("%06d", message.length());
+                send = messageLength.getBytes();
+                write(send);
+    
+                // TIMESTAMP 
+                String timestampString = timestamp.toString();
+                send = timestampString.getBytes();
+                write(send);
+    
+                // HASH
+                send = hash.getBytes();
+                write(send);
+    
+                // TITLE
+                send = title.getBytes();
+                write(send);
+    
+                // MESSAGE
+                send = message.getBytes();
+                write(send);
 
-            // VERSION
-            byte[] send = version.getBytes();
-            write(send);
+            }
 
-            // TITLE LENGTH
-            String titleLength = String.format("%03d", title.length());
-            send = titleLength.getBytes();
-            write(send);
-
-            // MESSAGE LENGTH
-            String messageLength = String.format("%06d", message.length());
-            send = messageLength.getBytes();
-            write(send);
-
-            // TIMESTAMP 
-            String nowString = now.toString();
-            send = nowString.getBytes();
-            write(send);
-
-            // HASH
-            send = hash.getBytes();
-            write(send);
-
-            // TITLE
-            send = title.getBytes();
-            write(send);
-
-            // MESSAGE
-            send = message.getBytes();
-            write(send);
         }
 
         /**
