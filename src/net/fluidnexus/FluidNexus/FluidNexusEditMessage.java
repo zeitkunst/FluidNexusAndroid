@@ -19,10 +19,20 @@
 
 package net.fluidnexus.FluidNexus;
 
+import java.lang.CharSequence;
+
+
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.app.Dialog;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -35,6 +45,30 @@ public class FluidNexusEditMessage extends Activity {
     private EditText messageEditText;
     private FluidNexusDbAdapter dbHelper;  
     private long id = -1;
+
+    private static final int DIALOG_REALLY_DISCARD = 0;
+
+    // This keeps track of how many times the text has been changed
+    // The text is always changed at least once for each EditText on the screen, so we just keep track of how many times it has changed; if it's over 2, then we know that the text needs to be saved
+    // TODO
+    // There's probably a better way of doing this...
+    private int textChanged = 0;
+
+    TextWatcher textWatcher = new TextWatcher() {
+        public void afterTextChanged(Editable s) {
+        }
+
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            textChanged += 1;
+            if (textChanged > 2) {
+                textChanged = 3;
+            }
+            log.debug("textChanged: " + textChanged);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle icicle) {
@@ -49,6 +83,8 @@ public class FluidNexusEditMessage extends Activity {
         
         titleEditText = (EditText) findViewById(R.id.title_edit);
         messageEditText = (EditText) findViewById(R.id.message_edit);
+        titleEditText.addTextChangedListener(textWatcher);
+        messageEditText.addTextChangedListener(textWatcher);
 
         Button saveButton = (Button) findViewById(R.id.save_message_button);
         Button discardButton = (Button) findViewById(R.id.discard_message_button);
@@ -79,18 +115,22 @@ public class FluidNexusEditMessage extends Activity {
             }
         });
 
-
-        /*
-         * TODO
-         * Check to see if things have been edited, load dialog to warn
-         */
         discardButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                setResult(RESULT_OK);
-                finish();
+                if (textChanged > 2) {
+                    showDialog(DIALOG_REALLY_DISCARD);
+                }
             }
         });
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        titleEditText.removeTextChangedListener(textWatcher);
+        messageEditText.removeTextChangedListener(textWatcher);
+    }
+
 
     private void saveState() {
         String title = titleEditText.getText().toString();
@@ -101,6 +141,42 @@ public class FluidNexusEditMessage extends Activity {
         values.put(FluidNexusDbAdapter.KEY_DATA, message);
         values.put(FluidNexusDbAdapter.KEY_HASH, FluidNexusDbAdapter.makeMD5(title + message));
         dbHelper.updateItemByID(id, values);
+    }
+
+
+    /**
+     * Method of creating dialogs for this activity
+     * @param id ID of the dialog to create
+     */
+    protected Dialog onCreateDialog(int id) {
+        Dialog dialog;
+
+        switch (id) {
+            case DIALOG_REALLY_DISCARD:
+                dialog = reallyDiscardDialog();
+                break;
+            default:
+                dialog = null;
+        }
+
+        return dialog;
+    }
+    
+    /**
+     * Method to create our really delete dialog
+     */
+    private AlertDialog reallyDiscardDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("The message has changed; are you sure you don't want to save?")
+            .setCancelable(false)
+            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    setResult(RESULT_OK);
+                    finish();
+                }
+            })
+            .setNegativeButton("No", null);
+        return builder.create();
     }
 
 }

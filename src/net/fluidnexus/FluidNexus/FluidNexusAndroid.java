@@ -201,8 +201,6 @@ public class FluidNexusAndroid extends ListActivity {
 
         enableBluetoothServicePref = prefs.getBoolean("enableBluetoothServicePref", true);
         if (enableBluetoothServicePref) {
-            // TODO
-            // be sure to start or stop the service if this pref changes
             log.info("Starting Bluetooth Service");
             startService(new Intent(FluidNexusBluetoothService.class.getName()));
         }
