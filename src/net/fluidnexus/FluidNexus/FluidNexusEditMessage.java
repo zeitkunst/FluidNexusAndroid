@@ -43,48 +43,30 @@ public class FluidNexusEditMessage extends Activity {
     private static FluidNexusLogger log = FluidNexusLogger.getLogger("FluidNexus"); 
     private EditText titleEditText;
     private EditText messageEditText;
-    private FluidNexusDbAdapter dbHelper;  
+    private FluidNexusDbAdapter dbAdapter;  
     private long id = -1;
 
+    String originalTitle = null;
+    String originalMessage = null;
+
     private static final int DIALOG_REALLY_DISCARD = 0;
-
-    // This keeps track of how many times the text has been changed
-    // The text is always changed at least once for each EditText on the screen, so we just keep track of how many times it has changed; if it's over 2, then we know that the text needs to be saved
-    // TODO
-    // There's probably a better way of doing this...
-    private int textChanged = 0;
-
-    TextWatcher textWatcher = new TextWatcher() {
-        public void afterTextChanged(Editable s) {
-        }
-
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        }
-
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            textChanged += 1;
-            if (textChanged > 2) {
-                textChanged = 3;
-            }
-            log.debug("textChanged: " + textChanged);
-        }
-    };
 
     @Override
     protected void onCreate(Bundle icicle) {
 
         super.onCreate(icicle);
-        dbHelper = new FluidNexusDbAdapter(this);
-        dbHelper.open();
+
+
+        // Create database instance
+        dbAdapter = new FluidNexusDbAdapter(this);
+        dbAdapter.open();
 
         setContentView(R.layout.message_edit);
-        setTitle(R.string.message_add_outgoing_title);
+        setTitle(R.string.message_edit_title);
         Bundle extras = getIntent().getExtras();
         
         titleEditText = (EditText) findViewById(R.id.title_edit);
         messageEditText = (EditText) findViewById(R.id.message_edit);
-        titleEditText.addTextChangedListener(textWatcher);
-        messageEditText.addTextChangedListener(textWatcher);
 
         Button saveButton = (Button) findViewById(R.id.save_message_button);
         Button discardButton = (Button) findViewById(R.id.discard_message_button);
@@ -92,15 +74,15 @@ public class FluidNexusEditMessage extends Activity {
 
         if (extras != null) {
             id = extras.getInt(FluidNexusDbAdapter.KEY_ID);
-            String title = extras.getString(FluidNexusDbAdapter.KEY_TITLE);
-            String message = extras.getString(FluidNexusDbAdapter.KEY_DATA); 
+            originalTitle = extras.getString(FluidNexusDbAdapter.KEY_TITLE);
+            originalMessage = extras.getString(FluidNexusDbAdapter.KEY_DATA); 
             
-            if (title != null) {
-                titleEditText.setText(title);
+            if (originalTitle != null) {
+                titleEditText.setText(originalTitle);
             }
 
-            if (message != null) {
-                messageEditText.setText(message);
+            if (originalMessage != null) {
+                messageEditText.setText(originalMessage);
 
             }
         } else {
@@ -117,21 +99,31 @@ public class FluidNexusEditMessage extends Activity {
 
         discardButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                if (textChanged > 2) {
+                boolean textChanged = checkIfTextChanged();
+                if (textChanged) {
                     showDialog(DIALOG_REALLY_DISCARD);
+                } else {
+                    setResult(RESULT_OK);
+                    finish();
                 }
             }
         });
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
-        titleEditText.removeTextChangedListener(textWatcher);
-        messageEditText.removeTextChangedListener(textWatcher);
     }
 
 
+    /**
+     * Save the state of our edited message in the database
+     */
     private void saveState() {
         String title = titleEditText.getText().toString();
         String message = messageEditText.getText().toString();
@@ -140,7 +132,28 @@ public class FluidNexusEditMessage extends Activity {
         values.put(FluidNexusDbAdapter.KEY_TITLE, title);
         values.put(FluidNexusDbAdapter.KEY_DATA, message);
         values.put(FluidNexusDbAdapter.KEY_HASH, FluidNexusDbAdapter.makeMD5(title + message));
-        dbHelper.updateItemByID(id, values);
+        dbAdapter.updateItemByID(id, values);
+    }
+
+    /**
+     * Check if the text has changed
+     * TODO is this going to be inefficient for very large bodies of text?
+     * There is a problem with using the TextWatcher, as it is called even for events not from the keyboard.  Not sure how to use this otherwise.
+     * @return true if it has, false otherwise
+     */
+    private boolean checkIfTextChanged() {
+        String title = titleEditText.getText().toString();
+        String message = messageEditText.getText().toString();
+
+        if (!(title.equals(originalTitle))) {
+            return true;
+        }
+
+        if (!(message.equals(originalMessage))) {
+            return true;
+        }
+
+        return false;
     }
 
 
@@ -163,7 +176,7 @@ public class FluidNexusEditMessage extends Activity {
     }
     
     /**
-     * Method to create our really delete dialog
+     * Method to create our really discard dialog
      */
     private AlertDialog reallyDiscardDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);

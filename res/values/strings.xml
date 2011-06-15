@@ -12,6 +12,7 @@
     <string name="message_view_title">View Message (Fluid Nexus)</string>
     <string name="help_title">Help + About (Fluid Nexus)</string>
     <string name="message_add_outgoing_title">Add Outgoing Message (Fluid Nexus)</string>
+    <string name="message_edit_title">Edit Message (Fluid Nexus)</string>
     <string name="message_view_outgoing_title">View Outgoing Messages (Fluid Nexus)</string>
     <string name="message_list_header_text_all">ALL MESSAGES</string>
     <string name="message_list_header_text_outgoing">OUTGOING MESSAGES</string>
