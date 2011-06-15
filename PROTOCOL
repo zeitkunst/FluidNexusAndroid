@@ -11,5 +11,61 @@
 * title
 * message
 
+== Version 2 ==
 
+Since on Android we cannot get the user-defined service names from the API, we cannot use service advertisement and stigmergy to figure out which hashes to send.  This was probably not scalable anyway.  So we have to develop a protocol for discovering which hashes the other device has to determine which ones to request.
 
+On Android it's also problematic for devices to be discoverable for any reasonable length of time.  Additionally, it seems RFCOMM can only happen for paired devices.  Thus, after the initial establishment of a connection and the pulling of hashes from the server, the client can switch roles and become a "server" for the other device.
+
+=== Commands ===
+
+0x10    HELO
+
+0x20    Hash list
+0x21    Hash list continuation
+
+0x30    Hash request
+
+0x40    Switch
+
+0xF0    Done
+0xF1    Done; no more hashes to send
+
+=== 0x10: HELO ===
+
+The client sends this command to the server with a 2-byte hex value for the version (currently 0x02), which the server return to the client with no arguments, in order to estable the connection.
+
+=== 0x20: Hash list ===
+
+To determine which hashes the server has, the client sends this command to the server with no arguments.  The server responds with data of the following format:
+
+0xX                 32 bytes
+number of hashes    hashes, multipled by the number being sent
+(limited to 16
+at a time)
+
+=== 0x21: Hash list continuation ===
+
+After receiving a set of hashes and (optionally) requesting data for a subset of them, the client may wish to get more hashes from the server.  This command is sent with an argument "offset" of the following:
+
+0xXXXX
+hex offset that determines where in the sequence of hashes the server should start in its transmission.  The server responds using the same format as with command 0x20.  If there are no other hashes to be sent, the server responds with the command 0xF1.
+
+=== 0x30: Hash request ===
+
+The client sends this command to the server with a a 32-byte argument of the hash it wants to receive.  The server responds in the manner as described in the ver1 protocol, with the following exceptions:
+
+* the "version" field is now 0x02.
+* "length" of title and "length" of message are now 3 byte and 6 byte _hex_ values respectively, sent as character strings.
+
+=== 0x40: Switch ===
+
+Command to let the server know that it should switch into a "client" mode, allowing it to send commands such as 0x20 to discover hashes from the former client.
+
+=== 0xF0: Done ===
+
+If at any point the client wishes to end the session it can send this command.  The server responds in kind.
+
+=== 0xF1: Done ===
+
+If the server hash no more hashes to send, it responds with this command.
