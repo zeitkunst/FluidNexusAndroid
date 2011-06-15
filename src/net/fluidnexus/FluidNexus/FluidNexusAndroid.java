@@ -30,6 +30,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.BroadcastReceiver;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -61,6 +62,7 @@ public class FluidNexusAndroid extends ListActivity {
     
     private SharedPreferences prefs;
     private Editor prefsEditor;
+    private SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener;
 
     // just for testing
     private BroadcastReceiver iReceiver;
@@ -98,6 +100,7 @@ public class FluidNexusAndroid extends ListActivity {
     private Cursor dbCursor;
 
     private BluetoothAdapter bluetoothAdapter = null;
+    private boolean enableBluetoothServicePref = true;
 
     private class NewMessageIntentReceiver extends BroadcastReceiver {
         public void onReceive(Context context, Intent intent) {
@@ -114,16 +117,6 @@ public class FluidNexusAndroid extends ListActivity {
     {
         super.onCreate(icicle);
         log.verbose("unfreezing...");
-        // TODO
-        // The following are supposed to make the window be somewhat blurry
-        // but the compositing is bad, as it makes the background be simply
-        // a checkerboard
-        /*
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND,WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
-        WindowManager.LayoutParams lp = getWindow().getAttributes();
-        lp.alpha = 0.85f;
-        getWindow().setAttributes(lp); 
-        */
 
         setContentView(R.layout.message_list);
         registerForContextMenu(getListView());
@@ -144,12 +137,6 @@ public class FluidNexusAndroid extends ListActivity {
         if (bluetoothAdapter == null) {
             Toast.makeText(this, "Bluetooth is not available; sending and receiving messages will not be possible", Toast.LENGTH_LONG).show();
         }
-
-
-        /*        
-        log.info("Starting bluetooth service");        
-        startService(new Intent(FluidNexusBluetoothService.class.getName()));
-        */
     }
 
     /**
@@ -212,7 +199,7 @@ public class FluidNexusAndroid extends ListActivity {
             }
         }
 
-        boolean enableBluetoothServicePref = prefs.getBoolean("enableBluetoothServicePref", true);
+        enableBluetoothServicePref = prefs.getBoolean("enableBluetoothServicePref", true);
         if (enableBluetoothServicePref) {
             // TODO
             // be sure to start or stop the service if this pref changes
@@ -224,7 +211,7 @@ public class FluidNexusAndroid extends ListActivity {
     @Override
     protected void onPause() {
         super.onPause();
-
+        unregisterReceiver(iReceiver);
     }
 
     @Override
@@ -236,7 +223,7 @@ public class FluidNexusAndroid extends ListActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(iReceiver);
+        prefs.unregisterOnSharedPreferenceChangeListener(preferenceChangeListener);
         dbAdapter.close();
     }
 
@@ -300,6 +287,26 @@ public class FluidNexusAndroid extends ListActivity {
         }
         
         this.showMessages = prefs.getBoolean("ShowMessages", true);
+
+        // Setup a listener for when preferences change
+        preferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            public void onSharedPreferenceChanged(SharedPreferences pref, String key) {
+                log.debug("changed key: " + key);
+                if (key.equals("enableBluetoothServicePref")) {
+                    boolean tmp = prefs.getBoolean("enableBluetoothServicePref", true);
+
+                    if (tmp) {
+                        startService(new Intent(FluidNexusBluetoothService.class.getName()));
+                    } else {
+                        stopService(new Intent(FluidNexusBluetoothService.class.getName()));
+                    }
+                    enableBluetoothServicePref = tmp;
+                }
+
+            }
+
+        };
+        prefs.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
     }
 
     @Override
@@ -375,18 +382,6 @@ public class FluidNexusAndroid extends ListActivity {
                 fillListView(VIEW_MODE);
                 break;
             case(ACTIVITY_PREFERENCES):
-                /*
-                 * TODO
-                 * figure out why I don't get extras anymore...
-                if (!extras.isEmpty()) {
-                    boolean bluetoothChanged = extras.getBoolean("bluetoothChanged", false);
-                    if (bluetoothChanged) {
-                        toast = Toast.makeText(this, R.string.toast_bluetooth_settings_changed, Toast.LENGTH_LONG);
-                        toast.show();
-
-                    }
-                }
-                */
                 break;
             case(REQUEST_ENABLE_BT):
                 if (resultCode == ListActivity.RESULT_OK) {
@@ -468,14 +463,6 @@ public class FluidNexusAndroid extends ListActivity {
                 return false;
             }
         });
-
-        // TODO
-        // Setting headers doesn't work because it inserts it as an element of the list, even when I tell it not too.  FOO!
-        //View headerView = getViewInflate().inflate(R.layout.message_list_header,null,false,null);
-        //headerView.setClickable(false);
-        //headerView.setFocusable(false);
-        //headerView.setFocusableInTouchMode(false);
-        //lv.addHeaderView(headerView,null,false);
 
         setListAdapter(messagesAdapter);
 
