@@ -221,6 +221,7 @@ public class FluidNexusBluetoothService extends Service {
 
         // Set icon, scrolling text, and timestamp
         Notification notification = new Notification(R.drawable.fluid_nexus_icon, text, System.currentTimeMillis());
+        notification.flags |= Notification.FLAG_ONGOING_EVENT;
 
         // The PendingIntent to launch the activity of the user selects this notification
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, FluidNexusAndroid.class), 0);

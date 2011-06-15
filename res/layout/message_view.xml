@@ -54,11 +54,10 @@ android:text="TextView"
 <Button
 android:id="@+id/view_message_back"
 android:layout_width="wrap_content"
-android:layout_height="32sp"
+android:layout_height="wrap_content"
 android:text="@string/view_message_back"
 android:layout_alignParentBottom="true"
 android:layout_alignParentRight="true"
-android:textSize="11sp"
 >
 </Button>
 </RelativeLayout>

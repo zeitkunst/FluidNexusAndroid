@@ -28,6 +28,11 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.ScrollView;
 
+/**
+ * TODO
+ * Rework how we handle the help functionality
+ * The layout thing is a mess right now, but we need to rethink it anyway
+ */
 public class FluidNexusHelp extends Activity {
 
     private static FluidNexusLogger log = FluidNexusLogger.getLogger("FluidNexus"); 
@@ -41,16 +46,16 @@ public class FluidNexusHelp extends Activity {
         setTitle(R.string.help_title);
         Bundle extras = getIntent().getExtras();
         
-        Button okButton = (Button) findViewById(R.id.help_return_button);
-        Button conceptButton = (Button) findViewById(R.id.help_concept_button);
-        Button helpButton = (Button) findViewById(R.id.help_help_button);
+        //Button okButton = (Button) findViewById(R.id.help_return_button);
+        //Button conceptButton = (Button) findViewById(R.id.help_concept_button);
+        //Button helpButton = (Button) findViewById(R.id.help_help_button);
         tv = (TextView) findViewById(R.id.help_text);
         ScrollView sv = (ScrollView) findViewById(R.id.help_scroll_view);
 
+        /*
         okButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 Bundle bundle = new Bundle();
-                /*setResult(RESULT_OK, null, bundle);*/
                 setResult(RESULT_OK);
                 finish();
             }
@@ -67,10 +72,6 @@ public class FluidNexusHelp extends Activity {
                 tv.setText(R.string.help_concept_text);
             }
         });
-
-
-
+        */
     }
-
-
 }

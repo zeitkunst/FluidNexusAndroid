@@ -166,7 +166,6 @@ public class FluidNexusAndroid extends ListActivity {
             .setCancelable(false)
             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    log.debug("Row ID is: " + currentRowID);
                     dbAdapter.deleteById(currentRowID);
                     currentRowID = -1;
                     fillListView(VIEW_MODE);
@@ -357,7 +356,6 @@ public class FluidNexusAndroid extends ListActivity {
     protected void onListItemClick(ListView l, View v, int position, long id) {
         // We will need to be careful later here about the different uses of position and rowID
         super.onListItemClick(l, v, position, id);
-        log.info("At position: " + position);
         Cursor localCursor = dbCursor;
         localCursor.moveToPosition(position);
 
