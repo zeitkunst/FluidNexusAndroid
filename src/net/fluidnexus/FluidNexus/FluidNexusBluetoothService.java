@@ -20,9 +20,14 @@
 package net.fluidnexus.FluidNexus;
 
 import java.lang.reflect.Method;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.util.UUID;
 import java.util.ArrayList;
 import java.util.Timer;
@@ -154,15 +159,6 @@ public class FluidNexusBluetoothService extends Service {
             }
         }
     };
-
-    public class FluidNexusBluetoothBinder extends Binder {
-        FluidNexusBluetoothService getService() {
-            return FluidNexusBluetoothService.this;
-        }
-    }
-
-    // This is the object that receives interactions from clients
-    private final IBinder binder = new FluidNexusBluetoothBinder();
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -374,6 +370,7 @@ public class FluidNexusBluetoothService extends Service {
          * Constructor for the thread
          */
         public BluetoothServiceThread() {
+            setName("FluidNexusBluetoothServiceThread");
         }
 
         /**
@@ -557,6 +554,7 @@ public class FluidNexusBluetoothService extends Service {
         private String socketType;
 
         public ConnectThread(BluetoothDevice remoteDevice, boolean secure) {
+            setName("FluidNexusConnectThread");
             device = remoteDevice;
             BluetoothSocket tmp = null;
             socketType = secure ? "Secure" : "Insecure";
@@ -615,18 +613,37 @@ public class FluidNexusBluetoothService extends Service {
      */
     private class ConnectedThread extends Thread {
         private final BluetoothSocket socket;
-        private final InputStream inputStream;
-        private final OutputStream outputStream;
+        //private final InputStream inputStream;
+        //private final OutputStream outputStream;
+        private DataInputStream inputStream = null;
+        private DataOutputStream outputStream = null;
+
+        private ArrayList<String> hashList = new ArrayList<String>();
+
+        private char connectedState = 0x00;
+        private final char DISCONNECTED = 0x00;
+        private final char HELO = 0x10;
+        private final char HASH_LIST = 0x20;
+        private final char HASH_LIST_CONTINUATION = 0x21;
+        private final char HASH_REQUEST = 0x30;
+        private final char SWITCH = 0x40;
+        private final char DONE_DONE = 0xF0;
+        private final char DONE_HASHES = 0xF1;
+
+
 
         public ConnectedThread(BluetoothSocket remoteSocket, String socketType) {
+            setName("FluidNexusConnectedThread");
             log.debug("Created ConnectedThread: " + socketType);
             socket = remoteSocket;
-            InputStream tmpIn = null;
-            OutputStream tmpOut = null;
+            DataInputStream tmpIn = null;
+            DataOutputStream tmpOut = null;
+
+            setConnectedState(DISCONNECTED);
 
             try {
-                tmpIn = socket.getInputStream();
-                tmpOut = socket.getOutputStream();
+                tmpIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+                tmpOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
             } catch (IOException e) {
                 log.error("Temp stream sockets not created");
             }
@@ -635,9 +652,166 @@ public class FluidNexusBluetoothService extends Service {
             outputStream = tmpOut;
         }
 
+        /**
+         * Set the state of the connected thread
+         * @param state Int that defines the connected thread state
+         */
+        private synchronized void setConnectedState(char newState) {
+            String tmpNewState = Integer.toHexString(Character.digit(newState, 16));
+            String tmpConnectedState = Integer.toHexString(Character.digit(connectedState, 16));
+            log.debug("Changing connected thread state from " + tmpConnectedState + " to " + tmpNewState);
+            connectedState = newState;
+        }
+    
+        /**
+         * Get the current state value
+         */
+        private synchronized char getConnectedState() {
+            return connectedState;
+        }
+
+        /**
+         * Setup our connection
+         */
+        private void sendHELO() {
+            // TODO
+            // perhaps this ByteBuffer should be an instance value, instead of being allocated all the time...but we'll see
+            /*
+            ByteBuffer b = ByteBuffer.allocate(2);
+            b.putChar(HELO);
+            byte[] send = b.array();
+            write(send);
+            byte[] buffer = read(2);
+            ByteBuffer bb = ByteBuffer.wrap(buffer);
+            char tmp = bb.getChar();
+            */
+            try {
+                outputStream.writeChar(HELO);
+                outputStream.flush();
+            } catch (IOException e) {
+                log.error("Exception during writing to outputStream: " + e);
+            }
+
+            try {
+                char tmp = inputStream.readChar();
+                if (tmp == HELO) {
+                    log.debug("got HELO");
+                    setConnectedState(HELO);
+                } else {
+                    log.debug("Received: " + tmp);
+                }
+            } catch (IOException e) {
+                log.error("Exception during reading from inputStream: " + e);
+            }
+
+            /*
+            String tmp = new String(buffer);
+                log.debug("Received: " + tmp);
+                */
+        }
+
+        /**
+         * Send hash request to server
+         */
+        public void requestHashList() {
+            // Send HASH_LIST command
+            try {
+                outputStream.writeChar(HASH_LIST);
+                outputStream.flush();
+            } catch (IOException e) {
+                log.error("Exception during writing to outputStream: " + e);
+            }
+
+            // Read result (number of hashes we're expecting
+            int numHashes = -1;
+            try {
+                numHashes = (int) inputStream.readChar();
+                log.debug("Expecting to receive number of hashes: " + numHashes);
+            } catch (IOException e) {
+                log.error("Exception during reading from inputStream: " + e);
+            }
+
+            // Read the hashes
+            for (int i = 0; i < numHashes; i++) {
+                byte[] hash = new byte[32];
+                try {
+                    inputStream.readFully(hash);
+                } catch (IOException e) {
+                    log.error("Exception during reading from inputStream: " + e);
+                }
+                String tmp = new String(hash);
+                hashList.add(tmp);
+                log.debug("received hash: " + tmp);
+            }
+            setConnectedState(HASH_LIST);
+        }
+
+        /**
+         * Request the data for each desired hash
+         */
+        private void requestHashes() {
+            // Send HASH_REQUEST command
+            try {
+                for (String currentHash: hashList) {
+                    outputStream.writeChar(HASH_REQUEST);
+                    outputStream.flush();
+
+                    byte[] send = currentHash.getBytes();
+                    outputStream.write(send, 0, send.length);
+                    outputStream.flush();
+                    
+                    int version = inputStream.readUnsignedByte();
+                    log.debug("Version is: " + version);
+
+                    int titleLength = inputStream.readInt();
+                    log.debug("Title length is: " + titleLength);
+
+                    int messageLength = inputStream.readInt();
+                    log.debug("Message length is: " + messageLength);
+
+                    byte[] timestamp = new byte[10];
+                    inputStream.readFully(timestamp);
+                    String tmp = new String(timestamp);
+                    log.debug("Timestamp is: " + tmp);
+
+                    byte[] title = new byte[titleLength];
+                    inputStream.readFully(title);
+                    tmp = new String(title);
+                    log.debug("Title is: " + tmp);
+
+                    byte[] message = new byte[messageLength];
+                    inputStream.readFully(message);
+                    tmp = new String(message);
+                    log.debug("Message is: " + tmp);
+     
+                }
+
+            } catch (IOException e) {
+                log.error("Exception during writing to outputStream in requestHashes: " + e);
+                this.cancel();
+            }
+
+        }
+
         public void run() {
             log.info("Begin ConnectedThread");
+            
+            while (true) {
+                switch(getConnectedState()) {
+                    case DISCONNECTED:
+                        sendHELO();
+                    case HELO:
+                        requestHashList();
+                    case HASH_LIST:
+                        requestHashes();
+                    case 0xFF:
+                        //log.debug("we should never have gotten here...");
+                    default:
+                        break;
+                }            
+            }
 
+            /*
             // Do sending process over all data
             // TODO
             // Only send if we need to...this is just for testing
@@ -692,6 +866,7 @@ public class FluidNexusBluetoothService extends Service {
                     log.error("Thread sleeping interrupted: " + e);
                 }
             }
+            */
 
         }
 
@@ -705,6 +880,22 @@ public class FluidNexusBluetoothService extends Service {
             } catch (IOException e) {
                 log.error("Exception during writing to outputStream: " + e);
             }
+        }
+
+        /**
+         * Read from the connected device via an OutputStream
+         * @param bytes Number of bytes to read
+         * @return byte[] buffer of bytes read, or null otherwise
+         */
+        public byte[] read(int bytes) {
+            byte[] buffer = new byte[bytes];
+            try {
+                inputStream.read(buffer, 0, bytes);
+            } catch (IOException e) {
+                log.error("Exception during reading from outputStream: " + e);
+            }
+
+            return buffer;
         }
 
         /**
