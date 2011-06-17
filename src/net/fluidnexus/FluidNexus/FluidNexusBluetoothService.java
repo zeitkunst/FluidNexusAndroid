@@ -30,7 +30,7 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -91,8 +91,6 @@ public class FluidNexusBluetoothService extends Service {
 
     private BluetoothServiceThread serviceThread = null;
 
-    // Threads
-    private ConnectThread connectThread;
 
     // Thread Handler message constants
     private final int CONNECTED_THREAD_FINISHED = 0x30;
@@ -249,27 +247,6 @@ public class FluidNexusBluetoothService extends Service {
         return state;
     }
 
-    /**
-     * Start a thread for connection to remove FluidNexus device
-     * @param device BluetoothDevice to connect to
-     * @param secure Socket security type
-     */
-    public synchronized void connect(BluetoothDevice device, boolean secure) {
-        log.debug("Connecting to: " + device);
-
-        // cancel any thread trying to connect
-        if (state == STATE_CONNECTING) {
-            if (connectThread != null) {
-                connectThread.cancel();
-                connectThread = null;
-            }
-        }
-
-        // State the thread that connects to the remove device
-        connectThread = new ConnectThread(device, true);
-        connectThread.start();
-        setServiceState(STATE_CONNECTING);
-    }
 
 
     /**
@@ -312,8 +289,11 @@ public class FluidNexusBluetoothService extends Service {
      * This thread runs all of the device/service discovery and socket communication
      */
     private class BluetoothServiceThread extends Thread {
+        // Threads
+        private ConnectThread connectThread;
+
         private BluetoothSocket socket;
-        private ArrayList<Map> connectedThreadMap = new ArrayList<Map>();
+        private ArrayList<HashMap> connectedThreadMap = new ArrayList<HashMap>();
 
         /**
          * Constructor for the thread
@@ -370,6 +350,32 @@ public class FluidNexusBluetoothService extends Service {
                 }
             }
         }
+
+        /**
+         * Start a thread for connection to remove FluidNexus device
+         * @param device BluetoothDevice to connect to
+         * @param secure Socket security type
+         */
+        public synchronized void connect(BluetoothDevice device, boolean secure) {
+            log.debug("Connecting to: " + device);
+    
+            // cancel any thread trying to connect
+            if (state == STATE_CONNECTING) {
+                if (connectThread != null) {
+                    connectThread.cancel();
+                    connectThread = null;
+                }
+            }
+    
+            // State the thread that connects to the remove device
+            connectThread = new ConnectThread(device, true);
+            HashMap threadMap = new HashMap();
+            //threadMap.put(device.getAddress(), connectThread);
+            
+            connectThread.start();
+            setServiceState(STATE_CONNECTING);
+        }
+
 
         /**
          * Run the actions to do with moving from the initial state
@@ -486,12 +492,13 @@ public class FluidNexusBluetoothService extends Service {
         private final char SWITCH = 0x40;
         private final char DONE_DONE = 0xF0;
         private final char DONE_HASHES = 0xF1;
+        private final char CLOSE_CONNECTION = 0xFF;
 
 
 
         //public ConnectedThread(BluetoothSocket remoteSocket, String socketType) {
         public ConnectThread(BluetoothDevice remoteDevice, boolean secure) {
-            setName("FluidNexusConnectThread");
+            setName("FluidNexusConnectThread: " + remoteDevice.getAddress());
             device = remoteDevice;
             BluetoothSocket tmp = null;
             socketType = secure ? "Secure" : "Insecure";
@@ -611,6 +618,8 @@ public class FluidNexusBluetoothService extends Service {
                 log.error("Exception during reading from inputStream: " + e);
             }
 
+            cleanupConnection();
+
         }
 
 
@@ -705,7 +714,7 @@ public class FluidNexusBluetoothService extends Service {
         public void run() {
             log.info("Begin ConnectedThread");
             
-            while (true) {
+            while (getConnectedState() != CLOSE_CONNECTION) {
                 switch(getConnectedState()) {
                     case DISCONNECTED:
                         sendHELO();
@@ -818,6 +827,21 @@ public class FluidNexusBluetoothService extends Service {
             } catch (IOException e) {
                 log.error("Exception when trying to flush outputStream: " + e);
             }
+        }
+
+        /**
+         * Cleanup the connection and exit out of main loop
+         */
+        public void cleanupConnection() {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                log.error("close() of ConnectedThread socket failed: " + e);
+            }
+
+            log.info("Closing the socket and ending the thread");
+            setConnectedState(CLOSE_CONNECTION);
+           
         }
 
         public void cancel() {
