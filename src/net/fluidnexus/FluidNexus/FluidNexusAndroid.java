@@ -60,6 +60,11 @@ import android.util.Log;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 
+/*
+ * TODO
+ * * deal with the database somehow not being open when we receive the MSG_NEW_MESSAGE_RECEIVED message after an orientation change.  This is totally opaque to me.
+ * * deal with new binding to the service when clicking on the notification; this shouldn't happen
+ */
 
 public class FluidNexusAndroid extends ListActivity {
     private FluidNexusDbAdapter dbAdapter;
@@ -168,9 +173,7 @@ public class FluidNexusAndroid extends ListActivity {
 
         setContentView(R.layout.message_list);
         registerForContextMenu(getListView());
-        dbAdapter = new FluidNexusDbAdapter(this);
-        dbAdapter.open();
-        fillListView(VIEW_MODE);
+
         log.verbose("starting up...");
       
         // Regiser my receiver to NEW_MESSAGE action
@@ -241,6 +244,10 @@ public class FluidNexusAndroid extends ListActivity {
         super.onStart();
         log.info("In onStart");
 
+        dbAdapter = new FluidNexusDbAdapter(this);
+        dbAdapter.open();
+        fillListView(VIEW_MODE);
+
         setupPreferences();
         if (bluetoothAdapter != null) {
             if (!bluetoothAdapter.isEnabled()) {
@@ -272,6 +279,7 @@ public class FluidNexusAndroid extends ListActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
         registerReceiver(iReceiver, iFilter);
     }
 
@@ -279,7 +287,14 @@ public class FluidNexusAndroid extends ListActivity {
     protected void onDestroy() {
         super.onDestroy();
         prefs.unregisterOnSharedPreferenceChangeListener(preferenceChangeListener);
+        dbCursor.close();
         dbAdapter.close();
+        try {
+            doUnbindService();
+        } catch (Throwable t) {
+            log.debug("Failed to unbind from the service");
+        }
+
     }
 
     /*
@@ -295,6 +310,7 @@ public class FluidNexusAndroid extends ListActivity {
         menu.setHeaderTitle(c.getString(c.getColumnIndexOrThrow(FluidNexusDbAdapter.KEY_TITLE)));
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.message_list_context, menu);
+        c.close();
     }
 
     @Override
@@ -355,6 +371,7 @@ public class FluidNexusAndroid extends ListActivity {
         i.putExtra(FluidNexusDbAdapter.KEY_TITLE, c.getString(c.getColumnIndex(FluidNexusDbAdapter.KEY_TITLE)));
         i.putExtra(FluidNexusDbAdapter.KEY_DATA, c.getString(c.getColumnIndex(FluidNexusDbAdapter.KEY_DATA)));
         startActivityForResult(i, ACTIVITY_EDIT_MESSAGE);
+        c.close();
 
     }
 
@@ -451,6 +468,7 @@ public class FluidNexusAndroid extends ListActivity {
         i.putExtra(FluidNexusDbAdapter.KEY_TITLE, localCursor.getString(localCursor.getColumnIndex(FluidNexusDbAdapter.KEY_TITLE)));
         i.putExtra(FluidNexusDbAdapter.KEY_DATA, localCursor.getString(localCursor.getColumnIndex(FluidNexusDbAdapter.KEY_DATA)));
         startActivityForResult(i, ACTIVITY_VIEW_MESSAGE);
+        localCursor.close();
     }
 
     @Override
@@ -512,7 +530,7 @@ public class FluidNexusAndroid extends ListActivity {
         } else if (viewType == 1) {
             dbCursor = dbAdapter.outgoing();
         }
-        startManagingCursor(dbCursor);
+        //startManagingCursor(dbCursor);
 
         TextView tv;
         tv = (TextView) findViewById(R.id.message_list_item);

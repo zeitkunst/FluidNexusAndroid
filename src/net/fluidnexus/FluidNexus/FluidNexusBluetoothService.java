@@ -65,8 +65,8 @@ import android.widget.Toast;
 
 /*
  * TODO
+ * * Send message from ConnectThread to service to let it know that the connection is finished
  * * Only receive hashes that we don't have
- * * Ignore devices that don't have the service installed
  * * Figure out why the service doesn't continually run the connect thread after one has finished
  * * Figure out why multiple threads aren't started for multiple hosts
  * * Enable other end of the communication (SWITCH)
@@ -90,7 +90,9 @@ public class FluidNexusBluetoothService extends Service {
     private ArrayList<Vector> currentData = new ArrayList<Vector>();
     private Vector<String> currentItem = new Vector<String>();
 
-    private ArrayList<Vector> devices = new ArrayList<Vector>();
+    private ArrayList<Vector> allDevices = new ArrayList<Vector>();
+    private ArrayList<BluetoothDevice> allDevicesBT = new ArrayList<BluetoothDevice>();
+    private ArrayList<BluetoothDevice> fnDevicesBT = new ArrayList<BluetoothDevice>();
     private Vector<String> device = new Vector<String>();
 
     private IntentFilter btFoundFilter;
@@ -147,13 +149,16 @@ public class FluidNexusBluetoothService extends Service {
                 device.clear();
                 device.add(foundDevice.getName());
                 device.add(foundDevice.getAddress());
-                devices.add(device);
+                allDevices.add(device);
+                allDevicesBT.add(foundDevice);
                 
                 // Print this info to the log, for now
                 log.info(foundDevice.getName() + " " + foundDevice.getAddress());
             } else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
                 // Clear out our device list
-                devices.clear();
+                allDevices.clear();
+                allDevicesBT.clear();
+                fnDevicesBT.clear();
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 setServiceState(STATE_DISCOVERY_FINISHED);
             }
@@ -219,9 +224,11 @@ public class FluidNexusBluetoothService extends Service {
         btFoundFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         this.registerReceiver(btDiscoveryReceiver, btFoundFilter);
 
+        /*
         String action = "android.bleutooth.device.action.UUID";
         IntentFilter sdpFilter = new IntentFilter(action);
         this.registerReceiver(sdpReceiver, sdpFilter);
+        */
 
         // setup database object
         dbHelper = new FluidNexusDbAdapter(this);
@@ -478,7 +485,30 @@ public class FluidNexusBluetoothService extends Service {
          * Run the actions after we've done discovery
          */
         private void doDiscoveryFinished() {
-            for (Vector currentDevice : devices) {
+            
+            for (BluetoothDevice currentDevice : allDevicesBT) {
+                log.debug("Working on services discovery for " + currentDevice.getName() + " with address " + currentDevice.getAddress());
+                ParcelUuid[] uuids = servicesFromDevice(currentDevice);
+
+                if (uuids != null) {
+                    for (Parcelable uuid: uuids) {
+                        log.debug("Found: " + uuid.toString());
+                        UUID tmpUUID = UUID.fromString(uuid.toString());
+                        if (tmpUUID.equals(FluidNexusUUID)) {
+                            log.debug("Fluid Nexus service found");
+                            fnDevicesBT.add(currentDevice);
+                        }
+                    }
+                }
+            }
+
+            for (BluetoothDevice currentDevice : fnDevicesBT) {
+                log.debug("Trying to connect to " + currentDevice.getName() + " with address " + currentDevice.getAddress());
+
+                connect(currentDevice, true);
+            }
+            /*
+            for (Vector currentDevice : allDevices) {
                 String name = (String) currentDevice.get(0);
                 String address = (String) currentDevice.get(1);
                 log.debug("Working on device " + name + " with address " + address);
@@ -486,6 +516,7 @@ public class FluidNexusBluetoothService extends Service {
 
                 connect(btDevice, true);
             }
+            */
         }
 
         /**
@@ -494,7 +525,7 @@ public class FluidNexusBluetoothService extends Service {
         private void doServiceDiscovery() {
             UUID tempUUID = UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
 
-            for (Vector currentDevice : devices) {
+            for (Vector currentDevice : allDevices) {
                 String name = (String) currentDevice.get(0);
                 String address = (String) currentDevice.get(1);
                 log.debug("Working on device " + name + " with address " + address);
