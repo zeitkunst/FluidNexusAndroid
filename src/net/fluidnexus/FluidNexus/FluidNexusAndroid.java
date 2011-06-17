@@ -23,19 +23,24 @@ import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.app.ListActivity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.BroadcastReceiver;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -93,7 +98,12 @@ public class FluidNexusAndroid extends ListActivity {
     private static final int MENU_HELP_ID = Menu.FIRST + 5;
 
     // messages from bluetooth service
-    public static final int MESSAGE_BT_STATE_CHANGED = 1;
+    Messenger bluetoothService = null;
+    final Messenger messenger = new Messenger(new IncomingHandler());
+
+    // Messages to the bluetooth service
+    static final int MSG_NEW_MESSAGE_CREATED = 0xF0;
+    static final int MSG_MESSAGE_DELETED = 0xF1;
 
     private boolean showMessages = true;
 
@@ -110,6 +120,44 @@ public class FluidNexusAndroid extends ListActivity {
             fillListView(VIEW_MODE);
         }
     }
+
+    /**
+     * Our handler for incoming messages
+     */
+    class IncomingHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case FluidNexusBluetoothService.MSG_NEW_MESSAGE_RECEIVED:
+                    log.debug("Received MSG_NEW_MESSAGE_RECEIVED");
+                    fillListView(VIEW_MODE);
+                    break;
+                default:
+                    super.handleMessage(msg);
+            }
+        }
+    }
+
+    private ServiceConnection bluetoothServiceConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            bluetoothService = new Messenger(service);
+            log.debug("Connected to service");
+            try {
+                Message msg = Message.obtain(null, FluidNexusBluetoothService.MSG_REGISTER_CLIENT);
+                msg.replyTo = messenger;
+                bluetoothService.send(msg);
+            } catch (RemoteException e) {
+                // Here, the service has crashed even before we were able to connect
+            }
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            // Called when the connection to the service has been unexpectedly closed
+            bluetoothService = null;
+            log.debug("Disconnected from service");
+        }
+
+    };
 
     /** Called when the activity is first created. */
     @Override
@@ -167,6 +215,17 @@ public class FluidNexusAndroid extends ListActivity {
             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     dbAdapter.deleteById(currentRowID);
+
+                    // TODO
+                    // move to instance method
+                    try {
+                        // Send message to service to note that a new message has been created
+                        Message msg = Message.obtain(null, MSG_MESSAGE_DELETED);
+                        bluetoothService.send(msg);
+                    } catch (RemoteException e) {
+                        // Here, the service has crashed even before we were able to connect
+                    }
+
                     currentRowID = -1;
                     fillListView(VIEW_MODE);
                     toast = Toast.makeText(getApplicationContext(), "Message deleted.", Toast.LENGTH_LONG);
@@ -200,8 +259,7 @@ public class FluidNexusAndroid extends ListActivity {
 
         enableBluetoothServicePref = prefs.getBoolean("enableBluetoothServicePref", true);
         if (enableBluetoothServicePref) {
-            log.info("Starting Bluetooth Service");
-            startService(new Intent(FluidNexusBluetoothService.class.getName()));
+            doBindService();
         }
     }
 
@@ -254,6 +312,35 @@ public class FluidNexusAndroid extends ListActivity {
                 return super.onContextItemSelected(item);
         }
     }
+
+    /**
+     * Bind to the service
+     */
+    private void doBindService() {
+        log.info("Binding to Fluid Nexus Bluetooth Service");
+        Intent i = new Intent(this, FluidNexusBluetoothService.class);
+        startService(i);
+        bindService(i, bluetoothServiceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    /**
+     * Unbind to the service
+     */
+    private void doUnbindService() {
+        if (bluetoothService != null) {
+            try {
+                Message msg = Message.obtain(null, FluidNexusBluetoothService.MSG_UNREGISTER_CLIENT);
+                msg.replyTo = messenger;
+                bluetoothService.send(msg);
+            } catch (RemoteException e) {
+                // nothing special to do if the service has already stopped for some reason
+            }
+
+            unbindService(bluetoothServiceConnection);
+            log.info("Unbound to the Fluid Nexus Bluetooth Service");
+        }
+    }
+
 
     /**
      * Open up a new activity to edit the message
@@ -375,6 +462,16 @@ public class FluidNexusAndroid extends ListActivity {
                 fillListView(VIEW_MODE);
                 break;
             case(ACTIVITY_ADD_OUTGOING):
+                // TODO
+                // move this to an instance method
+                try {
+                    // Send message to service to note that a new message has been created
+                    Message msg = Message.obtain(null, MSG_NEW_MESSAGE_CREATED);
+                    bluetoothService.send(msg);
+                } catch (RemoteException e) {
+                    // Here, the service has crashed even before we were able to connect
+                }
+
                 fillListView(VIEW_MODE);
                 break;
             case(ACTIVITY_PREFERENCES):

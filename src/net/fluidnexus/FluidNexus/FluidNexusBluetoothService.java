@@ -31,6 +31,7 @@ import java.nio.ByteBuffer;
 import java.util.UUID;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -55,17 +56,22 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.Messenger;
 import android.os.Parcelable;
 import android.os.ParcelUuid;
+import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
 
 /*
  * TODO
+ * * Only receive hashes that we don't have
+ * * Ignore devices that don't have the service installed
  * * Figure out why the service doesn't continually run the connect thread after one has finished
+ * * Figure out why multiple threads aren't started for multiple hosts
  * * Enable other end of the communication (SWITCH)
  * * Refactor python testing script into actual library for use
- * * Create intent in activity to notify service when a new item has been created
+ * * See if it's possible to manually enter paired devices to speed up creation of the network
  */
 
 public class FluidNexusBluetoothService extends Service {
@@ -80,7 +86,7 @@ public class FluidNexusBluetoothService extends Service {
     private BluetoothAdapter bluetoothAdapter;
 
     // Keeping track of items from the database
-    private ArrayList<String> currentHashes = new ArrayList<String>();
+    private HashSet<String> currentHashes = new HashSet<String>();
     private ArrayList<Vector> currentData = new ArrayList<Vector>();
     private Vector<String> currentItem = new Vector<String>();
 
@@ -92,6 +98,15 @@ public class FluidNexusBluetoothService extends Service {
 
     private BluetoothServiceThread serviceThread = null;
 
+    // keeps track of connected clients
+    // will likely always be only a single client, but what the hey
+    ArrayList<Messenger> clients = new ArrayList<Messenger>();
+    public static final int MSG_REGISTER_CLIENT = 0x10;
+    public static final int MSG_UNREGISTER_CLIENT = 0x11;
+    public static final int MSG_NEW_MESSAGE_RECEIVED = 0x20;
+
+    // Target we publish for clients to send messages to
+    final Messenger messenger = new Messenger(new IncomingHandler());
 
     // Thread Handler message constants
     private final int CONNECTED_THREAD_FINISHED = 0x30;
@@ -166,7 +181,29 @@ public class FluidNexusBluetoothService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return messenger.getBinder();
+    }
+
+    class IncomingHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MSG_REGISTER_CLIENT:
+                    log.debug("Adding client: " + msg.replyTo);
+                    clients.add(msg.replyTo);
+                    break;
+                case MSG_UNREGISTER_CLIENT:
+                    log.debug("Removing client: " + msg.replyTo);
+                    break;
+                case FluidNexusAndroid.MSG_NEW_MESSAGE_CREATED:
+                    log.debug("MSG_NEW_MESSAGE_CREATED received");
+                case FluidNexusAndroid.MSG_MESSAGE_DELETED:
+                    log.debug("MSG_MESSAGE_DELETED received");
+
+                default:
+                    super.handleMessage(msg);
+            }
+        }
     }
 
     @Override
@@ -200,6 +237,13 @@ public class FluidNexusBluetoothService extends Service {
             log.debug("Starting our bluetooth service thread...");
             serviceThread.start();
         }
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        log.debug("Received start id " + startId + ": " + intent);
+        // Run until explicitly stopped
+        return START_STICKY;
     }
 
     @Override
@@ -306,7 +350,7 @@ public class FluidNexusBluetoothService extends Service {
         /**
          * Handler that receives information from the threads
          */
-        private final Handler handler = new Handler() {
+        private final Handler threadHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 switch (msg.what) {
@@ -548,6 +592,18 @@ public class FluidNexusBluetoothService extends Service {
             outputStream = tmpOut;
         }
 
+        private void sendNewMessageMsg() {
+            for (int i = 0; i < clients.size(); i++) {
+                try {
+                    clients.get(i).send(Message.obtain(null, MSG_NEW_MESSAGE_RECEIVED));
+                } catch (RemoteException e) {
+                    // If we get here, the client is dead, and we should remove it from the list
+                    log.debug("Removing client: " + clients.get(i));
+                    clients.remove(i);
+                }
+            }
+        }
+
         /**
          * Set the state of the connected thread
          * @param state Int that defines the connected thread state
@@ -653,9 +709,13 @@ public class FluidNexusBluetoothService extends Service {
                 } catch (IOException e) {
                     log.error("Exception during reading from inputStream: " + e);
                 }
-                String tmp = new String(hash);
-                hashList.add(tmp);
-                log.debug("received hash: " + tmp);
+
+                // Check if we don't already have the hash
+                if (!(currentHashes.contains(hash))) {
+                    String tmp = new String(hash);
+                    hashList.add(tmp);
+                    log.debug("received hash: " + tmp);
+                }
             }
             setConnectedState(HASH_LIST);
         }
@@ -702,7 +762,7 @@ public class FluidNexusBluetoothService extends Service {
                     log.debug("Message is: " + tmp);
      
                 }
-
+                sendNewMessageMsg();
                 setConnectedState(DONE_DONE);
 
             } catch (IOException e) {
