@@ -62,9 +62,10 @@ import android.widget.Toast;
 
 /*
  * TODO
- * * Create cursors for getting hashes and items from database
+ * * Figure out why the service doesn't continually run the connect thread after one has finished
+ * * Enable other end of the communication (SWITCH)
+ * * Refactor python testing script into actual library for use
  * * Create intent in activity to notify service when a new item has been created
- * * Update activity to allow for deletion
  */
 
 public class FluidNexusBluetoothService extends Service {
@@ -732,15 +733,7 @@ public class FluidNexusBluetoothService extends Service {
             }
 
             /*
-            // Do sending process over all data
-            // TODO
-            // Only send if we need to...this is just for testing
-            
-            // TODO
-            // Need to figure out why only one item is being set at a time, even though we're looping through all of the values...
             for (Vector item: currentData) {
-                // TODO
-                // Enable reading from the connected device
                 // This is just a test using version 01 of the protocol
                 String version = "01";
                 String hash = (String) item.get(0);
