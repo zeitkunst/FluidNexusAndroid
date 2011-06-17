@@ -30,6 +30,7 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -67,38 +68,42 @@ import android.widget.Toast;
  */
 
 public class FluidNexusBluetoothService extends Service {
-    private static final String TAG = "FluidNexusBluetoothService";
-    private static final String SERVICE_NAME = "FluidNexus";
+    // Logging
     private static FluidNexusLogger log = FluidNexusLogger.getLogger("FluidNexus"); 
 
     // For database access
     private FluidNexusDbAdapter dbHelper;
     private Cursor hashesCursor;
     private Cursor dataCursor;
+
+    private BluetoothAdapter bluetoothAdapter;
+
+    // Keeping track of items from the database
     private ArrayList<String> currentHashes = new ArrayList<String>();
     private ArrayList<Vector> currentData = new ArrayList<Vector>();
     private Vector<String> currentItem = new Vector<String>();
 
-    private BluetoothAdapter bluetoothAdapter;
-
     private ArrayList<Vector> devices = new ArrayList<Vector>();
     private Vector<String> device = new Vector<String>();
+
     private IntentFilter btFoundFilter;
     private IntentFilter sdpFilter;
-
-    private Context ctx;
 
     private BluetoothServiceThread serviceThread = null;
 
     // Threads
     private ConnectThread connectThread;
-    private ConnectedThread connectedThread;
+
+    // Thread Handler message constants
+    private final int CONNECTED_THREAD_FINISHED = 0x30;
 
     // UUID
     private static final UUID FluidNexusUUID = UUID.fromString("bd547e68-952b-11e0-a6c7-0023148b3104");
-    
+
+    // State of the system
     private int state;
 
+    // Potential states
     public static final int STATE_NONE = 0;       // we're doing nothing
     public static final int STATE_DISCOVERY = 1; // we're discovering things
     public static final int STATE_DISCOVERY_FINISHED = 2; // we're done discovering things and can now move on
@@ -136,7 +141,7 @@ public class FluidNexusBluetoothService extends Service {
                 // Clear out our device list
                 devices.clear();
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-                setState(STATE_DISCOVERY_FINISHED);
+                setServiceState(STATE_DISCOVERY_FINISHED);
             }
         }
     };
@@ -232,7 +237,7 @@ public class FluidNexusBluetoothService extends Service {
      * Set the state of the bluetooth service
      * @param state Int that defines the current bluetooth service state
      */
-    private synchronized void setState(int newState) {
+    private synchronized void setServiceState(int newState) {
         log.debug("Changing state from " + state + " to " + newState);
         state = newState;
     }
@@ -240,7 +245,7 @@ public class FluidNexusBluetoothService extends Service {
     /**
      * Get the current state value
      */
-    private synchronized int getState() {
+    private synchronized int getServiceState() {
         return state;
     }
 
@@ -260,65 +265,12 @@ public class FluidNexusBluetoothService extends Service {
             }
         }
 
-        // cancel any thread sending data
-        // TODO do we want to do this?
-        if (connectedThread != null) {
-            connectedThread.cancel();
-            connectedThread = null;
-        }
-
         // State the thread that connects to the remove device
         connectThread = new ConnectThread(device, true);
         connectThread.start();
-        setState(STATE_CONNECTING);
+        setServiceState(STATE_CONNECTING);
     }
 
-    /**
-     * Start a thread for sending data to remote FluidNexus device
-     * @param socket BluetoothSocket on which the connection was made
-     * @param device BluetoothDevice that has been connected
-     * @param socketType type of socket being used
-     */
-    public synchronized void connected(BluetoothSocket socket, BluetoothDevice device, final String socketType) {
-        log.debug("Connected with socketype: " + socketType);
-
-        // Cancel thread that completed the connection
-        if (connectThread != null) {
-            connectThread.cancel();
-            connectThread = null;
-        }
-
-        // Cancel any thread currently running a connection
-        if (connectedThread != null) {
-            connectedThread.cancel();
-            connectedThread = null;
-        }
-
-        connectedThread = new ConnectedThread(socket, socketType);
-        connectedThread.start();
-
-        setState(STATE_CONNECTED);
-    }
-
-    /**
-     * Write to the connected thread in an unsynchronized manner
-     * @param out Bytes to write
-     * @see ConnectedThread#write(byte[])
-     */
-    public void write(byte[] out) {
-        // Create temporary thread object
-        ConnectedThread r;
-
-        // Synchronize a copy of this thread
-        synchronized (this) {
-            if (state != STATE_CONNECTED) return;
-
-            r = connectedThread;
-        }
-
-        // Perform write
-        r.write(out);
-    }
 
     /**
      * Get a list of services, in UUID form, for a given device; taken from http://wiresareobsolete.com/wordpress/2010/11/android-bluetooth-rfcomm/
@@ -361,10 +313,7 @@ public class FluidNexusBluetoothService extends Service {
      */
     private class BluetoothServiceThread extends Thread {
         private BluetoothSocket socket;
-        /*
-        private final InputStream inputStream;
-        private final OutputStream outputStream;
-        */
+        private ArrayList<Map> connectedThreadMap = new ArrayList<Map>();
 
         /**
          * Constructor for the thread
@@ -374,90 +323,95 @@ public class FluidNexusBluetoothService extends Service {
         }
 
         /**
+         * Handler that receives information from the threads
+         */
+        private final Handler handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case CONNECTED_THREAD_FINISHED:
+
+                        break;
+                    default:
+                        break;
+
+                }
+            }
+        };
+
+        /**
          * Begin the thread, and thus the service main loop
          */
         public void run() {
-            while (state != STATE_QUIT) {
-                // Go through our state machine
-                if (state == STATE_NONE) {
-                    // If we're at the beginning state, then start the discovery process
-                    // TESTING
-                    // Try and get hashes from the database
-                    // TODO
-                    // Only update this on a new intent from the activity
-                    hashesCursor = dbHelper.services();
-                    hashesCursor.moveToFirst();
-                    currentHashes.clear();
-
-                    while (hashesCursor.isAfterLast() == false) {
-                        currentHashes.add(hashesCursor.getString(1));
-                        hashesCursor.moveToNext();
-                    }
-                    hashesCursor.close();
-
-                    dataCursor = dbHelper.outgoing();
-                    dataCursor.moveToFirst();
-                    currentData.clear();
-
-                    String[] fields = new String[] {FluidNexusDbAdapter.KEY_HASH, FluidNexusDbAdapter.KEY_TIME, FluidNexusDbAdapter.KEY_TITLE, FluidNexusDbAdapter.KEY_DATA};
-                    while (dataCursor.isAfterLast() == false) {
-                        // I'm still not sure why I have to instantiate a new vector each time here, rather than using the local vector from earlier
-                        // This is one of those things of java that just makes me want to pull my hair out...
-                        Vector<String> tempVector = new Vector<String>();
-                        for (int i = 0; i < fields.length; i++) {
-                            int index = dataCursor.getColumnIndex(fields[i]);
-                            tempVector.add(dataCursor.getString(index));
-                        }
-                        currentData.add(tempVector);
-                        dataCursor.moveToNext();
-                    }
-                    dataCursor.close();
-
-                    try {
-                        doDiscovery();
-                    } catch (Exception e) {
-                        log.debug("some sort of exception: " + e);
-                    }
-
+            while (getServiceState() != STATE_QUIT) {
+                switch (getServiceState()) {
+                    case STATE_NONE:
+                        doStateNone();
+                        break;
+                    case STATE_DISCOVERY:
+                        // If we're discovering things, just continue
+                        break;
+                    case STATE_DISCOVERY_FINISHED:
+                        // If there discovery is finished, start trying to connect
+                        doDiscoveryFinished();
+                        break;
+                    case STATE_SERVICES:
+                        // If we're in service discovery, just continue
+                        // TODO
+                        // still need this?
+                        break;
+                    case STATE_CONNECTING:
+                        // If we're connecting, just continue
+                        // TODO
+                        // still need this?
+                        break;
+                    default:
+                        break;
                 }
+            }
+        }
 
-                // If we're discoverying things, just continue on our way
-                if (state == STATE_DISCOVERY) {
-                    continue;
+        /**
+         * Run the actions to do with moving from the initial state
+         */
+        private void doStateNone() {
+            // If we're at the beginning state, then start the discovery process
+            // TESTING
+            // Try and get hashes from the database
+            // TODO
+            // Only update this on a new intent from the activity
+            hashesCursor = dbHelper.services();
+            hashesCursor.moveToFirst();
+            currentHashes.clear();
+
+            while (hashesCursor.isAfterLast() == false) {
+                currentHashes.add(hashesCursor.getString(1));
+                hashesCursor.moveToNext();
+            }
+            hashesCursor.close();
+
+            dataCursor = dbHelper.outgoing();
+            dataCursor.moveToFirst();
+            currentData.clear();
+
+            String[] fields = new String[] {FluidNexusDbAdapter.KEY_HASH, FluidNexusDbAdapter.KEY_TIME, FluidNexusDbAdapter.KEY_TITLE, FluidNexusDbAdapter.KEY_DATA};
+            while (dataCursor.isAfterLast() == false) {
+                // I'm still not sure why I have to instantiate a new vector each time here, rather than using the local vector from earlier
+                // This is one of those things of java that just makes me want to pull my hair out...
+                Vector<String> tempVector = new Vector<String>();
+                for (int i = 0; i < fields.length; i++) {
+                    int index = dataCursor.getColumnIndex(fields[i]);
+                    tempVector.add(dataCursor.getString(index));
                 }
+                currentData.add(tempVector);
+                dataCursor.moveToNext();
+            }
+            dataCursor.close();
 
-                // If the discovery is finished, start trying to connect to remote devices
-                if (state == STATE_DISCOVERY_FINISHED) {
-                    for (Vector currentDevice : devices) {
-                        String name = (String) currentDevice.get(0);
-                        String address = (String) currentDevice.get(1);
-                        log.debug("Working on device " + name + " with address " + address);
-                        BluetoothDevice btDevice = bluetoothAdapter.getRemoteDevice(address);
-
-                        connect(btDevice, true);
-                    }
-
-                    // After this is all done, start the cycle again
-                    setState(STATE_NONE);
-                }
-
-                // If we're in services discovery, just continue
-                if (state == STATE_SERVICES) {
-                    continue;
-
-                }
-
-                if (state == STATE_CONNECTING) {
-                    continue;
-                }
-
-                /*
-                try{
-                    this.sleep(35000);
-                } catch (InterruptedException e) {
-                    log.error("Thread interrupted.");
-                }
-                */
+            try {
+                doDiscovery();
+            } catch (Exception e) {
+                log.debug("some sort of exception: " + e);
             }
         }
 
@@ -465,8 +419,22 @@ public class FluidNexusBluetoothService extends Service {
          * Run the actions to do with device discovery
          */
         private void doDiscovery() {
-            setState(STATE_DISCOVERY);
+            setServiceState(STATE_DISCOVERY);
             bluetoothAdapter.startDiscovery();
+        }
+
+        /**
+         * Run the actions after we've done discovery
+         */
+        private void doDiscoveryFinished() {
+            for (Vector currentDevice : devices) {
+                String name = (String) currentDevice.get(0);
+                String address = (String) currentDevice.get(1);
+                log.debug("Working on device " + name + " with address " + address);
+                BluetoothDevice btDevice = bluetoothAdapter.getRemoteDevice(address);
+
+                connect(btDevice, true);
+            }
         }
 
         /**
@@ -481,62 +449,9 @@ public class FluidNexusBluetoothService extends Service {
                 log.debug("Working on device " + name + " with address " + address);
                 BluetoothDevice btDevice = bluetoothAdapter.getRemoteDevice(address);
                 servicesFromDeviceAsync(btDevice);
-
-                /*
-                if (services == null) {
-                    log.debug("services seems to be null...");
-                } else {
-                    for (ParcelUuid s: services) {
-                        log.debug("Found service " + s.toString());
-                    }
-                }
-                */
-
-                /*
-                BluetoothSocket tmp = null;
-                try {
-                    tmp = btDevice.createRfcommSocketToServiceRecord(tempUUID);
-                } catch (IOException e) {
-                    log.debug("Socket creation failed: " + e);
-                }
-
-                socket = tmp;
-                try {
-                    socket.connect();
-                } catch (IOException e) {
-                    log.debug("Socket connection failed: " + e);
-                }
-                */
-
-
             }
-            /*
-            */
-            /*
-            try {
-                Class cl = Class.forName("android.bluetooth.BluetoothDevice");
-                Class[] par = {};
-                Method method = cl.getMethod("fetchUuidsWithSdp", par);
-                Object[] args = {};
-                method.invoke(device, args);
-            } catch (final ClassNotFoundException e) {
-                log.debug("Error: " + e);
-                e.printStackTrace();
-            } catch (NoSuchMethodException e) {
-                log.debug("Error: " + e);
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                log.debug("Error: " + e);
-                e.printStackTrace();
-            } catch (java.lang.reflect.InvocationTargetException e) {
-                log.debug("Error: " + e);
-                e.printStackTrace();
-
-            }
-            */
-
-
         }
+
         /** 
          * Cancel the thread
          */
@@ -546,73 +461,15 @@ public class FluidNexusBluetoothService extends Service {
     }
 
     /**
-     * This thread tries to connect to a remote device and send data
+     * Thread that actually sends data to a connected device
+     * TODO
+     * probably need to move some of the socket creation bits to another part of the class
      */
     private class ConnectThread extends Thread {
         private final BluetoothSocket socket;
         private final BluetoothDevice device;
         private String socketType;
 
-        public ConnectThread(BluetoothDevice remoteDevice, boolean secure) {
-            setName("FluidNexusConnectThread");
-            device = remoteDevice;
-            BluetoothSocket tmp = null;
-            socketType = secure ? "Secure" : "Insecure";
-
-            // get a socket for connection to the device
-            try {
-                if (secure) {
-                    tmp = device.createRfcommSocketToServiceRecord(FluidNexusUUID);
-                } else {
-                    //tmp = device.createInsecureRfcommSocketToServiceRecord(FluidNexusUUID);
-
-                }
-            } catch (IOException e) {
-                log.error("Socket Type: " + socketType + "create() failed: " + e);
-            }
-
-            socket = tmp;
-        }
-
-        public void run() {
-            log.info("Begin connect thread");
-            // TODO: cancel discovery
-            
-            try {
-                socket.connect();
-            } catch (IOException e) {
-                // Try to close the socket
-                try {
-                    socket.close();
-                } catch (IOException e2) {
-                    log.error("unable to close() socket during connection failure: " + e2);
-                }
-
-                // TODO: enable connectionFailed
-                return;
-            }
-
-            synchronized (FluidNexusBluetoothService.this) {
-                connectThread = null;
-            }
-
-            connected(socket, device, socketType);
-        }
-
-        public void cancel() {
-            try {
-                socket.close();
-            } catch (IOException e) {
-                log.error("close() of connect socket failed: " + e);
-            }
-        }
-    }
-
-    /**
-     * Thread that actually sends data to a connected device
-     */
-    private class ConnectedThread extends Thread {
-        private final BluetoothSocket socket;
         //private final InputStream inputStream;
         //private final OutputStream outputStream;
         private DataInputStream inputStream = null;
@@ -632,10 +489,41 @@ public class FluidNexusBluetoothService extends Service {
 
 
 
-        public ConnectedThread(BluetoothSocket remoteSocket, String socketType) {
-            setName("FluidNexusConnectedThread");
-            log.debug("Created ConnectedThread: " + socketType);
-            socket = remoteSocket;
+        //public ConnectedThread(BluetoothSocket remoteSocket, String socketType) {
+        public ConnectThread(BluetoothDevice remoteDevice, boolean secure) {
+            setName("FluidNexusConnectThread");
+            device = remoteDevice;
+            BluetoothSocket tmp = null;
+            socketType = secure ? "Secure" : "Insecure";
+
+            // Get our socket to the remove device
+            try {
+                if (secure) {
+                    tmp = device.createRfcommSocketToServiceRecord(FluidNexusUUID);
+                } else {
+                    // TODO
+                    // get rid of the secure, insecure distinction
+                }
+            } catch (IOException e) {
+                log.error("Socket Type: " + socketType + "create() failed: " + e);
+            }
+
+            // Save our socket
+            socket = tmp;
+
+            // Try to connect
+            try {
+                socket.connect();
+            } catch (IOException e) {
+                // Try to close the socket
+                try {
+                    socket.close();
+                } catch (IOException e2) {
+                    log.error("unable to close() socket during connection failure: " + e2);
+                }
+            }
+
+
             DataInputStream tmpIn = null;
             DataOutputStream tmpOut = null;
 
@@ -674,17 +562,7 @@ public class FluidNexusBluetoothService extends Service {
          * Setup our connection
          */
         private void sendHELO() {
-            // TODO
-            // perhaps this ByteBuffer should be an instance value, instead of being allocated all the time...but we'll see
-            /*
-            ByteBuffer b = ByteBuffer.allocate(2);
-            b.putChar(HELO);
-            byte[] send = b.array();
-            write(send);
-            byte[] buffer = read(2);
-            ByteBuffer bb = ByteBuffer.wrap(buffer);
-            char tmp = bb.getChar();
-            */
+            // Send the command to the server
             try {
                 outputStream.writeChar(HELO);
                 outputStream.flush();
@@ -692,6 +570,7 @@ public class FluidNexusBluetoothService extends Service {
                 log.error("Exception during writing to outputStream: " + e);
             }
 
+            // Read back the result
             try {
                 char tmp = inputStream.readChar();
                 if (tmp == HELO) {
@@ -704,11 +583,36 @@ public class FluidNexusBluetoothService extends Service {
                 log.error("Exception during reading from inputStream: " + e);
             }
 
-            /*
-            String tmp = new String(buffer);
-                log.debug("Received: " + tmp);
-                */
         }
+
+        /**
+         * Send done done command
+         */
+        private void sendDoneDone() {
+            // Send the command to the server
+            try {
+                outputStream.writeChar(DONE_DONE);
+                outputStream.flush();
+            } catch (IOException e) {
+                log.error("Exception during writing to outputStream: " + e);
+            }
+
+            // Read back the result
+            try {
+                char tmp = inputStream.readChar();
+                if (tmp == DONE_DONE) {
+                    log.debug("got DONE_DONE");
+                    // TODO
+                    // send message through handler to let parent service know it can reap us
+                } else {
+                    log.debug("Received: " + tmp);
+                }
+            } catch (IOException e) {
+                log.error("Exception during reading from inputStream: " + e);
+            }
+
+        }
+
 
         /**
          * Send hash request to server
@@ -722,7 +626,7 @@ public class FluidNexusBluetoothService extends Service {
                 log.error("Exception during writing to outputStream: " + e);
             }
 
-            // Read result (number of hashes we're expecting
+            // Read result (number of hashes we're expecting)
             int numHashes = -1;
             try {
                 numHashes = (int) inputStream.readChar();
@@ -752,6 +656,7 @@ public class FluidNexusBluetoothService extends Service {
         private void requestHashes() {
             // Send HASH_REQUEST command
             try {
+                // Go through each hash we have, request data
                 for (String currentHash: hashList) {
                     outputStream.writeChar(HASH_REQUEST);
                     outputStream.flush();
@@ -779,12 +684,16 @@ public class FluidNexusBluetoothService extends Service {
                     tmp = new String(title);
                     log.debug("Title is: " + tmp);
 
+                    // TODO
+                    // This is probably no good for very long messages...
                     byte[] message = new byte[messageLength];
                     inputStream.readFully(message);
                     tmp = new String(message);
                     log.debug("Message is: " + tmp);
      
                 }
+
+                setConnectedState(DONE_DONE);
 
             } catch (IOException e) {
                 log.error("Exception during writing to outputStream in requestHashes: " + e);
@@ -804,6 +713,8 @@ public class FluidNexusBluetoothService extends Service {
                         requestHashList();
                     case HASH_LIST:
                         requestHashes();
+                    case DONE_DONE:
+                        sendDoneDone();
                     case 0xFF:
                         //log.debug("we should never have gotten here...");
                     default:
