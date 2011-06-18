@@ -19,6 +19,9 @@ On Android it's also problematic for devices to be discoverable for any reasonab
 
 === Commands ===
 
+TODO: add some errors
+TODO: add type, mime-type, filename, and content length for binary data
+
 0x10    HELO
 
 0x20    Hash list
@@ -27,6 +30,7 @@ On Android it's also problematic for devices to be discoverable for any reasonab
 0x30    Hash request
 
 0x40    Switch
+0x41    Switch done
 
 0xF0    Done
 0xF1    Done; no more hashes to send

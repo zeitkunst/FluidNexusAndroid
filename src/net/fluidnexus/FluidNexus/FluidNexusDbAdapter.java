@@ -273,13 +273,16 @@ public class FluidNexusDbAdapter {
      * @param hash Hash to search for
      */
     public Cursor returnItemBasedOnHash(String hash) {
-        return database.query(DATABASE_TABLE, 
+        Cursor c = database.query(DATABASE_TABLE, 
                 new String [] {KEY_ID, KEY_SOURCE, KEY_TIME, KEY_TYPE, KEY_TITLE, KEY_DATA, KEY_HASH, KEY_CELLID, KEY_MINE},
                 KEY_HASH + "='" + hash + "'",
                 null,
                 null,
                 null,
                 KEY_TIME + " DESC");
+
+        c.moveToFirst();
+        return c;
     }
 
     /**
