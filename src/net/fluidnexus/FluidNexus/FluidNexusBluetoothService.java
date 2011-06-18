@@ -638,6 +638,7 @@ public class FluidNexusBluetoothService extends Service {
                 tmp = device.createRfcommSocketToServiceRecord(FluidNexusUUID);
             } catch (IOException e) {
                 log.error("create() failed: " + e);
+                cleanupConnection();
             }
 
             // Save our socket
@@ -653,6 +654,7 @@ public class FluidNexusBluetoothService extends Service {
                 } catch (IOException e2) {
                     log.error("unable to close() socket during connection failure: " + e2);
                 }
+                cleanupConnection();
             }
 
 
@@ -666,6 +668,7 @@ public class FluidNexusBluetoothService extends Service {
                 tmpOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
             } catch (IOException e) {
                 log.error("Temp stream sockets not created");
+                cleanupConnection();
             }
 
             inputStream = tmpIn;
@@ -712,6 +715,7 @@ public class FluidNexusBluetoothService extends Service {
                 outputStream.flush();
             } catch (IOException e) {
                 log.error("Exception during writing to outputStream: " + e);
+                cleanupConnection();
             }
 
             // Read back the result
@@ -725,6 +729,7 @@ public class FluidNexusBluetoothService extends Service {
                 }
             } catch (IOException e) {
                 log.error("Exception during reading from inputStream: " + e);
+                cleanupConnection();
             }
 
         }
@@ -739,6 +744,7 @@ public class FluidNexusBluetoothService extends Service {
                 outputStream.flush();
             } catch (IOException e) {
                 log.error("Exception during writing to outputStream: " + e);
+                cleanupConnection();
             }
 
             // Read back the result
@@ -753,6 +759,7 @@ public class FluidNexusBluetoothService extends Service {
                 }
             } catch (IOException e) {
                 log.error("Exception during reading from inputStream: " + e);
+                cleanupConnection();
             }
 
             cleanupConnection();
@@ -770,6 +777,7 @@ public class FluidNexusBluetoothService extends Service {
                 outputStream.flush();
             } catch (IOException e) {
                 log.error("Exception during writing to outputStream: " + e);
+                cleanupConnection();
             }
 
             // Read result (number of hashes we're expecting)
@@ -779,6 +787,7 @@ public class FluidNexusBluetoothService extends Service {
                 log.debug("Expecting to receive number of hashes: " + numHashes);
             } catch (IOException e) {
                 log.error("Exception during reading from inputStream: " + e);
+                cleanupConnection();
             }
 
             // Read the hashes
@@ -788,6 +797,7 @@ public class FluidNexusBluetoothService extends Service {
                     inputStream.readFully(hashBytes);
                 } catch (IOException e) {
                     log.error("Exception during reading from inputStream: " + e);
+                    cleanupConnection();
                 }
 
                 String hash = new String(hashBytes);                    
@@ -855,7 +865,7 @@ public class FluidNexusBluetoothService extends Service {
 
             } catch (IOException e) {
                 log.error("Exception during writing to outputStream in requestHashes: " + e);
-                this.cancel();
+                cleanupConnection();
             }
 
         }
@@ -870,6 +880,7 @@ public class FluidNexusBluetoothService extends Service {
                 outputStream.flush();
             } catch (IOException e) {
                 log.error("Exception during writing to outputStream: " + e);
+                cleanupConnection();
             }
 
             // Read back the result
@@ -883,6 +894,7 @@ public class FluidNexusBluetoothService extends Service {
                 }
             } catch (IOException e) {
                 log.error("Exception during reading from inputStream: " + e);
+                cleanupConnection();
             }
 
             // Enter into our sending loop
@@ -913,6 +925,7 @@ public class FluidNexusBluetoothService extends Service {
                     }
                 } catch (IOException e) {
                     log.error("Exception during reading from inputStream: " + e);
+                    cleanupConnection();
                 }
             }
 
@@ -944,6 +957,7 @@ public class FluidNexusBluetoothService extends Service {
                 }
             } catch (IOException e) {
                 log.error("Some sort of IO exception: " + e);
+                cleanupConnection();
             }
         }
 
@@ -956,6 +970,7 @@ public class FluidNexusBluetoothService extends Service {
                 inputStream.readFully(hashBytes);
             } catch (IOException e) {
                 log.error("Exception during reading from inputStream: " + e);
+                cleanupConnection();
             }
             String hash = new String(hashBytes);                    
             log.debug("Sending data for hash: " + hash);
@@ -994,8 +1009,7 @@ public class FluidNexusBluetoothService extends Service {
 
             } catch (IOException e) {
                 log.error("Exception during writing to outputStream in requestHashes: " + e);
-                // TODO
-                // better error handling
+                cleanupConnection();
             }
 
         }
@@ -1033,6 +1047,7 @@ public class FluidNexusBluetoothService extends Service {
                 outputStream.write(buffer);
             } catch (IOException e) {
                 log.error("Exception during writing to outputStream: " + e);
+                cleanupConnection();
             }
         }
 
@@ -1047,6 +1062,7 @@ public class FluidNexusBluetoothService extends Service {
                 inputStream.read(buffer, 0, bytes);
             } catch (IOException e) {
                 log.error("Exception during reading from outputStream: " + e);
+                cleanupConnection();
             }
 
             return buffer;
@@ -1060,6 +1076,7 @@ public class FluidNexusBluetoothService extends Service {
                 outputStream.flush();
             } catch (IOException e) {
                 log.error("Exception when trying to flush outputStream: " + e);
+                cleanupConnection();
             }
         }
 
@@ -1071,6 +1088,7 @@ public class FluidNexusBluetoothService extends Service {
                 socket.close();
             } catch (IOException e) {
                 log.error("close() of ConnectedThread socket failed: " + e);
+                cleanupConnection();
             }
 
             // TODO
@@ -1082,7 +1100,6 @@ public class FluidNexusBluetoothService extends Service {
             msg.setData(bundle);
             threadHandler.sendMessage(msg);
             setConnectedState(CLOSE_CONNECTION);
-           
         }
 
         public void cancel() {
@@ -1090,6 +1107,7 @@ public class FluidNexusBluetoothService extends Service {
                 socket.close();
             } catch (IOException e) {
                 log.error("close() of ConnectedThread socket failed: " + e);
+                cleanupConnection();
             }
         }
     }
