@@ -122,7 +122,7 @@ public class FluidNexusDbAdapter {
     }
 
     public void initialPopulate() {
-            float now = (float) System.currentTimeMillis();        
+            float now = (float) (System.currentTimeMillis()/1000);        
             add_received(0, now,
                "Schedule a meeting",
                 "We need to schedule a meeting soon.  Send a message around with the title [S] and good times to meet.  (This is an example of using the system to surreptitiously spread information about covert meetings.)",
@@ -180,7 +180,7 @@ public class FluidNexusDbAdapter {
             String title,
             String data,
             String cellID) {
-        float now = (float) System.currentTimeMillis();        
+        float now = (float) (System.currentTimeMillis()/1000);
 
         ContentValues values = new ContentValues();
         values.put(KEY_SOURCE, IMSI_HASH);

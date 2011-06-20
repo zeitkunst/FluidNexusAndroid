@@ -68,6 +68,7 @@ import android.widget.Toast;
  * * Ensure multiple threads are opened for multiple hosts running the software
  * * See if it's possible to manually enter paired devices to speed up creation of the network
  * * Abstract the sending of data over to sockets so that it works with any modality (zeroconf, ad-hoc, etc.)
+ * * Setup 3 threads: one server (listen), one client for discovery, one client for paired devices
  * * Improve error handling dramatically
  */
 
@@ -696,7 +697,7 @@ public class FluidNexusBluetoothServiceVer3 extends Service {
 
         /**
          * Set the state of the connected thread
-         * @param state Int that defines the connected thread state
+         * @param state char that defines the connected thread state
          */
         private synchronized void setConnectedState(char newState) {
             int iNew = (int) newState;
