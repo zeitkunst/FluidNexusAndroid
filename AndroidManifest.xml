@@ -22,9 +22,9 @@
         <activity android:name=".FluidNexusAddOutgoing"></activity>
         <activity android:name=".FluidNexusHelp"></activity>
         <activity android:name=".FluidNexusEditMessage"></activity>
-        <service android:name=".FluidNexusBluetoothService">
+        <service android:name=".FluidNexusBluetoothServiceVer3">
             <intent-filter>
-                <action android:name="net.fluidnexus.FluidNexus.FluidNexusBluetoothService" />
+                <action android:name="net.fluidnexus.FluidNexus.FluidNexusBluetoothServiceVer3" />
             </intent-filter>
         </service>
 

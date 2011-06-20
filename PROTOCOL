@@ -1,6 +1,6 @@
 = Fluid Nexus Protocol =
 
-== Version 1 ==
+== VERSION 1 ==
 
 * 2 byte version
 ** For Version 1, this is 01
@@ -11,7 +11,7 @@
 * title
 * message
 
-== Version 2 ==
+== VERSON 2 ==
 
 Since on Android we cannot get the user-defined service names from the API, we cannot use service advertisement and stigmergy to figure out which hashes to send.  This was probably not scalable anyway.  So we have to develop a protocol for discovering which hashes the other device has to determine which ones to request.
 
@@ -73,3 +73,68 @@ If at any point the client wishes to end the session it can send this command.  
 === 0xF1: Done ===
 
 If the server hash no more hashes to send, it responds with this command.
+
+== VERSION 3 ==
+
+We use Google's protocol buffers for data serialization.  This should allow us to easily deal with optional values, binary data, and so on.  Here's a potential outline of the commands and the protocol.
+
+In all cases "size" is a four byte unsigned int.
+
+The basic scheme of the protocol is as follows:
+
+1.  Client sends HELO to server, receives HELO from server in response.
+2.  Client sends its own list of hashes to server.
+3.  Server finds local hashes that are not in the list of hashes the client sent.
+4.  Server sends data of local hashes the client doesn't have.
+
+Once this is done, the client can optionally send another command SWITCH that switches the direction of the protocol.  Thus, after a SWITCH, the client expects to receive a list of hashes, and then sends new data back to the server.
+
+In terms of how this plays out in terms of reading and writing:
+
+Command         Client          Server
+HELO            Write           Read
+HELO            Read            Write
+HASHES          Write           Read
+MESSAGES        Read            Write
+SWITCH          Write           Read
+HASHES          Read            Write
+MESSAGES        Write           Read
+SWITCH          Read            Write
+DONE            Write           Read
+DONE            Read            Write
+
+=== Commands ===
+
+=== 0x10: HELO ===
+
+unsigned char command
+
+Send this command to initiate connection; the client expects to receive the same command in response.
+
+=== 0x20: HASHES ===
+
+unsigned char command
+unsigned int size
+void data
+
+Using our protobuf "FluidNexusHashes", send our list of hashes.
+
+=== 0x30: MESSAGES ===
+
+unsigned char command 
+unsigned int size
+void data
+
+Using our protobuf "FluidNexusMessages", send our batch of data (that has already been pared down by exchanging hashes and determining which ones the other side doesn't have).
+
+=== 0x80: SWITCH ===
+
+unsigned char command
+
+Command to switch from one mode to the other.
+
+=== 0xF0: DONE ===
+
+unsigned char command
+
+Command to end the connection.

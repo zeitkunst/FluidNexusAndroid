@@ -32,7 +32,7 @@ public class FluidNexusDbHelper extends SQLiteOpenHelper {
     private static FluidNexusLogger log = FluidNexusLogger.getLogger("FluidNexus"); 
 
     private static final String DATABASE_CREATE =
-        "create table FluidNexusData (_id integer primary key autoincrement, source varchar(32), time bigint, type integer, title varchar(40), data long varchar, hash varchar(32), cellID varchar(20), mine bit);";
+        "create table FluidNexusData (_id integer primary key autoincrement, source varchar(32), time float, type integer, title varchar(40), data long varchar, hash varchar(32), cellID varchar(20), mine bit);";
     private static final String DATABASE_NAME = "FluidNexusDatabase";
     private static final String DATABASE_TABLE = "FluidNexusData";
     private static final int DATABASE_VERSION = 1;

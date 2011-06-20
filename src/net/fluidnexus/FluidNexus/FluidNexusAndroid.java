@@ -133,7 +133,7 @@ public class FluidNexusAndroid extends ListActivity {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case FluidNexusBluetoothService.MSG_NEW_MESSAGE_RECEIVED:
+                case FluidNexusBluetoothServiceVer3.MSG_NEW_MESSAGE_RECEIVED:
                     log.debug("Received MSG_NEW_MESSAGE_RECEIVED");
                     fillListView(VIEW_MODE);
                     break;
@@ -148,7 +148,7 @@ public class FluidNexusAndroid extends ListActivity {
             bluetoothService = new Messenger(service);
             log.debug("Connected to service");
             try {
-                Message msg = Message.obtain(null, FluidNexusBluetoothService.MSG_REGISTER_CLIENT);
+                Message msg = Message.obtain(null, FluidNexusBluetoothServiceVer3.MSG_REGISTER_CLIENT);
                 msg.replyTo = messenger;
                 bluetoothService.send(msg);
             } catch (RemoteException e) {
@@ -334,7 +334,7 @@ public class FluidNexusAndroid extends ListActivity {
      */
     private void doBindService() {
         log.info("Binding to Fluid Nexus Bluetooth Service");
-        Intent i = new Intent(this, FluidNexusBluetoothService.class);
+        Intent i = new Intent(this, FluidNexusBluetoothServiceVer3.class);
         startService(i);
         bindService(i, bluetoothServiceConnection, Context.BIND_AUTO_CREATE);
     }
@@ -345,7 +345,7 @@ public class FluidNexusAndroid extends ListActivity {
     private void doUnbindService() {
         if (bluetoothService != null) {
             try {
-                Message msg = Message.obtain(null, FluidNexusBluetoothService.MSG_UNREGISTER_CLIENT);
+                Message msg = Message.obtain(null, FluidNexusBluetoothServiceVer3.MSG_UNREGISTER_CLIENT);
                 msg.replyTo = messenger;
                 bluetoothService.send(msg);
             } catch (RemoteException e) {
@@ -397,9 +397,9 @@ public class FluidNexusAndroid extends ListActivity {
                     boolean tmp = prefs.getBoolean("enableBluetoothServicePref", true);
 
                     if (tmp) {
-                        startService(new Intent(FluidNexusBluetoothService.class.getName()));
+                        startService(new Intent(FluidNexusBluetoothServiceVer3.class.getName()));
                     } else {
-                        stopService(new Intent(FluidNexusBluetoothService.class.getName()));
+                        stopService(new Intent(FluidNexusBluetoothServiceVer3.class.getName()));
                     }
                     enableBluetoothServicePref = tmp;
                 }

@@ -66,13 +66,12 @@ import android.widget.Toast;
 /*
  * TODO
  * * Ensure multiple threads are opened for multiple hosts running the software
- * * Ensure that only new items are added to the database and that we never have any duplicates
- * * Enable other end of the communication (SWITCH)
  * * See if it's possible to manually enter paired devices to speed up creation of the network
  * * Abstract the sending of data over to sockets so that it works with any modality (zeroconf, ad-hoc, etc.)
+ * * Improve error handling dramatically
  */
 
-public class FluidNexusBluetoothService extends Service {
+public class FluidNexusBluetoothServiceVer3 extends Service {
     // Logging
     private static FluidNexusLogger log = FluidNexusLogger.getLogger("FluidNexus"); 
 
@@ -458,7 +457,7 @@ public class FluidNexusBluetoothService extends Service {
             while (hashesCursor.isAfterLast() == false) {
                 // TODO
                 // change this to get the item based on the column name
-                currentHashes.add(hashesCursor.getString(1).toUpperCase());
+                currentHashes.add(hashesCursor.getString(1));
                 hashesCursor.moveToNext();
             }
             hashesCursor.close();
@@ -613,6 +612,7 @@ public class FluidNexusBluetoothService extends Service {
         private final Handler threadHandler;
 
         private char connectedState = 0x00;
+        /*
         private final char DISCONNECTED = 0x00;
         private final char HELO = 0x10;
         private final char HASH_LIST = 0x20;
@@ -623,8 +623,28 @@ public class FluidNexusBluetoothService extends Service {
         private final char DONE_DONE = 0xF0;
         private final char DONE_HASHES = 0xF1;
         private final char CLOSE_CONNECTION = 0xFF;
+        */
 
+        private final char STATE_START = 0x00;
+        private final char STATE_WRITE_HELO = 0x10;
+        private final char STATE_READ_HELO = 0x20;        
+        private final char STATE_WRITE_HASHES = 0x30;
+        private final char STATE_READ_MESSAGES = 0x40;
+        private final char STATE_WRITE_SWITCH = 0x50;
+        private final char STATE_READ_HASHES = 0x60;
+        private final char STATE_WRITE_MESSAGES = 0x70;
+        private final char STATE_READ_SWITCH = 0x80;
+        private final char STATE_WRITE_DONE = 0x90;
+        private final char STATE_READ_DONE = 0xA0;
+        private final char STATE_QUIT = 0xF0;
 
+        private final char HELO = 0x10;
+        private final char HASHES = 0x20;
+        private final char MESSAGES = 0x30;
+        private final char SWITCH = 0x80;
+        private final char DONE = 0xF0;
+
+        private HashSet<String> hashesToSend = new HashSet<String>();
 
         public ConnectThread(BluetoothDevice remoteDevice, Handler givenHandler) {
             setName("FluidNexusConnectThread: " + remoteDevice.getAddress());
@@ -633,6 +653,7 @@ public class FluidNexusBluetoothService extends Service {
 
             BluetoothSocket tmp = null;
 
+            setConnectedState(STATE_START);
             // Get our socket to the remove device
             try {
                 tmp = device.createRfcommSocketToServiceRecord(FluidNexusUUID);
@@ -661,8 +682,6 @@ public class FluidNexusBluetoothService extends Service {
             DataInputStream tmpIn = null;
             DataOutputStream tmpOut = null;
 
-            setConnectedState(DISCONNECTED);
-
             try {
                 tmpIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
                 tmpOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
@@ -673,6 +692,8 @@ public class FluidNexusBluetoothService extends Service {
 
             inputStream = tmpIn;
             outputStream = tmpOut;
+
+            setConnectedState(STATE_WRITE_HELO);
         }
 
         private void sendNewMessageMsg() {
@@ -692,9 +713,12 @@ public class FluidNexusBluetoothService extends Service {
          * @param state Int that defines the connected thread state
          */
         private synchronized void setConnectedState(char newState) {
-            //String tmpNewState = Integer.toHexString(Character.digit(newState, 16));
-            //String tmpConnectedState = Integer.toHexString(Character.digit(connectedState, 16));
-            log.debug("Changing connected thread state from " + connectedState + " to " + newState);
+            int iNew = (int) newState;
+            int iConnected = (int) connectedState;
+            String tmpNewState = Integer.toString(iNew);
+            String tmpConnectedState = Integer.toString(iConnected);
+            log.debug("Changing connected thread state from " + tmpConnectedState + " to " + tmpNewState);
+            //log.debug("Changing connected thread state from " + connectedState + " to " + newState);
             connectedState = newState;
         }
     
@@ -732,233 +756,6 @@ public class FluidNexusBluetoothService extends Service {
                 cleanupConnection();
             }
 
-        }
-
-        /**
-         * Send done done command
-         */
-        private void sendDoneDone() {
-            // Send the command to the server
-            try {
-                outputStream.writeChar(DONE_DONE);
-                outputStream.flush();
-            } catch (IOException e) {
-                log.error("Exception during writing to outputStream: " + e);
-                cleanupConnection();
-            }
-
-            // Read back the result
-            try {
-                char tmp = inputStream.readChar();
-                if (tmp == DONE_DONE) {
-                    log.debug("got DONE_DONE");
-                    // TODO
-                    // send message through handler to let parent service know it can reap us
-                } else {
-                    log.debug("Received: " + tmp);
-                }
-            } catch (IOException e) {
-                log.error("Exception during reading from inputStream: " + e);
-                cleanupConnection();
-            }
-
-            cleanupConnection();
-
-        }
-
-
-        /**
-         * Send hash request to server
-         */
-        public void requestHashList() {
-            // Send HASH_LIST command
-            try {
-                outputStream.writeChar(HASH_LIST);
-                outputStream.flush();
-            } catch (IOException e) {
-                log.error("Exception during writing to outputStream: " + e);
-                cleanupConnection();
-            }
-
-            // Read result (number of hashes we're expecting)
-            int numHashes = -1;
-            try {
-                numHashes = (int) inputStream.readChar();
-                log.debug("Expecting to receive number of hashes: " + numHashes);
-            } catch (IOException e) {
-                log.error("Exception during reading from inputStream: " + e);
-                cleanupConnection();
-            }
-
-            // Read the hashes
-            for (int i = 0; i < numHashes; i++) {
-                byte[] hashBytes = new byte[32];
-                try {
-                    inputStream.readFully(hashBytes);
-                } catch (IOException e) {
-                    log.error("Exception during reading from inputStream: " + e);
-                    cleanupConnection();
-                }
-
-                String hash = new String(hashBytes);                    
-                hash = hash.toUpperCase();
-                // Check if we don't already have the hash
-                if (!(currentHashes.contains(hash))) {
-                    String tmp = new String(hash);
-                    hashList.add(tmp);
-                    log.debug("received hash: " + tmp);
-                }
-            }
-            setConnectedState(HASH_LIST);
-        }
-
-        /**
-         * Request the data for each desired hash
-         */
-        private void requestHashes() {
-            // Send HASH_REQUEST command
-            try {
-                // Go through each hash we have, request data
-                for (String currentHash: hashList) {
-                    outputStream.writeChar(HASH_REQUEST);
-                    outputStream.flush();
-
-                    byte[] send = currentHash.getBytes();
-                    outputStream.write(send, 0, send.length);
-                    outputStream.flush();
-                    
-                    int version = inputStream.readUnsignedByte();
-                    log.debug("Version is: " + version);
-
-                    int titleLength = inputStream.readInt();
-                    log.debug("Title length is: " + titleLength);
-
-                    int messageLength = inputStream.readInt();
-                    log.debug("Message length is: " + messageLength);
-
-                    byte[] timestamp = new byte[10];
-                    inputStream.readFully(timestamp);
-                    String tmp = new String(timestamp);
-                    log.debug("Timestamp is: " + tmp);
-
-                    byte[] titleBytes = new byte[titleLength];
-                    inputStream.readFully(titleBytes);
-                    String title = new String(titleBytes);
-                    log.debug("Title is: " + title);
-
-                    // TODO
-                    // This is probably no good for very long messages...
-                    byte[] messageBytes = new byte[messageLength];
-                    inputStream.readFully(messageBytes);
-                    String message = new String(messageBytes);
-                    log.debug("Message is: " + message);
-
-                    dbAdapter.add_received(0, title, message, "(123,123,123,123)");
-                    currentHashes.add(currentHash.toUpperCase());
-     
-                }
-                hashList.clear();
-                sendNewMessageMsg();
-                Message msg = threadHandler.obtainMessage(UPDATE_HASHES);
-                threadHandler.sendMessage(msg);
-                setConnectedState(SWITCH);
-
-            } catch (IOException e) {
-                log.error("Exception during writing to outputStream in requestHashes: " + e);
-                cleanupConnection();
-            }
-
-        }
-
-        /**
-         * Send the switch command so that this side can start sending our local data
-         */
-        private void doSwitch() {
-            // Send the command to the server
-            try {
-                outputStream.writeChar(SWITCH);
-                outputStream.flush();
-            } catch (IOException e) {
-                log.error("Exception during writing to outputStream: " + e);
-                cleanupConnection();
-            }
-
-            // Read back the result
-            try {
-                char tmp = inputStream.readChar();
-                if (tmp == SWITCH) {
-                    log.debug("got SWITCH");
-                    setConnectedState(HELO);
-                } else {
-                    log.debug("Received: " + tmp);
-                }
-            } catch (IOException e) {
-                log.error("Exception during reading from inputStream: " + e);
-                cleanupConnection();
-            }
-
-            // Enter into our sending loop
-            doSendingLoop();
-        }
-
-        /**
-         * Enter into a loop that sends data to the server in the SWITCH condition.
-         */
-        private void doSendingLoop() {
-            // Read back the result
-            boolean done = false;
-            while (!done) {
-                try {
-                    char command = inputStream.readChar();
-                    switch (command) {
-                        case HASH_LIST:
-                            sendHashList();
-                            break;
-                        case HASH_REQUEST:
-                            sendDataForHash();
-                            break;
-                        case SWITCH_DONE:
-                            done = true;
-                        default:
-                            log.debug("Received unknown command: " + command);
-                            done = true;
-                    }
-                } catch (IOException e) {
-                    log.error("Exception during reading from inputStream: " + e);
-                    cleanupConnection();
-                }
-            }
-
-            setConnectedState(DONE_DONE);
-
-        }
-
-        /**
-         * Send our local hash list
-         */
-        private void sendHashList() {
-            
-            int numHashes = currentHashes.size();
-
-            if (numHashes > 16) {
-                log.debug("Number of hashes is larger than 16; unimplemented right now :-(");
-                setConnectedState(DONE_DONE);
-                return;
-            }
-
-            try {
-                outputStream.writeChar(numHashes);
-    
-                for (String currentHash: currentHashes) {
-                    log.debug("Sending hash " + currentHash);
-                    byte[] send = currentHash.getBytes();
-                    outputStream.write(send, 0, send.length);
-                    outputStream.flush();
-                }
-            } catch (IOException e) {
-                log.error("Some sort of IO exception: " + e);
-                cleanupConnection();
-            }
         }
 
         /**
@@ -1014,27 +811,253 @@ public class FluidNexusBluetoothService extends Service {
 
         }
 
+        /**
+         * Write a specified command to the server
+         * @param char command
+         */
+        private void writeCommand(char command) {
+            // Send the command to the server
+            try {
+                outputStream.writeChar(command);
+                outputStream.flush();
+            } catch (IOException e) {
+                log.error("Exception during writing to outputStream: " + e);
+                cleanupConnection();
+            }
+        }
+
+        /**
+         * Read a command from the server.
+         * @return char command
+         */
+        private char readCommand() {
+            // Read back the result
+            char tmp = 0;
+            try {
+                tmp = inputStream.readChar();
+            } catch (IOException e) {
+                log.error("Exception during reading from inputStream: " + e);
+                cleanupConnection();
+            }
+            return tmp;
+        }
+
+        /**
+         * Write our hashes in protobuf format
+         */
+        private void writeHashes() {
+            FluidNexusProtos.FluidNexusHashes.Builder hashesBuilder = FluidNexusProtos.FluidNexusHashes.newBuilder();
+
+            for (String currentHash: currentHashes) {
+                hashesBuilder.addMessageHash(currentHash);
+            }
+
+            FluidNexusProtos.FluidNexusHashes hashes = hashesBuilder.build();
+
+            byte[] toSend = hashes.toByteArray();
+            try {
+                writeCommand(HASHES);
+                outputStream.writeInt(toSend.length);
+                outputStream.flush();
+                outputStream.write(toSend, 0, toSend.length);
+                outputStream.flush();
+            } catch (IOException e) {
+                log.error("Error writing hashes to output stream: " + e);
+                cleanupConnection();
+            }
+
+            setConnectedState(STATE_READ_MESSAGES);
+        }
+
+        /**
+         * Read our messages
+         */
+        private void readMessages() {
+            try {
+                int messageSize = inputStream.readInt();
+                byte[] messagesArray = new byte[messageSize];
+                inputStream.readFully(messagesArray, 0, messageSize);
+
+                FluidNexusProtos.FluidNexusMessages messages = FluidNexusProtos.FluidNexusMessages.parseFrom(messagesArray);
+
+                for (FluidNexusProtos.FluidNexusMessage message : messages.getMessageList()) {
+                    log.debug("Got title: " + message.getMessageTitle());
+                    log.debug("Got content: " + message.getMessageContent());
+                    log.debug("Got timestamp: " + message.getMessageTimestamp());
+                    dbAdapter.add_received(0, message.getMessageTimestamp(), message.getMessageTitle(), message.getMessageContent(), "(123,123,123,123)");
+                }
+
+                sendNewMessageMsg();
+                Message msg = threadHandler.obtainMessage(UPDATE_HASHES);
+                threadHandler.sendMessage(msg);
+                setConnectedState(STATE_WRITE_SWITCH);
+            } catch (IOException e) {
+                log.error("Error writing hashes to output stream: " + e);
+                cleanupConnection();
+            }
+
+        }
+
+        /**
+         * Read hashes from the server
+         */
+        private void readHashes() {
+            try {
+                int hashesSize = inputStream.readInt();
+                byte[] hashesArray = new byte[hashesSize];
+                inputStream.readFully(hashesArray, 0, hashesSize);
+
+                FluidNexusProtos.FluidNexusHashes hashes = FluidNexusProtos.FluidNexusHashes.parseFrom(hashesArray);
+
+                // Create new hash set of all the items
+                hashesToSend.clear();                
+                hashesToSend = new HashSet<String>(currentHashes);
+
+                // Get their hashes
+                HashSet<String> theirHashes = new HashSet<String>();
+                for (String hash : hashes.getMessageHashList()) {
+                    log.debug("Got hash: " + hash);
+                    theirHashes.add(hash);
+                }
+
+                // Take the difference to know which hashes of ours to send
+                hashesToSend.removeAll(theirHashes);
+
+                setConnectedState(STATE_WRITE_MESSAGES);
+            } catch (IOException e) {
+                log.error("Error reading hashes from input stream: " + e);
+                cleanupConnection();
+            }
+
+        }
+
+        /**
+         * Write our messages to the server based on the hashes that the server doesn't have
+         */
+        private void writeMessages() {
+            try {
+
+                FluidNexusProtos.FluidNexusMessages.Builder messagesBuilder = FluidNexusProtos.FluidNexusMessages.newBuilder();
+
+                for (String currentHash: hashesToSend) {
+                    FluidNexusProtos.FluidNexusMessage.Builder messageBuilder = FluidNexusProtos.FluidNexusMessage.newBuilder();
+
+                    Cursor localCursor = dbAdapter.returnItemBasedOnHash(currentHash);
+        
+                    String title = localCursor.getString(localCursor.getColumnIndexOrThrow(FluidNexusDbAdapter.KEY_TITLE));
+                    String content = localCursor.getString(localCursor.getColumnIndexOrThrow(FluidNexusDbAdapter.KEY_DATA));
+                    Float timestamp = localCursor.getFloat(localCursor.getColumnIndexOrThrow(FluidNexusDbAdapter.KEY_TIME));
+                    localCursor.close();
+
+                    messageBuilder.setMessageTitle(title);
+                    messageBuilder.setMessageContent(content);
+                    messageBuilder.setMessageTimestamp(timestamp);
+                    FluidNexusProtos.FluidNexusMessage message = messageBuilder.build();
+                    messagesBuilder.addMessage(message);
+                }
+
+                FluidNexusProtos.FluidNexusMessages messages = messagesBuilder.build();
+
+                log.debug("Message is: " + messages.toString());
+                byte[] messagesSerialized = messages.toByteArray();
+                int messagesSerializedLength = messagesSerialized.length;
+                log.debug("Writing messages length of: " + messagesSerializedLength);
+                writeCommand(MESSAGES);
+                outputStream.writeInt(messagesSerializedLength);
+                outputStream.flush();
+                outputStream.write(messagesSerialized, 0, messagesSerializedLength);
+                outputStream.flush();
+
+                setConnectedState(STATE_READ_SWITCH);
+            } catch (IOException e) {
+                log.error("Error writing messages to output stream: " + e);
+                cleanupConnection();
+            }
+
+        }
+
         public void run() {
             log.info("Begin ConnectedThread");
             
-            while (getConnectedState() != CLOSE_CONNECTION) {
+            char command = 0x00;            
+            while (getConnectedState() != STATE_QUIT) {
                 switch(getConnectedState()) {
-                    case DISCONNECTED:
-                        sendHELO();
-                    case HELO:
-                        requestHashList();
-                    case HASH_LIST:
-                        requestHashes();
-                    case SWITCH:
-                        doSwitch();
-                    case DONE_DONE:
-                        sendDoneDone();
-                    case 0xFF:
-                        //log.debug("we should never have gotten here...");
+                    case STATE_WRITE_HELO:
+                        // TODO
+                        // better error handling
+                        writeCommand(HELO);
+                        setConnectedState(STATE_READ_HELO);
+                        break;
+                    case STATE_READ_HELO:
+                        command = readCommand();
+                        if (command != HELO) {
+                            log.error("Received unexpected command: " + command);
+                            cleanupConnection();
+                        } else {
+                            setConnectedState(STATE_WRITE_HASHES);
+                        }
+                        break;
+                    case STATE_WRITE_HASHES:
+                        writeHashes();
+                        break;
+                    case STATE_READ_MESSAGES:
+                        command = readCommand();
+                        if (command != MESSAGES) {
+                            log.error("Received unexpected command: " + command);
+                            cleanupConnection();
+                        } else {
+                            readMessages();
+                        }
+
+                        break;
+                    case STATE_WRITE_SWITCH:
+                        writeCommand(SWITCH);
+                        setConnectedState(STATE_READ_HASHES);
+                        break;
+                    case STATE_READ_HASHES:
+                        command = readCommand();
+                        if (command != HASHES) {
+                            log.error("Received unexpected command: " + command);
+                            cleanupConnection();
+                        } else {
+                            readHashes();
+                        }
+
+                        break;
+                    case STATE_WRITE_MESSAGES:
+                        writeMessages();
+                        break;
+                    case STATE_READ_SWITCH:
+                        command = readCommand();
+                        if (command != SWITCH) {
+                            log.error("Received unexpected command: " + command);
+                            cleanupConnection();
+                        } else {
+                            setConnectedState(STATE_WRITE_DONE);
+                        }
+                        break;
+                    case STATE_WRITE_DONE:
+                        writeCommand(DONE);
+                        setConnectedState(STATE_READ_DONE);
+                        break;
+                    case STATE_READ_DONE:
+                        command = readCommand();
+                        if (command != DONE) {
+                            log.error("Received unexpected command: " + command);
+                            cleanupConnection();
+                        } else {
+                            setConnectedState(STATE_QUIT);
+                        }
+
+                        break;
                     default:
+                        cleanupConnection();
                         break;
                 }            
             }
+
+            // We're done here
+            cleanupConnection();
 
         }
 
@@ -1099,7 +1122,7 @@ public class FluidNexusBluetoothService extends Service {
             bundle.putString("address", device.getAddress());
             msg.setData(bundle);
             threadHandler.sendMessage(msg);
-            setConnectedState(CLOSE_CONNECTION);
+            setConnectedState(STATE_QUIT);
         }
 
         public void cancel() {
@@ -1139,7 +1162,7 @@ public class FluidNexusBluetoothService extends Service {
      * @note Taken from http://stackoverflow.com/questions/332079/in-java-how-do-i-convert-a-byte-array-to-a-string-of-hex-digits-while-keeping-le
      */
     public static String toHexString(byte[] bytes) {
-        char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+        char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
         char[] hexChars = new char[bytes.length * 2];
         int v;
         for ( int j = 0; j < bytes.length; j++ ) {

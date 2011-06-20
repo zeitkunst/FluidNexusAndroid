@@ -122,15 +122,16 @@ public class FluidNexusDbAdapter {
     }
 
     public void initialPopulate() {
-            add_received(0,
+            float now = (float) System.currentTimeMillis();        
+            add_received(0, now,
                "Schedule a meeting",
                 "We need to schedule a meeting soon.  Send a message around with the title [S] and good times to meet.  (This is an example of using the system to surreptitiously spread information about covert meetings.)",
                 "(123,123,123,123)");
-            add_received(0,
+            add_received(0, now,
                 "Building materials",
                 "Some 2x4's and other sundry items seen around Walker Terrace.  (In the aftermath of a disaster, knowing where there might be temporary sources of material is very important.)",
                 "(123,123,123,123)");
-            add_received(0,
+            add_received(0, now,
                 "Universal Declaration of Human Rights",
                 "All human beings are born free and equal in dignity and rights.They are endowed with reason and conscience and should act towards one another in a spirit of brotherhood.  (In repressive regimes the system could be used to spread texts or other media that would be considered subversive.).  Everyone is entitled to all the rights and freedoms set forth in this Declaration, without distinction of any kind, such as race, colour, sex, language, religion, political or other opinion, national or social origin, property, birth or other status. Furthermore, no distinction shall be made on the basis of the political, jurisdictional or international status of the country or territory to which a person belongs, whether it be independent, trust, non-self-governing or under any other limitation of sovereignty....",
                 "(123,123,123,123)");
@@ -164,7 +165,7 @@ public class FluidNexusDbAdapter {
      * @note Taken from http://stackoverflow.com/questions/332079/in-java-how-do-i-convert-a-byte-array-to-a-string-of-hex-digits-while-keeping-le
      */
     public static String toHexString(byte[] bytes) {
-        char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+        char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
         char[] hexChars = new char[bytes.length * 2];
         int v;
         for ( int j = 0; j < bytes.length; j++ ) {
@@ -179,7 +180,7 @@ public class FluidNexusDbAdapter {
             String title,
             String data,
             String cellID) {
-        long now = System.currentTimeMillis();        
+        float now = (float) System.currentTimeMillis();        
 
         ContentValues values = new ContentValues();
         values.put(KEY_SOURCE, IMSI_HASH);
@@ -193,11 +194,10 @@ public class FluidNexusDbAdapter {
         return database.insert(DATABASE_TABLE, null, values);
     }
 
-    public long add_received(int type,
+    public long add_received(int type, float now,
             String title,
             String data,
             String cellID) {
-        long now = System.currentTimeMillis();        
 
         ContentValues values = new ContentValues();
         values.put(KEY_SOURCE, IMSI_HASH);
