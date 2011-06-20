@@ -424,20 +424,6 @@ public class FluidNexusBluetoothServiceVer3 extends Service {
         public synchronized void connect(BluetoothDevice device) {
             log.debug("Connecting to: " + device);
 
-            /*
-             * TODO
-             * This would seem to stop any potential parallel connections from happing.
-             */
-            /*    
-            // cancel any thread trying to connect
-            if (state == STATE_CONNECTING) {
-                if (connectThread != null) {
-                    connectThread.cancel();
-                    connectThread = null;
-                }
-            }
-            */
-
             // State the thread that connects to the remove device only if we're not already connecting
             ConnectThread connectThread = new ConnectThread(device, threadHandler);
             connectedDevices.add(device);            
@@ -730,88 +716,6 @@ public class FluidNexusBluetoothServiceVer3 extends Service {
         }
 
         /**
-         * Setup our connection
-         */
-        private void sendHELO() {
-            // Send the command to the server
-            try {
-                outputStream.writeChar(HELO);
-                outputStream.flush();
-            } catch (IOException e) {
-                log.error("Exception during writing to outputStream: " + e);
-                cleanupConnection();
-            }
-
-            // Read back the result
-            try {
-                char tmp = inputStream.readChar();
-                if (tmp == HELO) {
-                    log.debug("got HELO");
-                    setConnectedState(HELO);
-                } else {
-                    log.debug("Received: " + tmp);
-                }
-            } catch (IOException e) {
-                log.error("Exception during reading from inputStream: " + e);
-                cleanupConnection();
-            }
-
-        }
-
-        /**
-         * Send data for a particular hash
-         */
-        private void sendDataForHash() {
-            byte[] hashBytes = new byte[32];
-            try {
-                inputStream.readFully(hashBytes);
-            } catch (IOException e) {
-                log.error("Exception during reading from inputStream: " + e);
-                cleanupConnection();
-            }
-            String hash = new String(hashBytes);                    
-            log.debug("Sending data for hash: " + hash);
-            
-            hash = hash.toUpperCase();
-            Cursor localCursor = dbAdapter.returnItemBasedOnHash(hash);
-
-            String title = localCursor.getString(localCursor.getColumnIndexOrThrow(FluidNexusDbAdapter.KEY_TITLE));
-            String message = localCursor.getString(localCursor.getColumnIndexOrThrow(FluidNexusDbAdapter.KEY_DATA));
-            Integer timestamp = localCursor.getInt(localCursor.getColumnIndexOrThrow(FluidNexusDbAdapter.KEY_TIME));
-            String timestampString = timestamp.toString();
-            localCursor.close();
-
-            try {
-                outputStream.writeByte(0x02);
-                outputStream.flush();
-
-                outputStream.writeInt(title.length());
-                outputStream.flush();
-
-                outputStream.writeInt(message.length());
-                outputStream.flush();
-
-                String timestampStringShorter = timestampString.substring(0, 10);                    
-                byte[] send = timestampStringShorter.getBytes();
-                outputStream.write(send, 0, send.length);
-                outputStream.flush();
-
-                byte[] titleBytes = title.getBytes();
-                outputStream.write(titleBytes, 0, titleBytes.length);
-                outputStream.flush();
-
-                byte[] messageBytes = message.getBytes();
-                outputStream.write(messageBytes, 0, messageBytes.length);
-                outputStream.flush();
-
-            } catch (IOException e) {
-                log.error("Exception during writing to outputStream in requestHashes: " + e);
-                cleanupConnection();
-            }
-
-        }
-
-        /**
          * Write a specified command to the server
          * @param char command
          */
@@ -870,7 +774,7 @@ public class FluidNexusBluetoothServiceVer3 extends Service {
         }
 
         /**
-         * Read our messages
+         * Read our messages sent in protobuf format
          */
         private void readMessages() {
             try {
@@ -976,6 +880,9 @@ public class FluidNexusBluetoothServiceVer3 extends Service {
 
         }
 
+        /**
+         * Our thread's run method
+         */
         public void run() {
             log.info("Begin ConnectedThread");
             
@@ -1059,48 +966,6 @@ public class FluidNexusBluetoothServiceVer3 extends Service {
             // We're done here
             cleanupConnection();
 
-        }
-
-        /**
-         * Write to the connected device via an OutputStream
-         * @param buffer Bytes to write
-         */
-        public void write(byte[] buffer) {
-            try {
-                outputStream.write(buffer);
-            } catch (IOException e) {
-                log.error("Exception during writing to outputStream: " + e);
-                cleanupConnection();
-            }
-        }
-
-        /**
-         * Read from the connected device via an OutputStream
-         * @param bytes Number of bytes to read
-         * @return byte[] buffer of bytes read, or null otherwise
-         */
-        public byte[] read(int bytes) {
-            byte[] buffer = new byte[bytes];
-            try {
-                inputStream.read(buffer, 0, bytes);
-            } catch (IOException e) {
-                log.error("Exception during reading from outputStream: " + e);
-                cleanupConnection();
-            }
-
-            return buffer;
-        }
-
-        /**
-         * Flush the output stream
-         */
-        public void flush() {
-            try {
-                outputStream.flush();
-            } catch (IOException e) {
-                log.error("Exception when trying to flush outputStream: " + e);
-                cleanupConnection();
-            }
         }
 
         /**
