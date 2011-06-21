@@ -32,6 +32,7 @@ import java.util.UUID;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -69,6 +70,7 @@ import android.widget.Toast;
  * * See if it's possible to manually enter paired devices to speed up creation of the network
  * * Abstract the sending of data over to sockets so that it works with any modality (zeroconf, ad-hoc, etc.)
  * * Setup 3 threads: one server (listen), one client for discovery, one client for paired devices
+ * * * There's something about the paired logic below that doesn't quite work right...
  * * Improve error handling dramatically
  */
 
@@ -82,6 +84,8 @@ public class FluidNexusBluetoothServiceVer3 extends Service {
     private Cursor dataCursor;
 
     private BluetoothAdapter bluetoothAdapter;
+
+    private Set<BluetoothDevice> pairedDevices;
 
     // Keeping track of items from the database
     private HashSet<String> currentHashes = new HashSet<String>();
@@ -97,6 +101,7 @@ public class FluidNexusBluetoothServiceVer3 extends Service {
     private IntentFilter sdpFilter;
 
     private BluetoothServiceThread serviceThread = null;
+    private BluetoothServiceThread serviceThreadPaired = null;
 
     // keeps track of connected clients
     // will likely always be only a single client, but what the hey
@@ -146,13 +151,18 @@ public class FluidNexusBluetoothServiceVer3 extends Service {
                 // get bluetoothdevice object from intent
                 BluetoothDevice foundDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
-                device.clear();
-                device.add(foundDevice.getName());
-                device.add(foundDevice.getAddress());
-                allDevicesBT.add(foundDevice);
+                //if (pairedDevices.contains(foundDevice)) {
+                    //log.debug("Found device in paired list: " + foundDevice);
+                //} else {
+                    device.clear();
+                    device.add(foundDevice.getName());
+                    device.add(foundDevice.getAddress());
+                    allDevicesBT.add(foundDevice);
+                    // Print this info to the log, for now
+                    log.info(foundDevice.getName() + " " + foundDevice.getAddress());
+                //}
+
                 
-                // Print this info to the log, for now
-                log.info(foundDevice.getName() + " " + foundDevice.getAddress());
             } else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
                 // Clear out our device list
                 allDevicesBT.clear();
@@ -226,6 +236,7 @@ public class FluidNexusBluetoothServiceVer3 extends Service {
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         state = STATE_NONE;
+        pairedDevices = bluetoothAdapter.getBondedDevices();
 
         btFoundFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         btFoundFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
@@ -248,10 +259,20 @@ public class FluidNexusBluetoothServiceVer3 extends Service {
         showNotification();
 
         if (serviceThread == null) {
-            serviceThread = new BluetoothServiceThread();
-            log.debug("Starting our bluetooth service thread...");
+            boolean paired = true;
+            serviceThread = new BluetoothServiceThread(paired);
+            log.debug("Starting our bluetooth service thread for discovered and paired devices...");
             serviceThread.start();
         }
+
+        /*
+        if (serviceThreadPaired == null) {
+            boolean paired = true;
+            serviceThreadPaired = new BluetoothServiceThread(paired);
+            log.debug("Starting our bluetooth service thread for paired devices...");
+            serviceThreadPaired.start();
+        }
+        */
     }
 
     @Override
@@ -352,13 +373,17 @@ public class FluidNexusBluetoothServiceVer3 extends Service {
         // Threads
 
         private BluetoothSocket socket;
-
+        private boolean paired = false;
 
         /**
-         * Constructor for the thread
+         * Constructor for the thread that does discovery
          */
-        public BluetoothServiceThread() {
-            setName("FluidNexusBluetoothServiceThread");
+        public BluetoothServiceThread(boolean examinePaired) {
+
+            paired = examinePaired;
+
+            setName("FluidNexusBluetoothServiceThread-Paired+Discovery");
+
             updateHashes();
             updateData();
         }
@@ -392,30 +417,40 @@ public class FluidNexusBluetoothServiceVer3 extends Service {
         };
 
         /**
+         * Try to connect to our paired devices, first
+         */
+        private void doPairedConnect() {
+            for (BluetoothDevice pairedDevice: pairedDevices) {
+                connect(pairedDevice);
+            }
+        }
+
+        /**
          * Begin the thread, and thus the service main loop
          */
         public void run() {
-            while (getServiceState() != STATE_QUIT) {
-                switch (getServiceState()) {
-                    case STATE_NONE:
-                        doStateNone();
-                        break;
-                    case STATE_DISCOVERY:
-                        // If we're discovering things, just continue
-                        break;
-                    case STATE_DISCOVERY_FINISHED:
-                        // If there discovery is finished, start trying to connect
-                        doServiceDiscovery();
-                        break;
-                    case STATE_CONNECTING:
-                        doConnectToDevices();
-                        break;
-                    case STATE_SERVICE_WAIT:
-                        waitService();
-                    default:
-                        break;
+
+                while (getServiceState() != STATE_QUIT) {
+                    switch (getServiceState()) {
+                        case STATE_NONE:
+                            doStateNone();
+                            break;
+                        case STATE_DISCOVERY:
+                            // If we're discovering things, just continue
+                            break;
+                        case STATE_DISCOVERY_FINISHED:
+                            // If there discovery is finished, start trying to connect
+                            doServiceDiscovery();
+                            break;
+                        case STATE_CONNECTING:
+                            doConnectToDevices();
+                            break;
+                        case STATE_SERVICE_WAIT:
+                            waitService();
+                        default:
+                            break;
+                    }
                 }
-            }
         }
 
         /**
