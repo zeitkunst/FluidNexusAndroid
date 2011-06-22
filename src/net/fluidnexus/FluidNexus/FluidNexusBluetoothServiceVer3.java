@@ -828,16 +828,20 @@ public class FluidNexusBluetoothServiceVer3 extends Service {
 
                 FluidNexusProtos.FluidNexusMessages messages = FluidNexusProtos.FluidNexusMessages.parseFrom(messagesArray);
 
+                int count = 0;
                 for (FluidNexusProtos.FluidNexusMessage message : messages.getMessageList()) {
                     log.debug("Got title: " + message.getMessageTitle());
                     log.debug("Got content: " + message.getMessageContent());
                     log.debug("Got timestamp: " + message.getMessageTimestamp());
                     dbAdapter.add_received(0, message.getMessageTimestamp(), message.getMessageTitle(), message.getMessageContent());
+                    count += 1;
+                }
+                if (count > 0) {
+                    sendNewMessageMsg();
+                    Message msg = threadHandler.obtainMessage(UPDATE_HASHES);
+                    threadHandler.sendMessage(msg);
                 }
 
-                sendNewMessageMsg();
-                Message msg = threadHandler.obtainMessage(UPDATE_HASHES);
-                threadHandler.sendMessage(msg);
                 setConnectedState(STATE_WRITE_SWITCH);
             } catch (IOException e) {
                 log.error("Error writing hashes to output stream: " + e);
