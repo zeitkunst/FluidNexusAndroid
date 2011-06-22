@@ -41,6 +41,7 @@
     <string name="notification_fluid_nexus_send_outgoing_complete">Sending outgoing message</string>
     <string name="toast_bluetooth_settings_changed">Bluetooth simulator       settings changed; please restart the emulator and Fluid Nexus.  If using the bridge, be sure it is running before you start Fluid Nexus in the emulator.</string>
     <string name="toast_bluetooth_server_simulator_complete">This is the end of the Bluetooth server (receive) simulator.  If you want to see the messages being added again, please restart the emulator.</string>
+    <string name="toast_new_message_received">New message received.</string>
     <string name="intent_new_message">net.fluidnexus.FluidNexus.NEW_MESSAGE</string>
     <string name="intent_discovery_started">net.fluidnexus.FluidNexus.DISCOVERY_STARTED</string>
     <string name="intent_device_found">net.fluidnexus.FluidNexus.REMOTE_DEVICE_FOUND</string>
@@ -53,6 +54,7 @@
     <string name="preferences">Fluid Nexus Preferences</string>
     <string name="preferences_category_interface">Interface</string>
     <string name="preferences_category_network">Network</string>
+    <string name="preferences_category_bluetooth">Bluetooth</string>
     <string name="preferences_show_messages">Show messages?</string>
     <string name="preferences_show_messages_summary">Whether or not to show messages in the interface.</string>
     <string name="preferences_enable_bluetooth_service">Bluetooth Service</string>
@@ -61,6 +63,8 @@
     <string name="preferences_enable_zeroconf_service_summary">Whether or not the zeroconf service is enabled.  This service will run even when the application has ended.  This feature is under development.</string>
     <string name="preferences_enable_adhocwifi_service">Ad-Hoc Wifi Service</string>
     <string name="preferences_enable_adhocwifi_service_summary">Whether or not the Ad-Hoc Wifi service is enabled.  This service will run even when the application has ended.  This feature is under development.</string>
+    <string name="preferences_bluetooth_scan_frequency">Scan Frequency</string>
+    <string name="preferences_bluetooth_scan_frequency_summary">How often to scan for other devices.  Shorter durations will severely impact battery life.</string>
 
     <string name="help_help_text">Fluid Nexus unfortunately only works in simulated mode right now, since the m5 version of the emulator does not support Bluetooth natively.  Read on for more details about the different types of Bluetooth simulation.\n
 \n

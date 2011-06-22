@@ -29,4 +29,13 @@
             android:key="enableAdhocwifiServicePref" />
 
     </PreferenceCategory>
+    <PreferenceCategory android:title="@string/preferences_category_bluetooth">
+        <ListPreference 
+            android:title="@string/preferences_bluetooth_scan_frequency"
+            android:summary="@string/preferences_bluetooth_scan_frequency_summary"
+            android:defaultValue="300"
+            android:key="bluetoothScanFrequency"
+            android:entries="@array/scan_frequency_names"
+            android:entryValues="@array/scan_frequency_values" />
+    </PreferenceCategory>
 </PreferenceScreen>

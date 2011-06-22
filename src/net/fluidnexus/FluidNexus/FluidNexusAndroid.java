@@ -105,6 +105,7 @@ public class FluidNexusAndroid extends ListActivity {
     // messages from bluetooth service
     Messenger bluetoothService = null;
     final Messenger messenger = new Messenger(new IncomingHandler());
+    private boolean bound = false;
 
     // Messages to the bluetooth service
     static final int MSG_NEW_MESSAGE_CREATED = 0xF0;
@@ -117,15 +118,6 @@ public class FluidNexusAndroid extends ListActivity {
     private BluetoothAdapter bluetoothAdapter = null;
     private boolean enableBluetoothServicePref = true;
 
-    private class NewMessageIntentReceiver extends BroadcastReceiver {
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            log.info(action);
-            log.info("received new message intent.");
-            fillListView(VIEW_MODE);
-        }
-    }
-
     /**
      * Our handler for incoming messages
      */
@@ -135,6 +127,7 @@ public class FluidNexusAndroid extends ListActivity {
             switch (msg.what) {
                 case FluidNexusBluetoothServiceVer3.MSG_NEW_MESSAGE_RECEIVED:
                     log.debug("Received MSG_NEW_MESSAGE_RECEIVED");
+                    Toast.makeText(getApplicationContext(), R.string.toast_new_message_received, Toast.LENGTH_LONG).show();
                     fillListView(VIEW_MODE);
                     break;
                 default:
@@ -146,11 +139,18 @@ public class FluidNexusAndroid extends ListActivity {
     private ServiceConnection bluetoothServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             bluetoothService = new Messenger(service);
-            log.debug("Connected to service");
             try {
                 Message msg = Message.obtain(null, FluidNexusBluetoothServiceVer3.MSG_REGISTER_CLIENT);
                 msg.replyTo = messenger;
                 bluetoothService.send(msg);
+                log.debug("Connected to service");
+
+                // Send scan frequency on start
+                msg = Message.obtain(null, FluidNexusBluetoothServiceVer3.MSG_BLUETOOTH_SCAN_FREQUENCY);
+                msg.arg1 = Integer.parseInt(prefs.getString("bluetoothScanFrequency", "5"));
+                msg.replyTo = messenger;
+                bluetoothService.send(msg);
+
             } catch (RemoteException e) {
                 // Here, the service has crashed even before we were able to connect
             }
@@ -175,11 +175,13 @@ public class FluidNexusAndroid extends ListActivity {
         registerForContextMenu(getListView());
 
         log.verbose("starting up...");
-      
+
+        /*      
         // Regiser my receiver to NEW_MESSAGE action
         iFilter = new IntentFilter(getText(R.string.intent_new_message).toString());
         iReceiver = new NewMessageIntentReceiver();
         registerReceiver(iReceiver, iFilter);
+        */
 
         // setup bluetooth adapter
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -242,7 +244,6 @@ public class FluidNexusAndroid extends ListActivity {
     @Override 
     public void onStart() {
         super.onStart();
-        log.info("In onStart");
 
         dbAdapter = new FluidNexusDbAdapter(this);
         dbAdapter.open();
@@ -333,10 +334,13 @@ public class FluidNexusAndroid extends ListActivity {
      * Bind to the service
      */
     private void doBindService() {
-        log.info("Binding to Fluid Nexus Bluetooth Service");
-        Intent i = new Intent(this, FluidNexusBluetoothServiceVer3.class);
-        startService(i);
-        bindService(i, bluetoothServiceConnection, Context.BIND_AUTO_CREATE);
+        if (bound == false) {
+            log.info("Binding to Fluid Nexus Bluetooth Service");
+            Intent i = new Intent(this, FluidNexusBluetoothServiceVer3.class);
+            startService(i);
+            bindService(i, bluetoothServiceConnection, Context.BIND_AUTO_CREATE);
+            bound = true;
+        }
     }
 
     /**
@@ -402,6 +406,16 @@ public class FluidNexusAndroid extends ListActivity {
                         stopService(new Intent(FluidNexusBluetoothServiceVer3.class.getName()));
                     }
                     enableBluetoothServicePref = tmp;
+                } else if (key.equals("bluetoothScanFrequency")) {
+                    try {
+                        Message msg = Message.obtain(null, FluidNexusBluetoothServiceVer3.MSG_BLUETOOTH_SCAN_FREQUENCY);
+                        msg.arg1 = Integer.parseInt(prefs.getString("bluetoothScanFrequency", "5"));
+                        msg.replyTo = messenger;
+                        bluetoothService.send(msg);
+
+                    } catch (RemoteException e) {
+                        log.error("Unable to send scan frequency message: " + e);
+                    }
                 }
 
             }

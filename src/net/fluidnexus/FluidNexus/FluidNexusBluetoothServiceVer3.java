@@ -66,7 +66,10 @@ import android.widget.Toast;
 
 /*
  * TODO
+ * * Refactor database to allow for images, mime-types, sha-256
+ * * Add blacklist database to prevent getting messages we don't want anymore
  * * Ensure multiple threads are opened for multiple hosts running the software
+ * * * Figure out why it doesn't see any services for mooplop
  * * See if it's possible to manually enter paired devices to speed up creation of the network
  * * Abstract the sending of data over to sockets so that it works with any modality (zeroconf, ad-hoc, etc.)
  * * Setup 3 threads: one server (listen), one client for discovery, one client for paired devices
@@ -109,6 +112,9 @@ public class FluidNexusBluetoothServiceVer3 extends Service {
     public static final int MSG_REGISTER_CLIENT = 0x10;
     public static final int MSG_UNREGISTER_CLIENT = 0x11;
     public static final int MSG_NEW_MESSAGE_RECEIVED = 0x20;
+    public static final int MSG_BLUETOOTH_SCAN_FREQUENCY = 0x30;
+
+    private int scanFrequency = 5;
 
     // Target we publish for clients to send messages to
     final Messenger messenger = new Messenger(new IncomingHandler());
@@ -207,6 +213,10 @@ public class FluidNexusBluetoothServiceVer3 extends Service {
                     break;
                 case MSG_UNREGISTER_CLIENT:
                     log.debug("Removing client: " + msg.replyTo);
+                    break;
+                case MSG_BLUETOOTH_SCAN_FREQUENCY:
+                    log.debug("Changing scan frequency to: " + msg.arg1);
+                    scanFrequency = msg.arg1;
                     break;
                 case FluidNexusAndroid.MSG_NEW_MESSAGE_CREATED:
                     if (serviceThread != null) {
@@ -578,11 +588,9 @@ public class FluidNexusBluetoothServiceVer3 extends Service {
         }
 
         private void waitService() {
-            // TODO
-            // make this configurable?
             try {
-                log.debug("Service thread sleeping...");
-                this.sleep(5000);
+                log.debug("Service thread sleeping for " + scanFrequency + " seconds...");
+                this.sleep(scanFrequency * 1000);
             } catch (InterruptedException e) {
                 log.error("Thread sleeping interrupted: " + e);
             }

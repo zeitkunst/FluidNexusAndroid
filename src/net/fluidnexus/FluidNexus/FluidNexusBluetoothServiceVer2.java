@@ -851,8 +851,9 @@ public class FluidNexusBluetoothServiceVer2 extends Service {
                     inputStream.readFully(messageBytes);
                     String message = new String(messageBytes);
                     log.debug("Message is: " + message);
-
-                    dbAdapter.add_received(0, title, message, "(123,123,123,123)");
+                    
+                    float now = (float) (System.currentTimeMillis()/1000);        
+                    dbAdapter.add_received(0, now, title, message, "(123,123,123,123)");
                     currentHashes.add(currentHash.toUpperCase());
      
                 }
