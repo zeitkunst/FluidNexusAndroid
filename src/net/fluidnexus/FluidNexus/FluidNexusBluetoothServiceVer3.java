@@ -832,7 +832,7 @@ public class FluidNexusBluetoothServiceVer3 extends Service {
                     log.debug("Got title: " + message.getMessageTitle());
                     log.debug("Got content: " + message.getMessageContent());
                     log.debug("Got timestamp: " + message.getMessageTimestamp());
-                    dbAdapter.add_received(0, message.getMessageTimestamp(), message.getMessageTitle(), message.getMessageContent(), "(123,123,123,123)");
+                    dbAdapter.add_received(0, message.getMessageTimestamp(), message.getMessageTitle(), message.getMessageContent());
                 }
 
                 sendNewMessageMsg();
@@ -1064,6 +1064,24 @@ public class FluidNexusBluetoothServiceVer3 extends Service {
             return null;
         }
     }
+
+    /**
+     * Make a SHA-256 hash of the input string
+     * @param inputString Input string to create an MD5 hash of
+     */
+    public static String makeSHA256(String inputString) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] messageDigest = md.digest(inputString.getBytes());
+
+            String sha256 = toHexString(messageDigest);
+            return sha256;
+        } catch(NoSuchAlgorithmException e) {
+            log.error("SHA-256" + e.getMessage());
+            return null;
+        }
+    }
+
 
     /**
      * Take a byte array and turn it into a hex string

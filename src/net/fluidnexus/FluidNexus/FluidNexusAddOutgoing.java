@@ -71,7 +71,7 @@ public class FluidNexusAddOutgoing extends Activity {
         String title = titleEditText.getText().toString();
         String message = messageEditText.getText().toString();
 
-        dbHelper.add_new(0, title, message, "(123,123,123,123)");
+        dbHelper.add_new(0, title, message);
     }
 
 }

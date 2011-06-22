@@ -126,8 +126,8 @@ public class FluidNexusAndroid extends ListActivity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case FluidNexusBluetoothServiceVer3.MSG_NEW_MESSAGE_RECEIVED:
-                    log.debug("Received MSG_NEW_MESSAGE_RECEIVED");
                     Toast.makeText(getApplicationContext(), R.string.toast_new_message_received, Toast.LENGTH_LONG).show();
+                    log.debug("Received MSG_NEW_MESSAGE_RECEIVED");
                     fillListView(VIEW_MODE);
                     break;
                 default:
@@ -274,14 +274,11 @@ public class FluidNexusAndroid extends ListActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(iReceiver);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        registerReceiver(iReceiver, iFilter);
     }
 
     @Override
