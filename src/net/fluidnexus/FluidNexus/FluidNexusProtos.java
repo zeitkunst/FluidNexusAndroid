@@ -415,6 +415,13 @@ public final class FluidNexusProtos {
     public boolean hasMessageAttachment() { return hasMessageAttachment; }
     public com.google.protobuf.ByteString getMessageAttachment() { return messageAttachment_; }
     
+    // optional string message_attachment_original_filename = 9;
+    public static final int MESSAGE_ATTACHMENT_ORIGINAL_FILENAME_FIELD_NUMBER = 9;
+    private boolean hasMessageAttachmentOriginalFilename;
+    private java.lang.String messageAttachmentOriginalFilename_ = "";
+    public boolean hasMessageAttachmentOriginalFilename() { return hasMessageAttachmentOriginalFilename; }
+    public java.lang.String getMessageAttachmentOriginalFilename() { return messageAttachmentOriginalFilename_; }
+    
     private void initFields() {
       messageType_ = net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage.MessageType.TEXT;
     }
@@ -448,6 +455,9 @@ public final class FluidNexusProtos {
       }
       if (hasMessageAttachment()) {
         output.writeBytes(8, getMessageAttachment());
+      }
+      if (hasMessageAttachmentOriginalFilename()) {
+        output.writeString(9, getMessageAttachmentOriginalFilename());
       }
     }
     
@@ -488,6 +498,10 @@ public final class FluidNexusProtos {
       if (hasMessageAttachment()) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(8, getMessageAttachment());
+      }
+      if (hasMessageAttachmentOriginalFilename()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeStringSize(9, getMessageAttachmentOriginalFilename());
       }
       memoizedSerializedSize = size;
       return size;
@@ -657,6 +671,9 @@ public final class FluidNexusProtos {
         if (other.hasMessageAttachment()) {
           setMessageAttachment(other.getMessageAttachment());
         }
+        if (other.hasMessageAttachmentOriginalFilename()) {
+          setMessageAttachmentOriginalFilename(other.getMessageAttachmentOriginalFilename());
+        }
         return this;
       }
       
@@ -709,6 +726,10 @@ public final class FluidNexusProtos {
             }
             case 66: {
               setMessageAttachment(input.readBytes());
+              break;
+            }
+            case 74: {
+              setMessageAttachmentOriginalFilename(input.readString());
               break;
             }
           }
@@ -875,6 +896,27 @@ public final class FluidNexusProtos {
       public Builder clearMessageAttachment() {
         result.hasMessageAttachment = false;
         result.messageAttachment_ = getDefaultInstance().getMessageAttachment();
+        return this;
+      }
+      
+      // optional string message_attachment_original_filename = 9;
+      public boolean hasMessageAttachmentOriginalFilename() {
+        return result.hasMessageAttachmentOriginalFilename();
+      }
+      public java.lang.String getMessageAttachmentOriginalFilename() {
+        return result.getMessageAttachmentOriginalFilename();
+      }
+      public Builder setMessageAttachmentOriginalFilename(java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  result.hasMessageAttachmentOriginalFilename = true;
+        result.messageAttachmentOriginalFilename_ = value;
+        return this;
+      }
+      public Builder clearMessageAttachmentOriginalFilename() {
+        result.hasMessageAttachmentOriginalFilename = false;
+        result.messageAttachmentOriginalFilename_ = getDefaultInstance().getMessageAttachmentOriginalFilename();
         return this;
       }
       

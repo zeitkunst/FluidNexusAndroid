@@ -36,6 +36,7 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -60,6 +61,7 @@ import android.util.Log;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 
+import java.io.File;
 /*
  * TODO
  * * deal with the database somehow not being open when we receive the MSG_NEW_MESSAGE_RECEIVED message after an orientation change.  This is totally opaque to me.
@@ -118,6 +120,8 @@ public class FluidNexusAndroid extends ListActivity {
     private BluetoothAdapter bluetoothAdapter = null;
     private boolean enableBluetoothServicePref = true;
 
+    private File attachmentsDir = null;
+
     /**
      * Our handler for incoming messages
      */
@@ -175,6 +179,7 @@ public class FluidNexusAndroid extends ListActivity {
         registerForContextMenu(getListView());
 
         log.verbose("starting up...");
+
 
         /*      
         // Regiser my receiver to NEW_MESSAGE action
@@ -250,6 +255,13 @@ public class FluidNexusAndroid extends ListActivity {
         fillListView(VIEW_MODE);
 
         setupPreferences();
+        // Create our attachments dir            
+        // TODO
+        // Make this configurable to SD card
+        File dataDir = Environment.getExternalStorageDirectory();
+        attachmentsDir = new File(dataDir.getAbsolutePath() + "/FluidNexusAttachments");
+        attachmentsDir.mkdirs();
+
         if (bluetoothAdapter != null) {
             if (!bluetoothAdapter.isEnabled()) {
                 Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -285,7 +297,6 @@ public class FluidNexusAndroid extends ListActivity {
     protected void onDestroy() {
         super.onDestroy();
         prefs.unregisterOnSharedPreferenceChangeListener(preferenceChangeListener);
-        dbCursor.close();
         dbAdapter.close();
         try {
             doUnbindService();
