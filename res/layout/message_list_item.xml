@@ -10,7 +10,6 @@ android:id="@+id/list_item_layout"
 android:layout_width="fill_parent"
 android:layout_height="wrap_content"
 android:padding="5px"
-xmlns:android="http://schemas.android.com/apk/res/android"
 >
 
 <ImageView
@@ -41,5 +40,20 @@ android:layout_below="@+id/message_list_item"
 android:layout_alignLeft="@+id/message_list_item"
 >
 </TextView>
+</RelativeLayout>
+<RelativeLayout
+android:id="@+id/list_item_attachment"
+android:layout_width="fill_parent"
+android:layout_height="wrap_content"
+android:layout_below="@+id/list_item_layout"
+android:padding="5px"
+>
+<Button
+android:id="@+id/message_list_attachment"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:layout_alignParentLeft="true"
+>
+</Button>
 </RelativeLayout>
 </RelativeLayout>

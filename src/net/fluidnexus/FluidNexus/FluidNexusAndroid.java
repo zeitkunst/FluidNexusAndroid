@@ -35,6 +35,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -52,9 +53,11 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.MenuItem;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.Button;
 import android.widget.SimpleCursorAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.util.Log;
@@ -317,8 +320,16 @@ public class FluidNexusAndroid extends ListActivity {
         currentRowID = info.id;
         Cursor c = dbAdapter.returnItemByID(currentRowID);
         menu.setHeaderTitle(c.getString(c.getColumnIndexOrThrow(FluidNexusDbAdapter.KEY_TITLE)));
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.message_list_context, menu);
+        int mine = c.getInt(c.getColumnIndexOrThrow(FluidNexusDbAdapter.KEY_MINE));
+        log.debug("Mine is: " + mine);
+        if (mine == 0) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.message_list_context_noedit, menu);
+        } else {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.message_list_context, menu);
+        }
+
         c.close();
     }
 
@@ -557,9 +568,9 @@ public class FluidNexusAndroid extends ListActivity {
         TextView tv;
         tv = (TextView) findViewById(R.id.message_list_item);
         
-        String[] from = new String[] {FluidNexusDbAdapter.KEY_TITLE, FluidNexusDbAdapter.KEY_CONTENT, FluidNexusDbAdapter.KEY_MINE};
+        String[] from = new String[] {FluidNexusDbAdapter.KEY_TITLE, FluidNexusDbAdapter.KEY_CONTENT, FluidNexusDbAdapter.KEY_MINE, FluidNexusDbAdapter.KEY_ATTACHMENT_ORIGINAL_FILENAME};
         //String[] from = new String[] {FluidNexusDbAdapter.KEY_TITLE};
-        int[] to = new int[] {R.id.message_list_item, R.id.message_list_data, R.id.message_list_item_icon};
+        int[] to = new int[] {R.id.message_list_item, R.id.message_list_data, R.id.message_list_item_icon, R.id.message_list_attachment};
         //int[] to = new int[] {R.id.message_list_item};
         SimpleCursorAdapter messagesAdapter = new SimpleCursorAdapter(this, R.layout.message_list_item, dbCursor, from, to);
         ListView lv;
@@ -592,6 +603,35 @@ public class FluidNexusAndroid extends ListActivity {
                     }
                     
                     return true;
+                }
+
+                if (i == cursor.getColumnIndex(FluidNexusDbAdapter.KEY_ATTACHMENT_ORIGINAL_FILENAME)) {
+
+                    final String attachmentFilename = cursor.getString(i);
+                    final String attachmentPath = cursor.getString(cursor.getColumnIndex(FluidNexusDbAdapter.KEY_ATTACHMENT_PATH));
+                    Button viewAttachmentButton = (Button) view;
+
+                    viewAttachmentButton.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View view) {
+                            Intent intent = new Intent();
+
+                            Uri uri = Uri.parse("file:///" + attachmentPath);
+                            intent.setDataAndType(uri, "image/*");
+                            intent.setAction(android.content.Intent.ACTION_VIEW);
+                            startActivity(intent);
+
+                        }
+                    });
+
+
+                    if (attachmentFilename.equals("")) {
+                        viewAttachmentButton.setVisibility(View.GONE);
+                    } else {
+                        viewAttachmentButton.setText("View " + attachmentFilename);
+                    }
+
+                    return true;
+
                 }
                 return false;
             }
