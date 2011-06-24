@@ -24,6 +24,9 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -53,6 +56,7 @@ import android.content.IntentFilter;
 import android.content.BroadcastReceiver;
 import android.database.Cursor;
 import android.os.Binder;
+import android.os.Environment;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -506,7 +510,7 @@ public class FluidNexusBluetoothServiceVer3 extends Service {
             dataCursor.moveToFirst();
             currentData.clear();
 
-            String[] fields = new String[] {FluidNexusDbAdapter.KEY_HASH, FluidNexusDbAdapter.KEY_TIME, FluidNexusDbAdapter.KEY_TITLE, FluidNexusDbAdapter.KEY_DATA};
+            String[] fields = new String[] {FluidNexusDbAdapter.KEY_MESSAGE_HASH, FluidNexusDbAdapter.KEY_TIME, FluidNexusDbAdapter.KEY_TITLE, FluidNexusDbAdapter.KEY_CONTENT};
             while (dataCursor.isAfterLast() == false) {
                 // I'm still not sure why I have to instantiate a new vector each time here, rather than using the local vector from earlier
                 // This is one of those things of java that just makes me want to pull my hair out...
@@ -833,7 +837,39 @@ public class FluidNexusBluetoothServiceVer3 extends Service {
                     log.debug("Got title: " + message.getMessageTitle());
                     log.debug("Got content: " + message.getMessageContent());
                     log.debug("Got timestamp: " + message.getMessageTimestamp());
-                    dbAdapter.add_received(0, message.getMessageTimestamp(), message.getMessageTitle(), message.getMessageContent());
+
+                    if (message.hasMessageAttachmentOriginalFilename()) {
+                        // TODO
+                        // Assuming a location for the attachments here...this should be sent in an intent on service start
+                        File dataDir = Environment.getExternalStorageDirectory();
+                        File attachmentsDir = new File(dataDir.getAbsolutePath() + "/FluidNexusAttachments");
+                        attachmentsDir.mkdirs();
+                        
+                        // Open up a file for writing
+                        /* message_attachment_path = os.path.join(self.attachmentsDir, message_hash)
+                         *                     attachmentFP = open(message_attachment_path, "wb")
+                         *                                         attachmentFP.write(message.message_attachment)
+                         *                                                             attachmentFP.close()
+                         */
+                        String message_hash = dbAdapter.makeSHA256(message.getMessageTitle() + message.getMessageContent());
+                        File destinationPath = new File(attachmentsDir + "/" + message_hash);
+                        BufferedOutputStream f = null;
+                        try {
+                            f = new BufferedOutputStream(new FileOutputStream(destinationPath));
+                            byte[] ba = message.getMessageAttachment().toByteArray();
+                            f.write(ba);
+                        } finally {
+                            if (f != null) {
+                                f.close();
+                            }
+                        }
+
+
+
+                        dbAdapter.add_received(0, message.getMessageTimestamp(), message.getMessageTitle(), message.getMessageContent(), destinationPath.getAbsolutePath(), message.getMessageAttachmentOriginalFilename());
+                    } else {
+                        dbAdapter.add_received(0, message.getMessageTimestamp(), message.getMessageTitle(), message.getMessageContent());
+                    }
                     count += 1;
                 }
                 if (count > 0) {
@@ -897,7 +933,7 @@ public class FluidNexusBluetoothServiceVer3 extends Service {
                     Cursor localCursor = dbAdapter.returnItemBasedOnHash(currentHash);
         
                     String title = localCursor.getString(localCursor.getColumnIndexOrThrow(FluidNexusDbAdapter.KEY_TITLE));
-                    String content = localCursor.getString(localCursor.getColumnIndexOrThrow(FluidNexusDbAdapter.KEY_DATA));
+                    String content = localCursor.getString(localCursor.getColumnIndexOrThrow(FluidNexusDbAdapter.KEY_CONTENT));
                     Float timestamp = localCursor.getFloat(localCursor.getColumnIndexOrThrow(FluidNexusDbAdapter.KEY_TIME));
                     localCursor.close();
 

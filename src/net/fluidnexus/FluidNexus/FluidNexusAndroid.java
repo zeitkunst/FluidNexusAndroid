@@ -381,7 +381,7 @@ public class FluidNexusAndroid extends ListActivity {
         Intent i = new Intent(this, FluidNexusEditMessage.class);
         i.putExtra(FluidNexusDbAdapter.KEY_ID, c.getInt(c.getColumnIndex(FluidNexusDbAdapter.KEY_ID)));
         i.putExtra(FluidNexusDbAdapter.KEY_TITLE, c.getString(c.getColumnIndex(FluidNexusDbAdapter.KEY_TITLE)));
-        i.putExtra(FluidNexusDbAdapter.KEY_DATA, c.getString(c.getColumnIndex(FluidNexusDbAdapter.KEY_DATA)));
+        i.putExtra(FluidNexusDbAdapter.KEY_CONTENT, c.getString(c.getColumnIndex(FluidNexusDbAdapter.KEY_CONTENT)));
         startActivityForResult(i, ACTIVITY_EDIT_MESSAGE);
         c.close();
 
@@ -488,7 +488,7 @@ public class FluidNexusAndroid extends ListActivity {
         Intent i = new Intent(this, FluidNexusViewMessage.class);
         i.putExtra(FluidNexusDbAdapter.KEY_ID, localCursor.getInt(localCursor.getColumnIndex(FluidNexusDbAdapter.KEY_ID)));
         i.putExtra(FluidNexusDbAdapter.KEY_TITLE, localCursor.getString(localCursor.getColumnIndex(FluidNexusDbAdapter.KEY_TITLE)));
-        i.putExtra(FluidNexusDbAdapter.KEY_DATA, localCursor.getString(localCursor.getColumnIndex(FluidNexusDbAdapter.KEY_DATA)));
+        i.putExtra(FluidNexusDbAdapter.KEY_CONTENT, localCursor.getString(localCursor.getColumnIndex(FluidNexusDbAdapter.KEY_CONTENT)));
         startActivityForResult(i, ACTIVITY_VIEW_MESSAGE);
         localCursor.close();
     }
@@ -557,7 +557,7 @@ public class FluidNexusAndroid extends ListActivity {
         TextView tv;
         tv = (TextView) findViewById(R.id.message_list_item);
         
-        String[] from = new String[] {FluidNexusDbAdapter.KEY_TITLE, FluidNexusDbAdapter.KEY_DATA, FluidNexusDbAdapter.KEY_MINE};
+        String[] from = new String[] {FluidNexusDbAdapter.KEY_TITLE, FluidNexusDbAdapter.KEY_CONTENT, FluidNexusDbAdapter.KEY_MINE};
         //String[] from = new String[] {FluidNexusDbAdapter.KEY_TITLE};
         int[] to = new int[] {R.id.message_list_item, R.id.message_list_data, R.id.message_list_item_icon};
         //int[] to = new int[] {R.id.message_list_item};
@@ -568,7 +568,7 @@ public class FluidNexusAndroid extends ListActivity {
 
         messagesAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
             public boolean setViewValue(View view, Cursor cursor, int i) {
-                if (i == cursor.getColumnIndex(FluidNexusDbAdapter.KEY_DATA)) {
+                if (i == cursor.getColumnIndex(FluidNexusDbAdapter.KEY_CONTENT)) {
                     String fullMessage = cursor.getString(i);
                     TextView tv = (TextView) view;
                     int stringLen = fullMessage.length();

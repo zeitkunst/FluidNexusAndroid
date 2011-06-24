@@ -48,7 +48,7 @@ public class FluidNexusViewMessage extends Activity {
 
         if (extras != null) {
             String title = extras.getString(FluidNexusDbAdapter.KEY_TITLE);
-            String message = extras.getString(FluidNexusDbAdapter.KEY_DATA); 
+            String message = extras.getString(FluidNexusDbAdapter.KEY_CONTENT); 
             
             if (title != null) {
                 titleTextView.setText(title);

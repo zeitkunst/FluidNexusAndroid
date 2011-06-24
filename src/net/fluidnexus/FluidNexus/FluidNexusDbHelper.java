@@ -31,10 +31,21 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class FluidNexusDbHelper extends SQLiteOpenHelper {
     private static FluidNexusLogger log = FluidNexusLogger.getLogger("FluidNexus"); 
 
+    /*
+         message_type = Column('type', Integer, nullable = False, default = 0)
+             title = Column('title', String, nullable = False)
+                 content = Column('content', String, nullable = False)
+                     message_hash = Column('hash', String(length = 64), nullable = False, unique = True)
+                         time = Column('time', Float, default = float(0.0))
+                             attachment_path = Column('attachment_path', String, default = "")
+                                 attachment_original_filename = Column('attachment_original_filename',       String, default = "")
+                                     mine = Column('mine', Boolean, default = 0)
+
+                                     */
     private static final String DATABASE_CREATE =
-        "create table FluidNexusData (_id integer primary key autoincrement, source varchar(32), time float, type integer, title varchar(40), data long varchar, hash varchar(64), attachment blob, mine bit);";
-    private static final String DATABASE_NAME = "FluidNexusDatabase";
-    private static final String DATABASE_TABLE = "FluidNexusData";
+        "create table FluidNexusData (_id integer primary key autoincrement, type integer, title text, content text, message_hash text, time float, attachment_path text, attachment_original_filename text, mine bit);";
+    private static final String DATABASE_NAME = "FluidNexusDatabase.db";
+    private static final String DATABASE_TABLE = "Messages";
     private static final int DATABASE_VERSION = 1;
 
     public FluidNexusDbHelper(Context context) {

@@ -75,7 +75,7 @@ public class FluidNexusEditMessage extends Activity {
         if (extras != null) {
             id = extras.getInt(FluidNexusDbAdapter.KEY_ID);
             originalTitle = extras.getString(FluidNexusDbAdapter.KEY_TITLE);
-            originalMessage = extras.getString(FluidNexusDbAdapter.KEY_DATA); 
+            originalMessage = extras.getString(FluidNexusDbAdapter.KEY_CONTENT); 
             
             if (originalTitle != null) {
                 titleEditText.setText(originalTitle);
@@ -130,8 +130,8 @@ public class FluidNexusEditMessage extends Activity {
 
         ContentValues values = new ContentValues();
         values.put(FluidNexusDbAdapter.KEY_TITLE, title);
-        values.put(FluidNexusDbAdapter.KEY_DATA, message);
-        values.put(FluidNexusDbAdapter.KEY_HASH, FluidNexusDbAdapter.makeMD5(title + message));
+        values.put(FluidNexusDbAdapter.KEY_CONTENT, message);
+        values.put(FluidNexusDbAdapter.KEY_MESSAGE_HASH, FluidNexusDbAdapter.makeMD5(title + message));
         dbAdapter.updateItemByID(id, values);
     }
 

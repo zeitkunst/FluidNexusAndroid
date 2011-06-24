@@ -46,14 +46,16 @@ public class FluidNexusDbAdapter {
     /**
      * Keys for the parts of the table
      */
+
+        //"create table FluidNexusData (_id integer primary key autoincrement, type integer, title text, content text, message_hash text, time float, attachment_path text, attachment_original_filename text, mine bit);";
     public static final String KEY_ID = "_id";
-    public static final String KEY_SOURCE = "source";
-    public static final String KEY_TIME = "time";
     public static final String KEY_TYPE = "type";
     public static final String KEY_TITLE = "title";
-    public static final String KEY_DATA = "data";
-    public static final String KEY_HASH = "hash";
-    public static final String KEY_ATTACHMENT = "attachment";
+    public static final String KEY_CONTENT = "content";
+    public static final String KEY_MESSAGE_HASH= "message_hash";
+    public static final String KEY_TIME = "time";
+    public static final String KEY_ATTACHMENT_PATH = "attachment_path";
+    public static final String KEY_ATTACHMENT_ORIGINAL_FILENAME = "attachment_original_filename";
     public static final String KEY_MINE = "mine";
 
     /**
@@ -83,38 +85,6 @@ public class FluidNexusDbAdapter {
         dbHelper = new FluidNexusDbHelper(ctx);
         database = dbHelper.getWritableDatabase();
         return this;
-        /*
-        try {
-            // Open the database
-            db = ctx.openDatabase(DATABASE_NAME, null);
-        } catch (FileNotFoundException e) {
-            try {
-                // Doesn't exist?  Create it
-                log.info("Creating new database");
-                db = ctx.createDatabase(DATABASE_NAME, DATABASE_VERSION, 0, null);
-                db.execSQL(DATABASE_CREATE); 
-                add_received(0,
-                   "Schedule a meeting",
-                    "We need to schedule a meeting soon.  Send a message around with the title [S] and good times to meet.  (This is an example of using the system to surreptitiously spread information about covert meetings.)",
-                    "(123,123,123,123)");
-                add_received(0,
-                    "Building materials",
-                    "Some 2x4's and other sundry items seen around Walker Terrace.  (In the aftermath of a disaster, knowing where there might be temporary sources of material is very important.)",
-                    "(123,123,123,123)");
-                add_received(0,
-                    "Universal Declaration of Human Rights",
-                    "All human beings are born free and equal in dignity and rights.They are endowed with reason and conscience and should act towards one another in a spirit of brotherhood.  (In repressive regimes the system could be used to spread texts or other media that would be considered subversive.).  Everyone is entitled to all the rights and freedoms set forth in this Declaration, without distinction of any kind, such as race, colour, sex, language, religion, political or other opinion, national or social origin, property, birth or other status. Furthermore, no distinction shall be made on the basis of the political, jurisdictional or international status of the country or territory to which a person belongs, whether it be independent, trust, non-self-governing or under any other limitation of sovereignty....",
-                    "(123,123,123,123)");
-                add_new(0,
-                    "Witness to the event",
-                    "I saw them being taken away in the car--just swooped up like that.  (This is an example of a message we have created that is just marked as 'outgoing'.  The system can be easily used for spreading personal testimonials like this one.)",
-                    "(123,123,123,123)");
-
-            } catch (FileNotFoundException e1) {
-                throw new SQLException("Could not create database" + e);
-            }
-        }
-        */
     }
 
     public void close() {
@@ -190,42 +160,107 @@ public class FluidNexusDbAdapter {
         return new String(hexChars);
     }
 
+    /**
+     * Add a new message that doesn't have an attachment.
+     * @param type Type of the message
+     * @param title Title of the message
+     * @param content Content of the message
+     */
     public long add_new(int type,
             String title,
-            String data) {
+            String content) {
         float now = (float) (System.currentTimeMillis()/1000);
 
         ContentValues values = new ContentValues();
-        values.put(KEY_SOURCE, IMSI_HASH);
-        values.put(KEY_TIME, now);
         values.put(KEY_TYPE, type);
         values.put(KEY_TITLE, title);
-        values.put(KEY_DATA, data);
-        values.put(KEY_HASH, makeSHA256(title + data));
+        values.put(KEY_CONTENT, content);
+        values.put(KEY_MESSAGE_HASH, makeSHA256(title + content));
+        values.put(KEY_TIME, now);
+        values.put(KEY_ATTACHMENT_PATH, "");
+        values.put(KEY_ATTACHMENT_ORIGINAL_FILENAME, "");
         values.put(KEY_MINE, 1);
         return database.insert(DATABASE_TABLE, null, values);
     }
 
-    public long add_received(int type, float now,
+    /**
+     * Add a new message that has an attachment.
+     * @param type Type of the message
+     * @param title Title of the message
+     * @param content Content of the message
+     * @param attachment_path Path to the (local) attachment
+     * @param attachment_original_filename Original filename of attachment
+     */
+    public long add_new(int type,
             String title,
-            String data) {
+            String content, String attachment_path, String attachment_original_filename) {
+        float now = (float) (System.currentTimeMillis()/1000);
 
         ContentValues values = new ContentValues();
-        values.put(KEY_SOURCE, IMSI_HASH);
-        values.put(KEY_TIME, now);
         values.put(KEY_TYPE, type);
         values.put(KEY_TITLE, title);
-        values.put(KEY_DATA, data);
-        values.put(KEY_HASH, makeSHA256(title + data));
+        values.put(KEY_CONTENT, content);
+        values.put(KEY_MESSAGE_HASH, makeSHA256(title + content));
+        values.put(KEY_TIME, now);
+        values.put(KEY_ATTACHMENT_PATH, attachment_path);
+        values.put(KEY_ATTACHMENT_ORIGINAL_FILENAME, attachment_original_filename);
+        values.put(KEY_MINE, 1);
+        return database.insert(DATABASE_TABLE, null, values);
+    }
+
+    /**
+     * Add a received message that doesn't have an attachment.
+     * @param type Type of the message
+     * @param title Title of the message
+     * @param content Content of the message
+     */
+    public long add_received(int type, float timestamp,
+            String title,
+            String content) {
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_TYPE, type);
+        values.put(KEY_TITLE, title);
+        values.put(KEY_CONTENT, content);
+        values.put(KEY_MESSAGE_HASH, makeSHA256(title + content));
+        values.put(KEY_TIME, timestamp);
+        values.put(KEY_ATTACHMENT_PATH, "");
+        values.put(KEY_ATTACHMENT_ORIGINAL_FILENAME, "");
         values.put(KEY_MINE, 0);
         return database.insert(DATABASE_TABLE, null, values);
     }
 
     /**
+     * Add a received message that has an attachment
+     * @param type Type of the message
+     * @param title Title of the message
+     * @param content Content of the message
+     * @param attachment_path Path to the (local) attachment
+     * @param attachment_original_filename Original filename of attachment
+
+     */
+    public long add_received(int type, float timestamp,
+            String title,
+            String content, String attachment_path, String attachment_original_filename) {
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_TYPE, type);
+        values.put(KEY_TITLE, title);
+        values.put(KEY_CONTENT, content);
+        values.put(KEY_MESSAGE_HASH, makeSHA256(title + content));
+        values.put(KEY_TIME, timestamp);
+        values.put(KEY_ATTACHMENT_PATH, attachment_path);
+        values.put(KEY_ATTACHMENT_ORIGINAL_FILENAME, attachment_original_filename);
+        values.put(KEY_MINE, 0);
+        return database.insert(DATABASE_TABLE, null, values);
+    }
+
+
+    /**
      * Delete an item by the hash
      */
     public boolean deleteByHash(String hash) {
-        return database.delete(DATABASE_TABLE, KEY_HASH + "=" + hash, null) > 0;
+        return database.delete(DATABASE_TABLE, KEY_MESSAGE_HASH + "=" + hash, null) > 0;
     }
 
     /**
@@ -239,8 +274,9 @@ public class FluidNexusDbAdapter {
      * Return all of the items in the database
      */
     public Cursor all() {
+
         return database.query(DATABASE_TABLE, 
-                new String [] {KEY_ID, KEY_SOURCE, KEY_TIME, KEY_TYPE, KEY_TITLE, KEY_DATA, KEY_HASH, KEY_ATTACHMENT, KEY_MINE},
+                new String [] {KEY_ID, KEY_TYPE, KEY_TITLE, KEY_CONTENT, KEY_MESSAGE_HASH, KEY_TIME, KEY_ATTACHMENT_PATH, KEY_ATTACHMENT_ORIGINAL_FILENAME, KEY_MINE},
                 null,
                 null,
                 null,
@@ -253,7 +289,7 @@ public class FluidNexusDbAdapter {
      */
     public Cursor outgoing() {
         return database.query(DATABASE_TABLE, 
-                new String [] {KEY_ID, KEY_SOURCE, KEY_TIME, KEY_TYPE, KEY_TITLE, KEY_DATA, KEY_HASH, KEY_ATTACHMENT, KEY_MINE},
+                new String [] {KEY_ID, KEY_TYPE, KEY_TITLE, KEY_CONTENT, KEY_MESSAGE_HASH, KEY_TIME, KEY_ATTACHMENT_PATH, KEY_ATTACHMENT_ORIGINAL_FILENAME, KEY_MINE},
                 KEY_MINE + "=1",
                 null,
                 null,
@@ -267,7 +303,7 @@ public class FluidNexusDbAdapter {
      */
     public Cursor returnItemByID(long id) {
         Cursor c = database.query(DATABASE_TABLE, 
-                new String [] {KEY_ID, KEY_SOURCE, KEY_TIME, KEY_TYPE, KEY_TITLE, KEY_DATA, KEY_HASH, KEY_ATTACHMENT, KEY_MINE},
+                new String [] {KEY_ID, KEY_TYPE, KEY_TITLE, KEY_CONTENT, KEY_MESSAGE_HASH, KEY_TIME, KEY_ATTACHMENT_PATH, KEY_ATTACHMENT_ORIGINAL_FILENAME, KEY_MINE},
                 KEY_ID + "=" + id,
                 null,
                 null,
@@ -284,8 +320,8 @@ public class FluidNexusDbAdapter {
      */
     public Cursor returnItemBasedOnHash(String hash) {
         Cursor c = database.query(DATABASE_TABLE, 
-                new String [] {KEY_ID, KEY_SOURCE, KEY_TIME, KEY_TYPE, KEY_TITLE, KEY_DATA, KEY_HASH, KEY_ATTACHMENT, KEY_MINE},
-                KEY_HASH + "='" + hash + "'",
+                new String [] {KEY_ID, KEY_TYPE, KEY_TITLE, KEY_CONTENT, KEY_MESSAGE_HASH, KEY_TIME, KEY_ATTACHMENT_PATH, KEY_ATTACHMENT_ORIGINAL_FILENAME, KEY_MINE},
+                KEY_MESSAGE_HASH + "='" + hash + "'",
                 null,
                 null,
                 null,
@@ -309,7 +345,7 @@ public class FluidNexusDbAdapter {
      */
     public Cursor services() {
         return database.query(DATABASE_TABLE, 
-                new String [] {KEY_ID, KEY_HASH},
+                new String [] {KEY_ID, KEY_MESSAGE_HASH},
                 null,
                 null,
                 null,

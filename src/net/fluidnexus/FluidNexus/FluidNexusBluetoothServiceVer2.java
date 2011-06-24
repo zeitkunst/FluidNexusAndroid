@@ -474,7 +474,7 @@ public class FluidNexusBluetoothServiceVer2 extends Service {
             dataCursor.moveToFirst();
             currentData.clear();
 
-            String[] fields = new String[] {FluidNexusDbAdapter.KEY_HASH, FluidNexusDbAdapter.KEY_TIME, FluidNexusDbAdapter.KEY_TITLE, FluidNexusDbAdapter.KEY_DATA};
+            String[] fields = new String[] {FluidNexusDbAdapter.KEY_MESSAGE_HASH, FluidNexusDbAdapter.KEY_TIME, FluidNexusDbAdapter.KEY_TITLE, FluidNexusDbAdapter.KEY_CONTENT};
             while (dataCursor.isAfterLast() == false) {
                 // I'm still not sure why I have to instantiate a new vector each time here, rather than using the local vector from earlier
                 // This is one of those things of java that just makes me want to pull my hair out...
@@ -853,7 +853,7 @@ public class FluidNexusBluetoothServiceVer2 extends Service {
                     log.debug("Message is: " + message);
                     
                     float now = (float) (System.currentTimeMillis()/1000);        
-                    dbAdapter.add_received(0, now, title, message, "(123,123,123,123)");
+                    dbAdapter.add_received(0, now, title, message);
                     currentHashes.add(currentHash.toUpperCase());
      
                 }
@@ -979,7 +979,7 @@ public class FluidNexusBluetoothServiceVer2 extends Service {
             Cursor localCursor = dbAdapter.returnItemBasedOnHash(hash);
 
             String title = localCursor.getString(localCursor.getColumnIndexOrThrow(FluidNexusDbAdapter.KEY_TITLE));
-            String message = localCursor.getString(localCursor.getColumnIndexOrThrow(FluidNexusDbAdapter.KEY_DATA));
+            String message = localCursor.getString(localCursor.getColumnIndexOrThrow(FluidNexusDbAdapter.KEY_CONTENT));
             Integer timestamp = localCursor.getInt(localCursor.getColumnIndexOrThrow(FluidNexusDbAdapter.KEY_TIME));
             String timestampString = timestamp.toString();
             localCursor.close();
