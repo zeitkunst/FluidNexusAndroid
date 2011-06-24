@@ -26,6 +26,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -935,11 +936,29 @@ public class BluetoothServiceVer3 extends Service {
                     String title = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesDbAdapter.KEY_TITLE));
                     String content = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesDbAdapter.KEY_CONTENT));
                     Float timestamp = localCursor.getFloat(localCursor.getColumnIndexOrThrow(MessagesDbAdapter.KEY_TIME));
+                    String attachmentPath = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesDbAdapter.KEY_ATTACHMENT_PATH));
+                    String attachmentOriginalFilename = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesDbAdapter.KEY_ATTACHMENT_ORIGINAL_FILENAME));
                     localCursor.close();
 
                     messageBuilder.setMessageTitle(title);
                     messageBuilder.setMessageContent(content);
                     messageBuilder.setMessageTimestamp(timestamp);
+
+                    if (!(attachmentPath.equals(""))) {
+                        File file = new File(attachmentPath);
+                        FileInputStream fin = new FileInputStream(file);
+                        BufferedInputStream bin = new BufferedInputStream(fin);
+                        int length = (int) file.length();
+
+                        // TODO
+                        // Is there a better way of doing this, other than reading everything in at once?
+                        byte[] data = new byte[length];
+                        bin.read(data, 0, length);
+                        com.google.protobuf.ByteString bs = com.google.protobuf.ByteString.copyFrom(data);
+                        messageBuilder.setMessageAttachmentOriginalFilename(attachmentOriginalFilename);
+                        messageBuilder.setMessageAttachment(bs);
+                    }
+                    
                     Protos.FluidNexusMessage message = messageBuilder.build();
                     messagesBuilder.addMessage(message);
                 }

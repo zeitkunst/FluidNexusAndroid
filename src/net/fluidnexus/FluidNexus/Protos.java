@@ -319,8 +319,8 @@ public final class Protos {
     public enum MessageType
         implements com.google.protobuf.Internal.EnumLite {
       TEXT(0, 0),
-      IMAGE(1, 1),
-      AUDIO(2, 2),
+      AUDIO(1, 1),
+      IMAGE(2, 2),
       VIDEO(3, 3),
       ;
       
@@ -330,8 +330,8 @@ public final class Protos {
       public static MessageType valueOf(int value) {
         switch (value) {
           case 0: return TEXT;
-          case 1: return IMAGE;
-          case 2: return AUDIO;
+          case 1: return AUDIO;
+          case 2: return IMAGE;
           case 3: return VIDEO;
           default: return null;
         }

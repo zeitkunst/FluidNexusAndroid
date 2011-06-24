@@ -618,6 +618,7 @@ public class MainActivity extends ListActivity {
                     if (attachmentFilename.equals("")) {
                         viewAttachment.setVisibility(View.GONE);
                     } else {
+                        viewAttachment.setVisibility(View.VISIBLE);
                         viewAttachment.setText("Has attachment: " + attachmentFilename);
                     }
 
@@ -629,6 +630,6 @@ public class MainActivity extends ListActivity {
         });
 
         setListAdapter(messagesAdapter);
-
+        
     }
 }

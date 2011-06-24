@@ -21,18 +21,43 @@ package net.fluidnexus.FluidNexus;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
 
+import java.io.File;
+
+/*
+ * TODO
+ * * create menu for saving message
+ * * capture back button so that we can warn user if they haven't saved a changed message
+ */
 public class AddOutgoing extends Activity {
 
     private static Logger log = Logger.getLogger("FluidNexus"); 
     private EditText titleEditText;
     private EditText messageEditText;
     private MessagesDbAdapter dbAdapter;  
+
+    // Activity result codes
+    private static final int SELECT_TEXT = 0;
+    private static final int SELECT_AUDIO = 1;
+    private static final int SELECT_IMAGE = 2;
+    private static final int SELECT_VIDEO = 3;
+
+    private int attachmentType = SELECT_TEXT;
+    private Uri attachmentUri = null;
+    private String attachmentPath = null;
+    private TextView attachmentLabel = null;
 
     @Override
     protected void onCreate(Bundle icicle) {
@@ -47,8 +72,42 @@ public class AddOutgoing extends Activity {
         titleEditText = (EditText) findViewById(R.id.title_edit);
         messageEditText = (EditText) findViewById(R.id.message_edit);
 
+        Button addAttachmentButton = (Button) findViewById(R.id.add_attachment_button);
         Button saveButton = (Button) findViewById(R.id.save_message_button);
         Button discardButton = (Button) findViewById(R.id.discard_message_button);
+        Button removeAttachmentButton = (Button) findViewById(R.id.remove_attachment_button);
+        attachmentLabel = (TextView) findViewById(R.id.attachment_label);
+        attachmentLabel.setVisibility(View.GONE);
+
+        Spinner attachmentSpinner = (Spinner) findViewById(R.id.add_attachment_spinner);
+        ArrayAdapter adapter = ArrayAdapter.createFromResource(this, R.array.add_attachment_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        attachmentSpinner.setAdapter(adapter);
+
+        attachmentSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView adapter, View v, int i, long l) {
+                // TODO
+                // Make this less brittle...
+                if (i == 0) {
+                    attachmentType = SELECT_TEXT;
+                } else if (i == 1) {
+                    attachmentType = SELECT_AUDIO;
+
+                } else if (i == 2) {
+                    attachmentType = SELECT_IMAGE;
+                } else if (i == 3) {
+                    attachmentType = SELECT_VIDEO;
+
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView arg0) {
+
+            }
+        });            
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
@@ -61,17 +120,112 @@ public class AddOutgoing extends Activity {
 
         discardButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
+                // TODO
+                // Pop up confirmation dialog if contents have changed
                 setResult(RESULT_OK);
                 finish();
             }
         });
+
+        addAttachmentButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                if (attachmentType != SELECT_TEXT) {
+                    switch (attachmentType) {
+                        case SELECT_AUDIO:
+                            startActivityForResult(new Intent(Intent.ACTION_PICK, MediaStore.Audio.Media.INTERNAL_CONTENT_URI), attachmentType);
+                            break;
+                        case SELECT_IMAGE:
+                            startActivityForResult(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI), attachmentType);
+                            break;
+                        case SELECT_VIDEO:
+                            startActivityForResult(new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.INTERNAL_CONTENT_URI), attachmentType);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+            }
+        });
+
+        removeAttachmentButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                attachmentLabel.setVisibility(View.GONE);
+                attachmentUri = null;
+                attachmentPath = null;
+            }
+        });
+       
+        /*
+        attachmentButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                startActivityForResult(new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI), SELECT_IMAGE);
+            }
+        });
+        */
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if ((requestCode == SELECT_IMAGE) || (requestCode == SELECT_AUDIO) || (requestCode == SELECT_VIDEO)) {
+            if (resultCode == Activity.RESULT_OK) {
+                attachmentUri = data.getData();
+                log.debug("Attachment Uri: " + attachmentUri.toString());
+                attachmentPath = getRealPathFromURI(attachmentUri, resultCode);
+                log.debug("Attachment Path: " + attachmentPath);
+                attachmentLabel.setVisibility(View.VISIBLE);
+                attachmentLabel.setText(attachmentPath);
+            }
+        }
+    }
+
+    /**
+     * Get an actual path from a content URI
+     */
+    private String getRealPathFromURI(Uri contentUri, int type) {
+        String[] proj = new String[1];
+        String id;
+        if (type == SELECT_AUDIO) {
+            proj[0] = MediaStore.Audio.Media.DATA;
+            id = MediaStore.Audio.Media.DATA;
+        } else if (type == SELECT_IMAGE) {
+            proj[0] = MediaStore.Images.Media.DATA;
+            id = MediaStore.Images.Media.DATA;
+        } else if (type == SELECT_VIDEO) {
+            proj[0] = MediaStore.Video.Media.DATA;
+            id = MediaStore.Video.Media.DATA;
+        } else {
+            proj[0] = MediaStore.Images.Media.DATA;
+            id = MediaStore.Images.Media.DATA;
+        }
+
+        Cursor cursor = managedQuery(contentUri, proj, null, null, null);
+        int column_index = cursor.getColumnIndexOrThrow(id);
+        cursor.moveToFirst();
+        String result = cursor.getString(column_index);
+        cursor.close();
+        return result;
+    }
+
+
 
     private void saveState() {
         String title = titleEditText.getText().toString();
         String message = messageEditText.getText().toString();
 
-        dbAdapter.add_new(0, title, message);
+/*
+    public long add_new(int type,
+            String title,
+            String content, String attachment_path, String attachment_original_filename) {
+*/
+        if (attachmentPath == null) {
+            dbAdapter.add_new(0, title, message);
+        } else {
+            File file = new File(attachmentPath);
+            dbAdapter.add_new(attachmentType, title, message, attachmentPath, file.getName());
+        }
+
     }
 
 }
