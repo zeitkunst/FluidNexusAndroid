@@ -35,7 +35,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -52,7 +51,6 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.MenuItem;
-import android.webkit.MimeTypeMap;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Button;
 import android.widget.SimpleCursorAdapter;
@@ -97,6 +95,8 @@ public class MainActivity extends ListActivity {
     private static final int ACTIVITY_EDIT_MESSAGE = 7;
 
     private static int VIEW_MODE = 0;
+
+    private static final int MESSAGE_VIEW_LENGTH = 300;
 
     private long currentRowID = -1;
 
@@ -502,6 +502,8 @@ public class MainActivity extends ListActivity {
         i.putExtra(MessagesDbAdapter.KEY_ID, localCursor.getInt(localCursor.getColumnIndex(MessagesDbAdapter.KEY_ID)));
         i.putExtra(MessagesDbAdapter.KEY_TITLE, localCursor.getString(localCursor.getColumnIndex(MessagesDbAdapter.KEY_TITLE)));
         i.putExtra(MessagesDbAdapter.KEY_CONTENT, localCursor.getString(localCursor.getColumnIndex(MessagesDbAdapter.KEY_CONTENT)));
+        i.putExtra(MessagesDbAdapter.KEY_ATTACHMENT_ORIGINAL_FILENAME, localCursor.getString(localCursor.getColumnIndex(MessagesDbAdapter.KEY_ATTACHMENT_ORIGINAL_FILENAME)));
+        i.putExtra(MessagesDbAdapter.KEY_ATTACHMENT_PATH, localCursor.getString(localCursor.getColumnIndex(MessagesDbAdapter.KEY_ATTACHMENT_PATH)));
         startActivityForResult(i, ACTIVITY_VIEW_MESSAGE);
         localCursor.close();
     }
@@ -585,10 +587,10 @@ public class MainActivity extends ListActivity {
                     String fullMessage = cursor.getString(i);
                     TextView tv = (TextView) view;
                     int stringLen = fullMessage.length();
-                    if (stringLen < 20) {
-                        tv.setText(fullMessage + " ...");
+                    if (stringLen < MESSAGE_VIEW_LENGTH) {
+                        tv.setText(fullMessage);
                     } else {
-                        tv.setText(fullMessage.substring(0, 20) + " ...");
+                        tv.setText(fullMessage.substring(0, MESSAGE_VIEW_LENGTH) + " ...");
                     }
 
                     return true;
@@ -611,30 +613,12 @@ public class MainActivity extends ListActivity {
 
                     final String attachmentFilename = cursor.getString(i);
                     final String attachmentPath = cursor.getString(cursor.getColumnIndex(MessagesDbAdapter.KEY_ATTACHMENT_PATH));
-                    Button viewAttachmentButton = (Button) view;
-
-                    viewAttachmentButton.setOnClickListener(new View.OnClickListener() {
-                        public void onClick(View view) {
-                            Intent intent = new Intent();
-                            
-                            Uri uri = Uri.parse("file:///" + attachmentPath);
-                            MimeTypeMap mtm = MimeTypeMap.getSingleton();
-                            String extension = mtm.getFileExtensionFromUrl(attachmentFilename);
-                            log.debug("Extension: " + extension);
-                            String mimeTypeGuess = mtm.getMimeTypeFromExtension(extension.toLowerCase());
-                            log.debug("mime-type: " + mimeTypeGuess);
-                            intent.setDataAndType(uri, mimeTypeGuess);
-                            intent.setAction(android.content.Intent.ACTION_VIEW);
-                            startActivity(intent);
-
-                        }
-                    });
-
-
+                    TextView viewAttachment = (TextView) view;
+                   
                     if (attachmentFilename.equals("")) {
-                        viewAttachmentButton.setVisibility(View.GONE);
+                        viewAttachment.setVisibility(View.GONE);
                     } else {
-                        viewAttachmentButton.setText("View " + attachmentFilename);
+                        viewAttachment.setText("Has attachment: " + attachmentFilename);
                     }
 
                     return true;

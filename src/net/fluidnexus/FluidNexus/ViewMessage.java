@@ -21,8 +21,11 @@ package net.fluidnexus.FluidNexus;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
@@ -32,6 +35,8 @@ public class ViewMessage extends Activity {
     private static Logger log = Logger.getLogger("FluidNexus"); 
     private TextView titleTextView;
     private TextView messageTextView;
+    private String attachment_path;
+    private String attachment_original_filename;
 
     @Override
     protected void onCreate(Bundle icicle) {
@@ -45,17 +50,48 @@ public class ViewMessage extends Activity {
         titleTextView = (TextView) findViewById(R.id.view_message_title);
         messageTextView = (TextView) findViewById(R.id.view_message_data);
         Button backButton = (Button) findViewById(R.id.view_message_back);
+        Button viewAttachmentButton = (Button) findViewById(R.id.view_message_attachment);
+
+
 
         if (extras != null) {
             String title = extras.getString(MessagesDbAdapter.KEY_TITLE);
             String message = extras.getString(MessagesDbAdapter.KEY_CONTENT); 
-            
+            attachment_path = extras.getString(MessagesDbAdapter.KEY_ATTACHMENT_PATH);
+            attachment_original_filename = extras.getString(MessagesDbAdapter.KEY_ATTACHMENT_ORIGINAL_FILENAME); 
+           
             if (title != null) {
                 titleTextView.setText(title);
             }
 
             if (message != null) {
                 messageTextView.setText(message);
+
+            }
+
+            if (attachment_path.equals("")) {
+                viewAttachmentButton.setVisibility(View.GONE);
+            } else {
+                viewAttachmentButton.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View view) {
+                        Intent intent = new Intent();
+
+
+                        String filenameArray[] = attachment_original_filename.split("\\.");
+                        String extension = filenameArray[filenameArray.length-1];
+
+                        Uri uri = Uri.parse("file:///" + attachment_path);
+                        MimeTypeMap mtm = MimeTypeMap.getSingleton();
+                        log.debug("Extension: " + extension);
+                        String mimeTypeGuess = mtm.getMimeTypeFromExtension(extension.toLowerCase());
+                        log.debug("mime-type: " + mimeTypeGuess);
+                        intent.setDataAndType(uri, mimeTypeGuess);
+                        intent.setAction(android.content.Intent.ACTION_VIEW);
+                        startActivity(intent);
+        
+                    }
+                });
+                viewAttachmentButton.setText("View " + attachment_original_filename);
 
             }
 

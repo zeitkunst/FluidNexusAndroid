@@ -48,12 +48,13 @@ android:layout_height="wrap_content"
 android:layout_below="@+id/list_item_layout"
 android:padding="5px"
 >
-<Button
+<TextView
 android:id="@+id/message_list_attachment"
 android:layout_width="wrap_content"
 android:layout_height="wrap_content"
+android:textStyle="bold"
 android:layout_alignParentLeft="true"
 >
-</Button>
+</TextView>
 </RelativeLayout>
 </RelativeLayout>
