@@ -38,12 +38,12 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
-public class FluidNexusEditMessage extends Activity {
+public class EditMessage extends Activity {
 
-    private static FluidNexusLogger log = FluidNexusLogger.getLogger("FluidNexus"); 
+    private static Logger log = Logger.getLogger("FluidNexus"); 
     private EditText titleEditText;
     private EditText messageEditText;
-    private FluidNexusDbAdapter dbAdapter;  
+    private MessagesDbAdapter dbAdapter;  
     private long id = -1;
 
     String originalTitle = null;
@@ -58,7 +58,7 @@ public class FluidNexusEditMessage extends Activity {
 
 
         // Create database instance
-        dbAdapter = new FluidNexusDbAdapter(this);
+        dbAdapter = new MessagesDbAdapter(this);
         dbAdapter.open();
 
         setContentView(R.layout.message_edit);
@@ -73,9 +73,9 @@ public class FluidNexusEditMessage extends Activity {
 
 
         if (extras != null) {
-            id = extras.getInt(FluidNexusDbAdapter.KEY_ID);
-            originalTitle = extras.getString(FluidNexusDbAdapter.KEY_TITLE);
-            originalMessage = extras.getString(FluidNexusDbAdapter.KEY_CONTENT); 
+            id = extras.getInt(MessagesDbAdapter.KEY_ID);
+            originalTitle = extras.getString(MessagesDbAdapter.KEY_TITLE);
+            originalMessage = extras.getString(MessagesDbAdapter.KEY_CONTENT); 
             
             if (originalTitle != null) {
                 titleEditText.setText(originalTitle);
@@ -86,7 +86,7 @@ public class FluidNexusEditMessage extends Activity {
 
             }
         } else {
-            log.error("FluidNexusEditMessage: Unable to get any extras...this should never happen :-)");
+            log.error("EditMessage: Unable to get any extras...this should never happen :-)");
         }
 
         saveButton.setOnClickListener(new View.OnClickListener() {
@@ -129,9 +129,9 @@ public class FluidNexusEditMessage extends Activity {
         String message = messageEditText.getText().toString();
 
         ContentValues values = new ContentValues();
-        values.put(FluidNexusDbAdapter.KEY_TITLE, title);
-        values.put(FluidNexusDbAdapter.KEY_CONTENT, message);
-        values.put(FluidNexusDbAdapter.KEY_MESSAGE_HASH, FluidNexusDbAdapter.makeMD5(title + message));
+        values.put(MessagesDbAdapter.KEY_TITLE, title);
+        values.put(MessagesDbAdapter.KEY_CONTENT, message);
+        values.put(MessagesDbAdapter.KEY_MESSAGE_HASH, MessagesDbAdapter.makeMD5(title + message));
         dbAdapter.updateItemByID(id, values);
     }
 

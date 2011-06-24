@@ -7,11 +7,11 @@ package net.fluidnexus.FluidNexus;
 
 import android.util.Log;
 
-public class FluidNexusLogger {
+public class Logger {
     private String name;
     private final static String ANDROID_LOG_TAG ="FluidNexus";
 
-    private FluidNexusLogger( String name ) {
+    private Logger( String name ) {
         this.name = name;
     }
 
@@ -20,8 +20,8 @@ public class FluidNexusLogger {
         return msg;
     }
 
-    public static FluidNexusLogger getLogger( String name ) {
-        return new FluidNexusLogger( name);
+    public static Logger getLogger( String name ) {
+        return new Logger( name);
     }
 
     public void debug( String msg ) {

@@ -35,13 +35,13 @@ import android.telephony.TelephonyManager;
 
 import java.io.FileNotFoundException;
 
-public class FluidNexusDbAdapter {
-    private static FluidNexusLogger log = FluidNexusLogger.getLogger("FluidNexus"); 
+public class MessagesDbAdapter {
+    private static Logger log = Logger.getLogger("FluidNexus"); 
     private String IMSI_HASH;
 
     private SQLiteDatabase database;
-    private FluidNexusDbHelper dbHelper;
-    private static final String DATABASE_TABLE = "FluidNexusData";
+    private MessagesDbHelper dbHelper;
+    private static final String DATABASE_TABLE = "Messages";
 
     /**
      * Keys for the parts of the table
@@ -68,7 +68,7 @@ public class FluidNexusDbAdapter {
     /**
      * Constructor: create our db context
      */
-    public FluidNexusDbAdapter(Context context) {
+    public MessagesDbAdapter(Context context) {
         /*SystemProperties prop = new SystemProperties();*/
         /*IMSI_HASH = makeMD5(prop.get(TelephonyManager.getSubscriberId()));*/
 
@@ -81,8 +81,8 @@ public class FluidNexusDbAdapter {
     /**
      * Try to open the fluid nexus database
      */
-    public FluidNexusDbAdapter open() throws SQLException {
-        dbHelper = new FluidNexusDbHelper(ctx);
+    public MessagesDbAdapter open() throws SQLException {
+        dbHelper = new MessagesDbHelper(ctx);
         database = dbHelper.getWritableDatabase();
         return this;
     }

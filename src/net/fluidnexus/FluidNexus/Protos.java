@@ -3,8 +3,8 @@
 
 package net.fluidnexus.FluidNexus;
 
-public final class FluidNexusProtos {
-  private FluidNexusProtos() {}
+public final class Protos {
+  private Protos() {}
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistryLite registry) {
   }
@@ -70,41 +70,41 @@ public final class FluidNexusProtos {
       return size;
     }
     
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusHashes parseFrom(
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusHashes parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusHashes parseFrom(
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusHashes parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry)
                .buildParsed();
     }
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusHashes parseFrom(byte[] data)
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusHashes parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusHashes parseFrom(
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusHashes parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry)
                .buildParsed();
     }
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusHashes parseFrom(java.io.InputStream input)
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusHashes parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusHashes parseFrom(
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusHashes parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry)
                .buildParsed();
     }
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusHashes parseDelimitedFrom(java.io.InputStream input)
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusHashes parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input)) {
@@ -113,7 +113,7 @@ public final class FluidNexusProtos {
         return null;
       }
     }
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusHashes parseDelimitedFrom(
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusHashes parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -124,12 +124,12 @@ public final class FluidNexusProtos {
         return null;
       }
     }
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusHashes parseFrom(
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusHashes parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusHashes parseFrom(
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusHashes parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -139,26 +139,26 @@ public final class FluidNexusProtos {
     
     public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusHashes prototype) {
+    public static Builder newBuilder(net.fluidnexus.FluidNexus.Protos.FluidNexusHashes prototype) {
       return newBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
     
     public static final class Builder extends
         com.google.protobuf.GeneratedMessageLite.Builder<
-          net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusHashes, Builder> {
-      private net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusHashes result;
+          net.fluidnexus.FluidNexus.Protos.FluidNexusHashes, Builder> {
+      private net.fluidnexus.FluidNexus.Protos.FluidNexusHashes result;
       
-      // Construct using net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusHashes.newBuilder()
+      // Construct using net.fluidnexus.FluidNexus.Protos.FluidNexusHashes.newBuilder()
       private Builder() {}
       
       private static Builder create() {
         Builder builder = new Builder();
-        builder.result = new net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusHashes();
+        builder.result = new net.fluidnexus.FluidNexus.Protos.FluidNexusHashes();
         return builder;
       }
       
-      protected net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusHashes internalGetResult() {
+      protected net.fluidnexus.FluidNexus.Protos.FluidNexusHashes internalGetResult() {
         return result;
       }
       
@@ -167,7 +167,7 @@ public final class FluidNexusProtos {
           throw new IllegalStateException(
             "Cannot call clear() after build().");
         }
-        result = new net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusHashes();
+        result = new net.fluidnexus.FluidNexus.Protos.FluidNexusHashes();
         return this;
       }
       
@@ -175,21 +175,21 @@ public final class FluidNexusProtos {
         return create().mergeFrom(result);
       }
       
-      public net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusHashes getDefaultInstanceForType() {
-        return net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusHashes.getDefaultInstance();
+      public net.fluidnexus.FluidNexus.Protos.FluidNexusHashes getDefaultInstanceForType() {
+        return net.fluidnexus.FluidNexus.Protos.FluidNexusHashes.getDefaultInstance();
       }
       
       public boolean isInitialized() {
         return result.isInitialized();
       }
-      public net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusHashes build() {
+      public net.fluidnexus.FluidNexus.Protos.FluidNexusHashes build() {
         if (result != null && !isInitialized()) {
           throw newUninitializedMessageException(result);
         }
         return buildPartial();
       }
       
-      private net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusHashes buildParsed()
+      private net.fluidnexus.FluidNexus.Protos.FluidNexusHashes buildParsed()
           throws com.google.protobuf.InvalidProtocolBufferException {
         if (!isInitialized()) {
           throw newUninitializedMessageException(
@@ -198,7 +198,7 @@ public final class FluidNexusProtos {
         return buildPartial();
       }
       
-      public net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusHashes buildPartial() {
+      public net.fluidnexus.FluidNexus.Protos.FluidNexusHashes buildPartial() {
         if (result == null) {
           throw new IllegalStateException(
             "build() has already been called on this Builder.");
@@ -207,13 +207,13 @@ public final class FluidNexusProtos {
           result.messageHash_ =
             java.util.Collections.unmodifiableList(result.messageHash_);
         }
-        net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusHashes returnMe = result;
+        net.fluidnexus.FluidNexus.Protos.FluidNexusHashes returnMe = result;
         result = null;
         return returnMe;
       }
       
-      public Builder mergeFrom(net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusHashes other) {
-        if (other == net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusHashes.getDefaultInstance()) return this;
+      public Builder mergeFrom(net.fluidnexus.FluidNexus.Protos.FluidNexusHashes other) {
+        if (other == net.fluidnexus.FluidNexus.Protos.FluidNexusHashes.getDefaultInstance()) return this;
         if (!other.messageHash_.isEmpty()) {
           if (result.messageHash_.isEmpty()) {
             result.messageHash_ = new java.util.ArrayList<java.lang.String>();
@@ -292,7 +292,7 @@ public final class FluidNexusProtos {
     
     static {
       defaultInstance = new FluidNexusHashes(true);
-      net.fluidnexus.FluidNexus.FluidNexusProtos.internalForceInit();
+      net.fluidnexus.FluidNexus.Protos.internalForceInit();
       defaultInstance.initFields();
     }
     
@@ -404,9 +404,9 @@ public final class FluidNexusProtos {
     // optional .FluidNexus.FluidNexusMessage.MessageType message_type = 7;
     public static final int MESSAGE_TYPE_FIELD_NUMBER = 7;
     private boolean hasMessageType;
-    private net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage.MessageType messageType_;
+    private net.fluidnexus.FluidNexus.Protos.FluidNexusMessage.MessageType messageType_;
     public boolean hasMessageType() { return hasMessageType; }
-    public net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage.MessageType getMessageType() { return messageType_; }
+    public net.fluidnexus.FluidNexus.Protos.FluidNexusMessage.MessageType getMessageType() { return messageType_; }
     
     // optional bytes message_attachment = 8;
     public static final int MESSAGE_ATTACHMENT_FIELD_NUMBER = 8;
@@ -423,7 +423,7 @@ public final class FluidNexusProtos {
     public java.lang.String getMessageAttachmentOriginalFilename() { return messageAttachmentOriginalFilename_; }
     
     private void initFields() {
-      messageType_ = net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage.MessageType.TEXT;
+      messageType_ = net.fluidnexus.FluidNexus.Protos.FluidNexusMessage.MessageType.TEXT;
     }
     public final boolean isInitialized() {
       return true;
@@ -507,41 +507,41 @@ public final class FluidNexusProtos {
       return size;
     }
     
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage parseFrom(
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusMessage parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage parseFrom(
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusMessage parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry)
                .buildParsed();
     }
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage parseFrom(byte[] data)
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusMessage parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage parseFrom(
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusMessage parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry)
                .buildParsed();
     }
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage parseFrom(java.io.InputStream input)
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusMessage parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage parseFrom(
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusMessage parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry)
                .buildParsed();
     }
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage parseDelimitedFrom(java.io.InputStream input)
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusMessage parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input)) {
@@ -550,7 +550,7 @@ public final class FluidNexusProtos {
         return null;
       }
     }
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage parseDelimitedFrom(
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusMessage parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -561,12 +561,12 @@ public final class FluidNexusProtos {
         return null;
       }
     }
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage parseFrom(
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusMessage parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage parseFrom(
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusMessage parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -576,26 +576,26 @@ public final class FluidNexusProtos {
     
     public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage prototype) {
+    public static Builder newBuilder(net.fluidnexus.FluidNexus.Protos.FluidNexusMessage prototype) {
       return newBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
     
     public static final class Builder extends
         com.google.protobuf.GeneratedMessageLite.Builder<
-          net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage, Builder> {
-      private net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage result;
+          net.fluidnexus.FluidNexus.Protos.FluidNexusMessage, Builder> {
+      private net.fluidnexus.FluidNexus.Protos.FluidNexusMessage result;
       
-      // Construct using net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage.newBuilder()
+      // Construct using net.fluidnexus.FluidNexus.Protos.FluidNexusMessage.newBuilder()
       private Builder() {}
       
       private static Builder create() {
         Builder builder = new Builder();
-        builder.result = new net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage();
+        builder.result = new net.fluidnexus.FluidNexus.Protos.FluidNexusMessage();
         return builder;
       }
       
-      protected net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage internalGetResult() {
+      protected net.fluidnexus.FluidNexus.Protos.FluidNexusMessage internalGetResult() {
         return result;
       }
       
@@ -604,7 +604,7 @@ public final class FluidNexusProtos {
           throw new IllegalStateException(
             "Cannot call clear() after build().");
         }
-        result = new net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage();
+        result = new net.fluidnexus.FluidNexus.Protos.FluidNexusMessage();
         return this;
       }
       
@@ -612,21 +612,21 @@ public final class FluidNexusProtos {
         return create().mergeFrom(result);
       }
       
-      public net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage getDefaultInstanceForType() {
-        return net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage.getDefaultInstance();
+      public net.fluidnexus.FluidNexus.Protos.FluidNexusMessage getDefaultInstanceForType() {
+        return net.fluidnexus.FluidNexus.Protos.FluidNexusMessage.getDefaultInstance();
       }
       
       public boolean isInitialized() {
         return result.isInitialized();
       }
-      public net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage build() {
+      public net.fluidnexus.FluidNexus.Protos.FluidNexusMessage build() {
         if (result != null && !isInitialized()) {
           throw newUninitializedMessageException(result);
         }
         return buildPartial();
       }
       
-      private net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage buildParsed()
+      private net.fluidnexus.FluidNexus.Protos.FluidNexusMessage buildParsed()
           throws com.google.protobuf.InvalidProtocolBufferException {
         if (!isInitialized()) {
           throw newUninitializedMessageException(
@@ -635,18 +635,18 @@ public final class FluidNexusProtos {
         return buildPartial();
       }
       
-      public net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage buildPartial() {
+      public net.fluidnexus.FluidNexus.Protos.FluidNexusMessage buildPartial() {
         if (result == null) {
           throw new IllegalStateException(
             "build() has already been called on this Builder.");
         }
-        net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage returnMe = result;
+        net.fluidnexus.FluidNexus.Protos.FluidNexusMessage returnMe = result;
         result = null;
         return returnMe;
       }
       
-      public Builder mergeFrom(net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage other) {
-        if (other == net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage.getDefaultInstance()) return this;
+      public Builder mergeFrom(net.fluidnexus.FluidNexus.Protos.FluidNexusMessage other) {
+        if (other == net.fluidnexus.FluidNexus.Protos.FluidNexusMessage.getDefaultInstance()) return this;
         if (other.hasMessageTitle()) {
           setMessageTitle(other.getMessageTitle());
         }
@@ -718,7 +718,7 @@ public final class FluidNexusProtos {
             }
             case 56: {
               int rawValue = input.readEnum();
-              net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage.MessageType value = net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage.MessageType.valueOf(rawValue);
+              net.fluidnexus.FluidNexus.Protos.FluidNexusMessage.MessageType value = net.fluidnexus.FluidNexus.Protos.FluidNexusMessage.MessageType.valueOf(rawValue);
               if (value != null) {
                 setMessageType(value);
               }
@@ -861,10 +861,10 @@ public final class FluidNexusProtos {
       public boolean hasMessageType() {
         return result.hasMessageType();
       }
-      public net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage.MessageType getMessageType() {
+      public net.fluidnexus.FluidNexus.Protos.FluidNexusMessage.MessageType getMessageType() {
         return result.getMessageType();
       }
-      public Builder setMessageType(net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage.MessageType value) {
+      public Builder setMessageType(net.fluidnexus.FluidNexus.Protos.FluidNexusMessage.MessageType value) {
         if (value == null) {
           throw new NullPointerException();
         }
@@ -874,7 +874,7 @@ public final class FluidNexusProtos {
       }
       public Builder clearMessageType() {
         result.hasMessageType = false;
-        result.messageType_ = net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage.MessageType.TEXT;
+        result.messageType_ = net.fluidnexus.FluidNexus.Protos.FluidNexusMessage.MessageType.TEXT;
         return this;
       }
       
@@ -925,7 +925,7 @@ public final class FluidNexusProtos {
     
     static {
       defaultInstance = new FluidNexusMessage(true);
-      net.fluidnexus.FluidNexus.FluidNexusProtos.internalForceInit();
+      net.fluidnexus.FluidNexus.Protos.internalForceInit();
       defaultInstance.initFields();
     }
     
@@ -951,13 +951,13 @@ public final class FluidNexusProtos {
     
     // repeated .FluidNexus.FluidNexusMessage message = 1;
     public static final int MESSAGE_FIELD_NUMBER = 1;
-    private java.util.List<net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage> message_ =
+    private java.util.List<net.fluidnexus.FluidNexus.Protos.FluidNexusMessage> message_ =
       java.util.Collections.emptyList();
-    public java.util.List<net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage> getMessageList() {
+    public java.util.List<net.fluidnexus.FluidNexus.Protos.FluidNexusMessage> getMessageList() {
       return message_;
     }
     public int getMessageCount() { return message_.size(); }
-    public net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage getMessage(int index) {
+    public net.fluidnexus.FluidNexus.Protos.FluidNexusMessage getMessage(int index) {
       return message_.get(index);
     }
     
@@ -970,7 +970,7 @@ public final class FluidNexusProtos {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
-      for (net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage element : getMessageList()) {
+      for (net.fluidnexus.FluidNexus.Protos.FluidNexusMessage element : getMessageList()) {
         output.writeMessage(1, element);
       }
     }
@@ -981,7 +981,7 @@ public final class FluidNexusProtos {
       if (size != -1) return size;
     
       size = 0;
-      for (net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage element : getMessageList()) {
+      for (net.fluidnexus.FluidNexus.Protos.FluidNexusMessage element : getMessageList()) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, element);
       }
@@ -989,41 +989,41 @@ public final class FluidNexusProtos {
       return size;
     }
     
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessages parseFrom(
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusMessages parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessages parseFrom(
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusMessages parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry)
                .buildParsed();
     }
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessages parseFrom(byte[] data)
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusMessages parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessages parseFrom(
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusMessages parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry)
                .buildParsed();
     }
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessages parseFrom(java.io.InputStream input)
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusMessages parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessages parseFrom(
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusMessages parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry)
                .buildParsed();
     }
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessages parseDelimitedFrom(java.io.InputStream input)
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusMessages parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input)) {
@@ -1032,7 +1032,7 @@ public final class FluidNexusProtos {
         return null;
       }
     }
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessages parseDelimitedFrom(
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusMessages parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -1043,12 +1043,12 @@ public final class FluidNexusProtos {
         return null;
       }
     }
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessages parseFrom(
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusMessages parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
-    public static net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessages parseFrom(
+    public static net.fluidnexus.FluidNexus.Protos.FluidNexusMessages parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -1058,26 +1058,26 @@ public final class FluidNexusProtos {
     
     public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessages prototype) {
+    public static Builder newBuilder(net.fluidnexus.FluidNexus.Protos.FluidNexusMessages prototype) {
       return newBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
     
     public static final class Builder extends
         com.google.protobuf.GeneratedMessageLite.Builder<
-          net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessages, Builder> {
-      private net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessages result;
+          net.fluidnexus.FluidNexus.Protos.FluidNexusMessages, Builder> {
+      private net.fluidnexus.FluidNexus.Protos.FluidNexusMessages result;
       
-      // Construct using net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessages.newBuilder()
+      // Construct using net.fluidnexus.FluidNexus.Protos.FluidNexusMessages.newBuilder()
       private Builder() {}
       
       private static Builder create() {
         Builder builder = new Builder();
-        builder.result = new net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessages();
+        builder.result = new net.fluidnexus.FluidNexus.Protos.FluidNexusMessages();
         return builder;
       }
       
-      protected net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessages internalGetResult() {
+      protected net.fluidnexus.FluidNexus.Protos.FluidNexusMessages internalGetResult() {
         return result;
       }
       
@@ -1086,7 +1086,7 @@ public final class FluidNexusProtos {
           throw new IllegalStateException(
             "Cannot call clear() after build().");
         }
-        result = new net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessages();
+        result = new net.fluidnexus.FluidNexus.Protos.FluidNexusMessages();
         return this;
       }
       
@@ -1094,21 +1094,21 @@ public final class FluidNexusProtos {
         return create().mergeFrom(result);
       }
       
-      public net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessages getDefaultInstanceForType() {
-        return net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessages.getDefaultInstance();
+      public net.fluidnexus.FluidNexus.Protos.FluidNexusMessages getDefaultInstanceForType() {
+        return net.fluidnexus.FluidNexus.Protos.FluidNexusMessages.getDefaultInstance();
       }
       
       public boolean isInitialized() {
         return result.isInitialized();
       }
-      public net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessages build() {
+      public net.fluidnexus.FluidNexus.Protos.FluidNexusMessages build() {
         if (result != null && !isInitialized()) {
           throw newUninitializedMessageException(result);
         }
         return buildPartial();
       }
       
-      private net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessages buildParsed()
+      private net.fluidnexus.FluidNexus.Protos.FluidNexusMessages buildParsed()
           throws com.google.protobuf.InvalidProtocolBufferException {
         if (!isInitialized()) {
           throw newUninitializedMessageException(
@@ -1117,7 +1117,7 @@ public final class FluidNexusProtos {
         return buildPartial();
       }
       
-      public net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessages buildPartial() {
+      public net.fluidnexus.FluidNexus.Protos.FluidNexusMessages buildPartial() {
         if (result == null) {
           throw new IllegalStateException(
             "build() has already been called on this Builder.");
@@ -1126,16 +1126,16 @@ public final class FluidNexusProtos {
           result.message_ =
             java.util.Collections.unmodifiableList(result.message_);
         }
-        net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessages returnMe = result;
+        net.fluidnexus.FluidNexus.Protos.FluidNexusMessages returnMe = result;
         result = null;
         return returnMe;
       }
       
-      public Builder mergeFrom(net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessages other) {
-        if (other == net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessages.getDefaultInstance()) return this;
+      public Builder mergeFrom(net.fluidnexus.FluidNexus.Protos.FluidNexusMessages other) {
+        if (other == net.fluidnexus.FluidNexus.Protos.FluidNexusMessages.getDefaultInstance()) return this;
         if (!other.message_.isEmpty()) {
           if (result.message_.isEmpty()) {
-            result.message_ = new java.util.ArrayList<net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage>();
+            result.message_ = new java.util.ArrayList<net.fluidnexus.FluidNexus.Protos.FluidNexusMessage>();
           }
           result.message_.addAll(other.message_);
         }
@@ -1158,7 +1158,7 @@ public final class FluidNexusProtos {
               break;
             }
             case 10: {
-              net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage.Builder subBuilder = net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage.newBuilder();
+              net.fluidnexus.FluidNexus.Protos.FluidNexusMessage.Builder subBuilder = net.fluidnexus.FluidNexus.Protos.FluidNexusMessage.newBuilder();
               input.readMessage(subBuilder, extensionRegistry);
               addMessage(subBuilder.buildPartial());
               break;
@@ -1169,47 +1169,47 @@ public final class FluidNexusProtos {
       
       
       // repeated .FluidNexus.FluidNexusMessage message = 1;
-      public java.util.List<net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage> getMessageList() {
+      public java.util.List<net.fluidnexus.FluidNexus.Protos.FluidNexusMessage> getMessageList() {
         return java.util.Collections.unmodifiableList(result.message_);
       }
       public int getMessageCount() {
         return result.getMessageCount();
       }
-      public net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage getMessage(int index) {
+      public net.fluidnexus.FluidNexus.Protos.FluidNexusMessage getMessage(int index) {
         return result.getMessage(index);
       }
-      public Builder setMessage(int index, net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage value) {
+      public Builder setMessage(int index, net.fluidnexus.FluidNexus.Protos.FluidNexusMessage value) {
         if (value == null) {
           throw new NullPointerException();
         }
         result.message_.set(index, value);
         return this;
       }
-      public Builder setMessage(int index, net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage.Builder builderForValue) {
+      public Builder setMessage(int index, net.fluidnexus.FluidNexus.Protos.FluidNexusMessage.Builder builderForValue) {
         result.message_.set(index, builderForValue.build());
         return this;
       }
-      public Builder addMessage(net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage value) {
+      public Builder addMessage(net.fluidnexus.FluidNexus.Protos.FluidNexusMessage value) {
         if (value == null) {
           throw new NullPointerException();
         }
         if (result.message_.isEmpty()) {
-          result.message_ = new java.util.ArrayList<net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage>();
+          result.message_ = new java.util.ArrayList<net.fluidnexus.FluidNexus.Protos.FluidNexusMessage>();
         }
         result.message_.add(value);
         return this;
       }
-      public Builder addMessage(net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage.Builder builderForValue) {
+      public Builder addMessage(net.fluidnexus.FluidNexus.Protos.FluidNexusMessage.Builder builderForValue) {
         if (result.message_.isEmpty()) {
-          result.message_ = new java.util.ArrayList<net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage>();
+          result.message_ = new java.util.ArrayList<net.fluidnexus.FluidNexus.Protos.FluidNexusMessage>();
         }
         result.message_.add(builderForValue.build());
         return this;
       }
       public Builder addAllMessage(
-          java.lang.Iterable<? extends net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage> values) {
+          java.lang.Iterable<? extends net.fluidnexus.FluidNexus.Protos.FluidNexusMessage> values) {
         if (result.message_.isEmpty()) {
-          result.message_ = new java.util.ArrayList<net.fluidnexus.FluidNexus.FluidNexusProtos.FluidNexusMessage>();
+          result.message_ = new java.util.ArrayList<net.fluidnexus.FluidNexus.Protos.FluidNexusMessage>();
         }
         super.addAll(values, result.message_);
         return this;
@@ -1224,7 +1224,7 @@ public final class FluidNexusProtos {
     
     static {
       defaultInstance = new FluidNexusMessages(true);
-      net.fluidnexus.FluidNexus.FluidNexusProtos.internalForceInit();
+      net.fluidnexus.FluidNexus.Protos.internalForceInit();
       defaultInstance.initFields();
     }
     

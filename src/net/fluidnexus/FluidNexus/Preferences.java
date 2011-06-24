@@ -27,7 +27,7 @@ import android.preference.PreferenceActivity;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.widget.Toast;
  
-public class FluidNexusPreferences extends PreferenceActivity {
+public class Preferences extends PreferenceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

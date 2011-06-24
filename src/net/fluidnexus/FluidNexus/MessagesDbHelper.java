@@ -28,8 +28,8 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-public class FluidNexusDbHelper extends SQLiteOpenHelper {
-    private static FluidNexusLogger log = FluidNexusLogger.getLogger("FluidNexus"); 
+public class MessagesDbHelper extends SQLiteOpenHelper {
+    private static Logger log = Logger.getLogger("FluidNexus"); 
 
     /*
          message_type = Column('type', Integer, nullable = False, default = 0)
@@ -43,12 +43,12 @@ public class FluidNexusDbHelper extends SQLiteOpenHelper {
 
                                      */
     private static final String DATABASE_CREATE =
-        "create table FluidNexusData (_id integer primary key autoincrement, type integer, title text, content text, message_hash text, time float, attachment_path text, attachment_original_filename text, mine bit);";
+        "create table Messages (_id integer primary key autoincrement, type integer, title text, content text, message_hash text, time float, attachment_path text, attachment_original_filename text, mine bit);";
     private static final String DATABASE_NAME = "FluidNexusDatabase.db";
     private static final String DATABASE_TABLE = "Messages";
     private static final int DATABASE_VERSION = 1;
 
-    public FluidNexusDbHelper(Context context) {
+    public MessagesDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 

@@ -33,9 +33,9 @@ import android.widget.ScrollView;
  * Rework how we handle the help functionality
  * The layout thing is a mess right now, but we need to rethink it anyway
  */
-public class FluidNexusHelp extends Activity {
+public class Help extends Activity {
 
-    private static FluidNexusLogger log = FluidNexusLogger.getLogger("FluidNexus"); 
+    private static Logger log = Logger.getLogger("FluidNexus"); 
     private TextView tv;
 
     @Override

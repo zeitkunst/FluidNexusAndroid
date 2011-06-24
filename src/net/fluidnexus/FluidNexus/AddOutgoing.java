@@ -27,19 +27,19 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
-public class FluidNexusAddOutgoing extends Activity {
+public class AddOutgoing extends Activity {
 
-    private static FluidNexusLogger log = FluidNexusLogger.getLogger("FluidNexus"); 
+    private static Logger log = Logger.getLogger("FluidNexus"); 
     private EditText titleEditText;
     private EditText messageEditText;
-    private FluidNexusDbAdapter dbHelper;  
+    private MessagesDbAdapter dbAdapter;  
 
     @Override
     protected void onCreate(Bundle icicle) {
 
         super.onCreate(icicle);
-        dbHelper = new FluidNexusDbAdapter(this);
-        dbHelper.open();
+        dbAdapter = new MessagesDbAdapter(this);
+        dbAdapter.open();
 
         setContentView(R.layout.message_edit);
         setTitle(R.string.message_add_outgoing_title);
@@ -71,7 +71,7 @@ public class FluidNexusAddOutgoing extends Activity {
         String title = titleEditText.getText().toString();
         String message = messageEditText.getText().toString();
 
-        dbHelper.add_new(0, title, message);
+        dbAdapter.add_new(0, title, message);
     }
 
 }

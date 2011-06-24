@@ -65,14 +65,15 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 
 import java.io.File;
+
 /*
  * TODO
  * * deal with the database somehow not being open when we receive the MSG_NEW_MESSAGE_RECEIVED message after an orientation change.  This is totally opaque to me.
  * * deal with new binding to the service when clicking on the notification; this shouldn't happen
  */
 
-public class FluidNexusAndroid extends ListActivity {
-    private FluidNexusDbAdapter dbAdapter;
+public class MainActivity extends ListActivity {
+    private MessagesDbAdapter dbAdapter;
     private Toast toast;
     
     private SharedPreferences prefs;
@@ -83,7 +84,7 @@ public class FluidNexusAndroid extends ListActivity {
     private BroadcastReceiver iReceiver;
     private IntentFilter iFilter;
 
-    private static FluidNexusLogger log = FluidNexusLogger.getLogger("FluidNexus"); 
+    private static Logger log = Logger.getLogger("FluidNexus"); 
 
     private static final int ACTIVITY_HOME = 0;
     private static final int ACTIVITY_VIEW_OUTGOING = 1;
@@ -132,7 +133,7 @@ public class FluidNexusAndroid extends ListActivity {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case FluidNexusBluetoothServiceVer3.MSG_NEW_MESSAGE_RECEIVED:
+                case BluetoothServiceVer3.MSG_NEW_MESSAGE_RECEIVED:
                     Toast.makeText(getApplicationContext(), R.string.toast_new_message_received, Toast.LENGTH_LONG).show();
                     log.debug("Received MSG_NEW_MESSAGE_RECEIVED");
                     fillListView(VIEW_MODE);
@@ -147,13 +148,13 @@ public class FluidNexusAndroid extends ListActivity {
         public void onServiceConnected(ComponentName className, IBinder service) {
             bluetoothService = new Messenger(service);
             try {
-                Message msg = Message.obtain(null, FluidNexusBluetoothServiceVer3.MSG_REGISTER_CLIENT);
+                Message msg = Message.obtain(null, BluetoothServiceVer3.MSG_REGISTER_CLIENT);
                 msg.replyTo = messenger;
                 bluetoothService.send(msg);
                 log.debug("Connected to service");
 
                 // Send scan frequency on start
-                msg = Message.obtain(null, FluidNexusBluetoothServiceVer3.MSG_BLUETOOTH_SCAN_FREQUENCY);
+                msg = Message.obtain(null, BluetoothServiceVer3.MSG_BLUETOOTH_SCAN_FREQUENCY);
                 msg.arg1 = Integer.parseInt(prefs.getString("bluetoothScanFrequency", "5"));
                 msg.replyTo = messenger;
                 bluetoothService.send(msg);
@@ -253,7 +254,7 @@ public class FluidNexusAndroid extends ListActivity {
     public void onStart() {
         super.onStart();
 
-        dbAdapter = new FluidNexusDbAdapter(this);
+        dbAdapter = new MessagesDbAdapter(this);
         dbAdapter.open();
         fillListView(VIEW_MODE);
 
@@ -319,8 +320,8 @@ public class FluidNexusAndroid extends ListActivity {
         AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
         currentRowID = info.id;
         Cursor c = dbAdapter.returnItemByID(currentRowID);
-        menu.setHeaderTitle(c.getString(c.getColumnIndexOrThrow(FluidNexusDbAdapter.KEY_TITLE)));
-        int mine = c.getInt(c.getColumnIndexOrThrow(FluidNexusDbAdapter.KEY_MINE));
+        menu.setHeaderTitle(c.getString(c.getColumnIndexOrThrow(MessagesDbAdapter.KEY_TITLE)));
+        int mine = c.getInt(c.getColumnIndexOrThrow(MessagesDbAdapter.KEY_MINE));
         log.debug("Mine is: " + mine);
         if (mine == 0) {
             MenuInflater inflater = getMenuInflater();
@@ -355,7 +356,7 @@ public class FluidNexusAndroid extends ListActivity {
     private void doBindService() {
         if (bound == false) {
             log.info("Binding to Fluid Nexus Bluetooth Service");
-            Intent i = new Intent(this, FluidNexusBluetoothServiceVer3.class);
+            Intent i = new Intent(this, BluetoothServiceVer3.class);
             startService(i);
             bindService(i, bluetoothServiceConnection, Context.BIND_AUTO_CREATE);
             bound = true;
@@ -368,7 +369,7 @@ public class FluidNexusAndroid extends ListActivity {
     private void doUnbindService() {
         if (bluetoothService != null) {
             try {
-                Message msg = Message.obtain(null, FluidNexusBluetoothServiceVer3.MSG_UNREGISTER_CLIENT);
+                Message msg = Message.obtain(null, BluetoothServiceVer3.MSG_UNREGISTER_CLIENT);
                 msg.replyTo = messenger;
                 bluetoothService.send(msg);
             } catch (RemoteException e) {
@@ -389,10 +390,10 @@ public class FluidNexusAndroid extends ListActivity {
     private void editMessage() {
         Cursor c = dbAdapter.returnItemByID(currentRowID);
 
-        Intent i = new Intent(this, FluidNexusEditMessage.class);
-        i.putExtra(FluidNexusDbAdapter.KEY_ID, c.getInt(c.getColumnIndex(FluidNexusDbAdapter.KEY_ID)));
-        i.putExtra(FluidNexusDbAdapter.KEY_TITLE, c.getString(c.getColumnIndex(FluidNexusDbAdapter.KEY_TITLE)));
-        i.putExtra(FluidNexusDbAdapter.KEY_CONTENT, c.getString(c.getColumnIndex(FluidNexusDbAdapter.KEY_CONTENT)));
+        Intent i = new Intent(this, EditMessage.class);
+        i.putExtra(MessagesDbAdapter.KEY_ID, c.getInt(c.getColumnIndex(MessagesDbAdapter.KEY_ID)));
+        i.putExtra(MessagesDbAdapter.KEY_TITLE, c.getString(c.getColumnIndex(MessagesDbAdapter.KEY_TITLE)));
+        i.putExtra(MessagesDbAdapter.KEY_CONTENT, c.getString(c.getColumnIndex(MessagesDbAdapter.KEY_CONTENT)));
         startActivityForResult(i, ACTIVITY_EDIT_MESSAGE);
         c.close();
 
@@ -420,14 +421,14 @@ public class FluidNexusAndroid extends ListActivity {
                     boolean tmp = prefs.getBoolean("enableBluetoothServicePref", true);
 
                     if (tmp) {
-                        startService(new Intent(FluidNexusBluetoothServiceVer3.class.getName()));
+                        startService(new Intent(BluetoothServiceVer3.class.getName()));
                     } else {
-                        stopService(new Intent(FluidNexusBluetoothServiceVer3.class.getName()));
+                        stopService(new Intent(BluetoothServiceVer3.class.getName()));
                     }
                     enableBluetoothServicePref = tmp;
                 } else if (key.equals("bluetoothScanFrequency")) {
                     try {
-                        Message msg = Message.obtain(null, FluidNexusBluetoothServiceVer3.MSG_BLUETOOTH_SCAN_FREQUENCY);
+                        Message msg = Message.obtain(null, BluetoothServiceVer3.MSG_BLUETOOTH_SCAN_FREQUENCY);
                         msg.arg1 = Integer.parseInt(prefs.getString("bluetoothScanFrequency", "5"));
                         msg.replyTo = messenger;
                         bluetoothService.send(msg);
@@ -480,7 +481,7 @@ public class FluidNexusAndroid extends ListActivity {
                 editPreferences();
                 return true;
             case R.id.menu_help:
-                Intent i = new Intent(this, FluidNexusHelp.class);
+                Intent i = new Intent(this, Help.class);
                 /*startSubActivity(i, ACTIVITY_HELP);*/
                 startActivityForResult(i, ACTIVITY_HELP);
                 return true;
@@ -496,10 +497,10 @@ public class FluidNexusAndroid extends ListActivity {
         Cursor localCursor = dbCursor;
         localCursor.moveToPosition(position);
 
-        Intent i = new Intent(this, FluidNexusViewMessage.class);
-        i.putExtra(FluidNexusDbAdapter.KEY_ID, localCursor.getInt(localCursor.getColumnIndex(FluidNexusDbAdapter.KEY_ID)));
-        i.putExtra(FluidNexusDbAdapter.KEY_TITLE, localCursor.getString(localCursor.getColumnIndex(FluidNexusDbAdapter.KEY_TITLE)));
-        i.putExtra(FluidNexusDbAdapter.KEY_CONTENT, localCursor.getString(localCursor.getColumnIndex(FluidNexusDbAdapter.KEY_CONTENT)));
+        Intent i = new Intent(this, ViewMessage.class);
+        i.putExtra(MessagesDbAdapter.KEY_ID, localCursor.getInt(localCursor.getColumnIndex(MessagesDbAdapter.KEY_ID)));
+        i.putExtra(MessagesDbAdapter.KEY_TITLE, localCursor.getString(localCursor.getColumnIndex(MessagesDbAdapter.KEY_TITLE)));
+        i.putExtra(MessagesDbAdapter.KEY_CONTENT, localCursor.getString(localCursor.getColumnIndex(MessagesDbAdapter.KEY_CONTENT)));
         startActivityForResult(i, ACTIVITY_VIEW_MESSAGE);
         localCursor.close();
     }
@@ -539,12 +540,12 @@ public class FluidNexusAndroid extends ListActivity {
     }
 
     private void editPreferences() {
-        Intent intent = new Intent(this, FluidNexusPreferences.class);
+        Intent intent = new Intent(this, Preferences.class);
         startActivityForResult(intent, ACTIVITY_PREFERENCES);
     }
 
     private void addOutgoingMessage() {
-        Intent intent = new Intent(this, FluidNexusAddOutgoing.class);
+        Intent intent = new Intent(this, AddOutgoing.class);
         startActivityForResult(intent, ACTIVITY_ADD_OUTGOING);
     }
 
@@ -568,8 +569,8 @@ public class FluidNexusAndroid extends ListActivity {
         TextView tv;
         tv = (TextView) findViewById(R.id.message_list_item);
         
-        String[] from = new String[] {FluidNexusDbAdapter.KEY_TITLE, FluidNexusDbAdapter.KEY_CONTENT, FluidNexusDbAdapter.KEY_MINE, FluidNexusDbAdapter.KEY_ATTACHMENT_ORIGINAL_FILENAME};
-        //String[] from = new String[] {FluidNexusDbAdapter.KEY_TITLE};
+        String[] from = new String[] {MessagesDbAdapter.KEY_TITLE, MessagesDbAdapter.KEY_CONTENT, MessagesDbAdapter.KEY_MINE, MessagesDbAdapter.KEY_ATTACHMENT_ORIGINAL_FILENAME};
+        //String[] from = new String[] {MessagesDbAdapter.KEY_TITLE};
         int[] to = new int[] {R.id.message_list_item, R.id.message_list_data, R.id.message_list_item_icon, R.id.message_list_attachment};
         //int[] to = new int[] {R.id.message_list_item};
         SimpleCursorAdapter messagesAdapter = new SimpleCursorAdapter(this, R.layout.message_list_item, dbCursor, from, to);
@@ -579,7 +580,7 @@ public class FluidNexusAndroid extends ListActivity {
 
         messagesAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
             public boolean setViewValue(View view, Cursor cursor, int i) {
-                if (i == cursor.getColumnIndex(FluidNexusDbAdapter.KEY_CONTENT)) {
+                if (i == cursor.getColumnIndex(MessagesDbAdapter.KEY_CONTENT)) {
                     String fullMessage = cursor.getString(i);
                     TextView tv = (TextView) view;
                     int stringLen = fullMessage.length();
@@ -592,7 +593,7 @@ public class FluidNexusAndroid extends ListActivity {
                     return true;
                 }
 
-                if (i == cursor.getColumnIndex(FluidNexusDbAdapter.KEY_MINE)) {
+                if (i == cursor.getColumnIndex(MessagesDbAdapter.KEY_MINE)) {
                     ImageView iv = (ImageView) view;
                     int mine = cursor.getInt(i);
 
@@ -605,10 +606,10 @@ public class FluidNexusAndroid extends ListActivity {
                     return true;
                 }
 
-                if (i == cursor.getColumnIndex(FluidNexusDbAdapter.KEY_ATTACHMENT_ORIGINAL_FILENAME)) {
+                if (i == cursor.getColumnIndex(MessagesDbAdapter.KEY_ATTACHMENT_ORIGINAL_FILENAME)) {
 
                     final String attachmentFilename = cursor.getString(i);
-                    final String attachmentPath = cursor.getString(cursor.getColumnIndex(FluidNexusDbAdapter.KEY_ATTACHMENT_PATH));
+                    final String attachmentPath = cursor.getString(cursor.getColumnIndex(MessagesDbAdapter.KEY_ATTACHMENT_PATH));
                     Button viewAttachmentButton = (Button) view;
 
                     viewAttachmentButton.setOnClickListener(new View.OnClickListener() {

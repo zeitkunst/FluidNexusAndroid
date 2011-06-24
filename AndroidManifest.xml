@@ -10,22 +10,22 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"></uses-permission>
 
     <application android:label="@string/app_name">
-        <activity android:name=".FluidNexusAndroid" android:label="@string/app_name" android:icon="@drawable/fluid_nexus_icon">
+        <activity android:name=".MainActivity" android:label="@string/app_name" android:icon="@drawable/fluid_nexus_icon">
         
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".FluidNexusPreferences" android:label="@string/preferences"></activity>
-        <activity android:name=".FluidNexusViewMessage"></activity>
-        <activity android:name=".FluidNexusViewOutgoing"></activity>
-        <activity android:name=".FluidNexusAddOutgoing"></activity>
-        <activity android:name=".FluidNexusHelp"></activity>
-        <activity android:name=".FluidNexusEditMessage"></activity>
-        <service android:name=".FluidNexusBluetoothServiceVer3">
+        <activity android:name=".Preferences" android:label="@string/preferences"></activity>
+        <activity android:name=".ViewMessage"></activity>
+        <!-- <activity android:name=".FluidNexusViewOutgoing"></activity> -->
+        <activity android:name=".AddOutgoing"></activity>
+        <activity android:name=".Help"></activity>
+        <activity android:name=".EditMessage"></activity>
+        <service android:name=".BluetoothServiceVer3">
             <intent-filter>
-                <action android:name="net.fluidnexus.FluidNexus.FluidNexusBluetoothServiceVer3" />
+                <action android:name="net.fluidnexus.FluidNexus.BluetoothServiceVer3" />
             </intent-filter>
         </service>
 

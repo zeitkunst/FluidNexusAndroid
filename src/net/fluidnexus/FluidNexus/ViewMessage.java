@@ -27,9 +27,9 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
-public class FluidNexusViewMessage extends Activity {
+public class ViewMessage extends Activity {
 
-    private static FluidNexusLogger log = FluidNexusLogger.getLogger("FluidNexus"); 
+    private static Logger log = Logger.getLogger("FluidNexus"); 
     private TextView titleTextView;
     private TextView messageTextView;
 
@@ -47,8 +47,8 @@ public class FluidNexusViewMessage extends Activity {
         Button backButton = (Button) findViewById(R.id.view_message_back);
 
         if (extras != null) {
-            String title = extras.getString(FluidNexusDbAdapter.KEY_TITLE);
-            String message = extras.getString(FluidNexusDbAdapter.KEY_CONTENT); 
+            String title = extras.getString(MessagesDbAdapter.KEY_TITLE);
+            String message = extras.getString(MessagesDbAdapter.KEY_CONTENT); 
             
             if (title != null) {
                 titleTextView.setText(title);
