@@ -52,6 +52,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.MenuItem;
+import android.webkit.MimeTypeMap;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Button;
 import android.widget.SimpleCursorAdapter;
@@ -615,9 +616,14 @@ public class MainActivity extends ListActivity {
                     viewAttachmentButton.setOnClickListener(new View.OnClickListener() {
                         public void onClick(View view) {
                             Intent intent = new Intent();
-
+                            
                             Uri uri = Uri.parse("file:///" + attachmentPath);
-                            intent.setDataAndType(uri, "image/*");
+                            MimeTypeMap mtm = MimeTypeMap.getSingleton();
+                            String extension = mtm.getFileExtensionFromUrl(attachmentFilename);
+                            log.debug("Extension: " + extension);
+                            String mimeTypeGuess = mtm.getMimeTypeFromExtension(extension.toLowerCase());
+                            log.debug("mime-type: " + mimeTypeGuess);
+                            intent.setDataAndType(uri, mimeTypeGuess);
                             intent.setAction(android.content.Intent.ACTION_VIEW);
                             startActivity(intent);
 
