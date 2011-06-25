@@ -73,19 +73,13 @@
     <string name="preferences_bluetooth_scan_frequency">Scan Frequency</string>
     <string name="preferences_bluetooth_scan_frequency_summary">How often to scan for other devices.  Shorter durations will severely impact battery life.</string>
 
-    <string name="help_help_text">Fluid Nexus unfortunately only works in simulated mode right now, since the m5 version of the emulator does not support Bluetooth natively.  Read on for more details about the different types of Bluetooth simulation.\n
-\n
-HELP\n
-\n
-There are two types of messages in Fluid Nexus.  The first, \"outgoing\", are messages you have created and that are designed to be the first ones sent to other nearby phones.  These are indicated by the icon with the arrow pointing  left, outside of the device.  The second are messages that you have received from other phones; these are indicated by the icon without the arrow.  Your phone will try and send these messages after it has sent all of the messages marked as outgoing.\n
+    <string name="help_help_text">There are two types of messages in Fluid Nexus.  The first, \"outgoing\", are messages you have created and that are designed to be the first ones sent to other nearby phones.  These are indicated by the icon with the arrow pointing  left, outside of the device.  The second are messages that you have received from other phones; these are indicated by the icon without the arrow.  Your phone will try and send these messages after it has sent all of the messages marked as outgoing.\n
 \n
 VIEWING A MESSAGE: Simply click/tap/hit enter on a message to open a window that allows you to see the entirety of the message.\n
 DELETING A MESSAGE: Once you have selected a message using the keyboard or direction pad, open the menu and select \"Delete message\" to remove it from the database and advertisements.\n
 ADDING A MESSAGE: Open the menu and select \"Add Outgoing\".  Enter your message, select save, and it will be queued for for sending, as well as appearing in your message list.\n
 VIEW ALL MESSAGES: The default opening view of Fluid Nexus, this shows all of the messages on your device.  You can also return to this view by opening the menu and selecting \"View All\".\n
 VIEW OUTGOING: This shows you only the messages you have created and that are thus marked as \"outgoing\".  You can select this by opening the menu and selecting \"View Outgoing\".\n
-CHANGE SETTINGS: Select the menu and choose \"Settings\".  Here you can determine whether or not messages are visible (so Fluid Nexus can be run in a silent mode; currently unimplemented), and what type of Bluetooth simulation to use: if checked, Bluetooth events are simulated, if not checked, Bluetooth events work through the bridge.  To run this, from the command line type \"adb forward tcp:7010 tcp:7010\" and start the two bridge programs \"python assets/bridgeClient.py\" and \"python assets/bridgeServer.py\".  The bridge only works if you also have a Nokia phone running Fluid Nexus; for more information, see <a href='http://fluidnexus.net\#install'>http://fluidnexus.net\#install</a>.\n
-GETTING HELP: You\'re here already :-)\n
 \n
 ABOUT\n
 \n
@@ -93,7 +87,7 @@ Google Android port by Nick Knouf.\n
 \n
 Nokia Series 60 Python version by Nick Knouf with Bruno Vianna, Luis Ayuso, and Mónica Sánchez.\n
 \n
-Source code is available from http://fluidnexus.net and is licensed under the GPLv3.  You can view the subversion repository at https://svn.zeitkunst.org/viewvc/FluidNexusAndroid/ .</string>
+Source code is available from http://fluidnexus.net and is licensed under the GPLv3.  Code is available at <a href="https://github.com/zeitkunst/FluidNexusAndroid">https://github.com/zeitkunst/FluidNexusAndroid</a> and for the desktop version <a href="https://github.com/zeitkunst/FluidNexus">https://github.com/zeitkunst/FluidNexus</a>.</string>
     <string name="help_concept_text">Fluid Nexus is an application for mobile phones that is primarily designed to enable activists or relief workers to send messages and data amongst themselves independent of a centralized cellular network.  The idea is to provide a means of communication between people when the centralized network has been shut down, either by the government during a time of unrest, or by nature due to a massive disaster.  During such times the use of the centralized network for voice or SMS is not possible.  Yet, if we can use the fact that people still must move about the world, then we can use ideas from sneaker-nets to turn people into carriers of data.  Given enough people, we can create fluid, temporary, ad-hoc networks that pass messages one person at a time, spreading out as a contagion and eventually reaching members of the group.  This enables surreptitious communication via daily activity and relies on a fluid view of reality.  Additionally, Fluid Nexus can be used as a hyperlocal message board, loosely attached to physical locations.\n
 \n
 Fluid Nexus is not designed as a general-purpose piece of software; rather, it is developed with specific types of users in mind.  Thus, while the ideas here could be very useful for social-networking or productivity applications, this is not what I am most interested in.  However, I definitely welcome the extension of these ideas into these other domains.  Indeed, Fluid Nexus is related to work in the following projects: mesh networking in the OLPC ( http://wiki.laptop.org/go/Mesh_Network_Details ), the Haggle project ( http://www.haggleproject.org/ ), and Comm.unity ( http://community.mit.edu/ ), among many others.\n

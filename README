@@ -19,7 +19,6 @@ Data are sent over bluetooth without any transport-layer security.  We are looki
 
 = TODO =
 
-* Enable saving and sending of attachments
 * Enabled adding of messages to "blacklist"
 * Implement zeroconf server and client functionality
 * Implement SQLCipher database encryption

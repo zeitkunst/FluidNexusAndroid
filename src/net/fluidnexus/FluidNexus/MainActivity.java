@@ -311,6 +311,7 @@ public class MainActivity extends ListActivity {
     protected void onDestroy() {
         super.onDestroy();
         prefs.unregisterOnSharedPreferenceChangeListener(preferenceChangeListener);
+        dbCursor.close();
         dbAdapter.close();
         try {
             doUnbindService();
