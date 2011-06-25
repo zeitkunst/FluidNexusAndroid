@@ -393,10 +393,14 @@ public class MainActivity extends ListActivity {
 
         Intent i = new Intent(this, EditMessage.class);
         i.putExtra(MessagesDbAdapter.KEY_ID, c.getInt(c.getColumnIndex(MessagesDbAdapter.KEY_ID)));
+        i.putExtra(MessagesDbAdapter.KEY_TYPE, c.getInt(c.getColumnIndex(MessagesDbAdapter.KEY_TYPE)));
         i.putExtra(MessagesDbAdapter.KEY_TITLE, c.getString(c.getColumnIndex(MessagesDbAdapter.KEY_TITLE)));
         i.putExtra(MessagesDbAdapter.KEY_CONTENT, c.getString(c.getColumnIndex(MessagesDbAdapter.KEY_CONTENT)));
-        startActivityForResult(i, ACTIVITY_EDIT_MESSAGE);
+        i.putExtra(MessagesDbAdapter.KEY_ATTACHMENT_ORIGINAL_FILENAME, c.getString(c.getColumnIndex(MessagesDbAdapter.KEY_ATTACHMENT_ORIGINAL_FILENAME)));
+        i.putExtra(MessagesDbAdapter.KEY_ATTACHMENT_PATH, c.getString(c.getColumnIndex(MessagesDbAdapter.KEY_ATTACHMENT_PATH)));
+
         c.close();
+        startActivityForResult(i, ACTIVITY_EDIT_MESSAGE);
 
     }
 

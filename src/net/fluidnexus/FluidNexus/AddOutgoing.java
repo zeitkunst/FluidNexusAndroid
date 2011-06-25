@@ -61,7 +61,6 @@ public class AddOutgoing extends Activity {
     private static final int SELECT_VIDEO = 3;
 
     private static final int DIALOG_SAVE = 0;
-    private boolean toSave = false;
 
     private int attachmentType = SELECT_TEXT;
     private Uri attachmentUri = null;
