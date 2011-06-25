@@ -229,6 +229,15 @@ public class MainActivity extends ListActivity {
             .setCancelable(false)
             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
+                    Cursor c = dbAdapter.returnItemByID(currentRowID);
+                    String attachmentPath = c.getString(c.getColumnIndex(MessagesDbAdapter.KEY_ATTACHMENT_PATH));
+                    c.close();
+                    
+                    if (!(attachmentPath.equals(""))) {
+                        File f = new File(attachmentPath);
+                        f.delete();
+                    }
+
                     dbAdapter.deleteById(currentRowID);
 
                     // TODO

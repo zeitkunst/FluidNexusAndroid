@@ -93,8 +93,6 @@ public class EditMessage extends Activity {
         messageEditText = (EditText) findViewById(R.id.message_edit);
 
         Button addAttachmentButton = (Button) findViewById(R.id.add_attachment_button);
-        Button saveButton = (Button) findViewById(R.id.save_message_button);
-        Button discardButton = (Button) findViewById(R.id.discard_message_button);
         Button removeAttachmentButton = (Button) findViewById(R.id.remove_attachment_button);
         attachmentLabel = (TextView) findViewById(R.id.attachment_label);
         attachmentLabel.setVisibility(View.GONE);
@@ -191,26 +189,6 @@ public class EditMessage extends Activity {
                 attachmentLabel.setVisibility(View.GONE);
                 attachmentUri = null;
                 attachmentPath = null;
-            }
-        });
-
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                saveState();
-                setResult(RESULT_OK);
-                finish();
-            }
-        });
-
-        discardButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                boolean textChanged = checkIfTextChanged();
-                if (textChanged) {
-                    //showDialog(DIALOG_REALLY_DISCARD);
-                } else {
-                    setResult(RESULT_OK);
-                    finish();
-                }
             }
         });
     }

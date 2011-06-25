@@ -853,7 +853,10 @@ public class BluetoothServiceVer3 extends Service {
                          *                                                             attachmentFP.close()
                          */
                         String message_hash = dbAdapter.makeSHA256(message.getMessageTitle() + message.getMessageContent());
-                        File destinationPath = new File(attachmentsDir + "/" + message_hash);
+
+                        String filenameArray[] = message.getMessageAttachmentOriginalFilename().split("\\.");
+                        String extension = filenameArray[filenameArray.length-1];
+                        File destinationPath = new File(attachmentsDir + "/" + message_hash + "." + extension);
                         BufferedOutputStream f = null;
                         try {
                             f = new BufferedOutputStream(new FileOutputStream(destinationPath));
