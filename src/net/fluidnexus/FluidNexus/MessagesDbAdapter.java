@@ -57,6 +57,7 @@ public class MessagesDbAdapter {
     public static final String KEY_ATTACHMENT_PATH = "attachment_path";
     public static final String KEY_ATTACHMENT_ORIGINAL_FILENAME = "attachment_original_filename";
     public static final String KEY_MINE = "mine";
+    public static final String KEY_BLACKLIST = "blacklist";
 
     /**
      * Database creation statement
@@ -180,6 +181,7 @@ public class MessagesDbAdapter {
         values.put(KEY_ATTACHMENT_PATH, "");
         values.put(KEY_ATTACHMENT_ORIGINAL_FILENAME, "");
         values.put(KEY_MINE, 1);
+        values.put(KEY_BLACKLIST, 0);
         return database.insert(DATABASE_TABLE, null, values);
     }
 
@@ -205,6 +207,7 @@ public class MessagesDbAdapter {
         values.put(KEY_ATTACHMENT_PATH, attachment_path);
         values.put(KEY_ATTACHMENT_ORIGINAL_FILENAME, attachment_original_filename);
         values.put(KEY_MINE, 1);
+        values.put(KEY_BLACKLIST, 0);
         return database.insert(DATABASE_TABLE, null, values);
     }
 
@@ -227,6 +230,7 @@ public class MessagesDbAdapter {
         values.put(KEY_ATTACHMENT_PATH, "");
         values.put(KEY_ATTACHMENT_ORIGINAL_FILENAME, "");
         values.put(KEY_MINE, 0);
+        values.put(KEY_BLACKLIST, 0);
         return database.insert(DATABASE_TABLE, null, values);
     }
 
@@ -252,6 +256,7 @@ public class MessagesDbAdapter {
         values.put(KEY_ATTACHMENT_PATH, attachment_path);
         values.put(KEY_ATTACHMENT_ORIGINAL_FILENAME, attachment_original_filename);
         values.put(KEY_MINE, 0);
+        values.put(KEY_BLACKLIST, 0);
         return database.insert(DATABASE_TABLE, null, values);
     }
 
@@ -276,7 +281,7 @@ public class MessagesDbAdapter {
     public Cursor all() {
 
         return database.query(DATABASE_TABLE, 
-                new String [] {KEY_ID, KEY_TYPE, KEY_TITLE, KEY_CONTENT, KEY_MESSAGE_HASH, KEY_TIME, KEY_ATTACHMENT_PATH, KEY_ATTACHMENT_ORIGINAL_FILENAME, KEY_MINE},
+                new String [] {KEY_ID, KEY_TYPE, KEY_TITLE, KEY_CONTENT, KEY_MESSAGE_HASH, KEY_TIME, KEY_ATTACHMENT_PATH, KEY_ATTACHMENT_ORIGINAL_FILENAME, KEY_MINE, KEY_BLACKLIST},
                 null,
                 null,
                 null,
@@ -285,11 +290,26 @@ public class MessagesDbAdapter {
     }
 
     /**
+     * Return all of the items in the database, with optional blacklist parameter
+     */
+    public Cursor allNoBlacklist() {
+
+        return database.query(DATABASE_TABLE, 
+                new String [] {KEY_ID, KEY_TYPE, KEY_TITLE, KEY_CONTENT, KEY_MESSAGE_HASH, KEY_TIME, KEY_ATTACHMENT_PATH, KEY_ATTACHMENT_ORIGINAL_FILENAME, KEY_MINE, KEY_BLACKLIST},
+                KEY_BLACKLIST + "=0",
+                null,
+                null,
+                null,
+                KEY_TIME + " DESC");
+    }
+
+
+    /**
      * Return outgoing items in the database
      */
     public Cursor outgoing() {
         return database.query(DATABASE_TABLE, 
-                new String [] {KEY_ID, KEY_TYPE, KEY_TITLE, KEY_CONTENT, KEY_MESSAGE_HASH, KEY_TIME, KEY_ATTACHMENT_PATH, KEY_ATTACHMENT_ORIGINAL_FILENAME, KEY_MINE},
+                new String [] {KEY_ID, KEY_TYPE, KEY_TITLE, KEY_CONTENT, KEY_MESSAGE_HASH, KEY_TIME, KEY_ATTACHMENT_PATH, KEY_ATTACHMENT_ORIGINAL_FILENAME, KEY_MINE, KEY_BLACKLIST},
                 KEY_MINE + "=1",
                 null,
                 null,
@@ -298,12 +318,26 @@ public class MessagesDbAdapter {
     }
 
     /**
+     * Return blacklist items in the database
+     */
+    public Cursor blacklist() {
+        return database.query(DATABASE_TABLE, 
+                new String [] {KEY_ID, KEY_TYPE, KEY_TITLE, KEY_CONTENT, KEY_MESSAGE_HASH, KEY_TIME, KEY_ATTACHMENT_PATH, KEY_ATTACHMENT_ORIGINAL_FILENAME, KEY_MINE, KEY_BLACKLIST},
+                KEY_BLACKLIST + "=1",
+                null,
+                null,
+                null,
+                KEY_TIME + " DESC");
+    }
+
+
+    /**
      * Return item based on its ID
      * @param id ID of the desired item
      */
     public Cursor returnItemByID(long id) {
         Cursor c = database.query(DATABASE_TABLE, 
-                new String [] {KEY_ID, KEY_TYPE, KEY_TITLE, KEY_CONTENT, KEY_MESSAGE_HASH, KEY_TIME, KEY_ATTACHMENT_PATH, KEY_ATTACHMENT_ORIGINAL_FILENAME, KEY_MINE},
+                new String [] {KEY_ID, KEY_TYPE, KEY_TITLE, KEY_CONTENT, KEY_MESSAGE_HASH, KEY_TIME, KEY_ATTACHMENT_PATH, KEY_ATTACHMENT_ORIGINAL_FILENAME, KEY_MINE, KEY_BLACKLIST},
                 KEY_ID + "=" + id,
                 null,
                 null,
@@ -320,7 +354,7 @@ public class MessagesDbAdapter {
      */
     public Cursor returnItemBasedOnHash(String hash) {
         Cursor c = database.query(DATABASE_TABLE, 
-                new String [] {KEY_ID, KEY_TYPE, KEY_TITLE, KEY_CONTENT, KEY_MESSAGE_HASH, KEY_TIME, KEY_ATTACHMENT_PATH, KEY_ATTACHMENT_ORIGINAL_FILENAME, KEY_MINE},
+                new String [] {KEY_ID, KEY_TYPE, KEY_TITLE, KEY_CONTENT, KEY_MESSAGE_HASH, KEY_TIME, KEY_ATTACHMENT_PATH, KEY_ATTACHMENT_ORIGINAL_FILENAME, KEY_MINE, KEY_BLACKLIST},
                 KEY_MESSAGE_HASH + "='" + hash + "'",
                 null,
                 null,

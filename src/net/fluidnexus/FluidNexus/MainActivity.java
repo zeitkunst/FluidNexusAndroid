@@ -24,6 +24,7 @@ import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -101,6 +102,8 @@ public class MainActivity extends ListActivity {
     private long currentRowID = -1;
 
     private static final int DIALOG_REALLY_DELETE = 0;
+    private static final int DIALOG_REALLY_BLACKLIST = 1;
+    private static final int DIALOG_REALLY_UNBLACKLIST = 2;
 
     private static final int MENU_ADD_ID = Menu.FIRST;
     private static final int MENU_VIEW_ID = Menu.FIRST + 1;
@@ -108,6 +111,7 @@ public class MainActivity extends ListActivity {
     private static final int MENU_ALL_ID = Menu.FIRST + 3;
     private static final int MENU_DELETE_ID = Menu.FIRST + 4;
     private static final int MENU_HELP_ID = Menu.FIRST + 5;
+    private static final int MENU_BLACKLIST_ID = Menu.FIRST + 5;
 
     // messages from bluetooth service
     Messenger bluetoothService = null;
@@ -213,6 +217,12 @@ public class MainActivity extends ListActivity {
             case DIALOG_REALLY_DELETE:
                 dialog = reallyDeleteDialog();
                 break;
+            case DIALOG_REALLY_BLACKLIST:
+                dialog = reallyBlacklistDialog();
+                break;
+            case DIALOG_REALLY_UNBLACKLIST:
+                dialog = reallyUnblacklistDialog();
+                break;
             default:
                 dialog = null;
         }
@@ -260,6 +270,54 @@ public class MainActivity extends ListActivity {
         return builder.create();
     }
 
+    /**
+     * Method to create our really blacklist dialog
+     */
+    private AlertDialog reallyBlacklistDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.really_blacklist_dialog)
+            .setCancelable(false)
+            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    ContentValues values = new ContentValues();
+                    values.put(MessagesDbAdapter.KEY_BLACKLIST, 1);
+                    dbAdapter.updateItemByID(currentRowID, values);
+
+                    currentRowID = -1;
+                    fillListView(VIEW_MODE);
+                    toast = Toast.makeText(getApplicationContext(), R.string.toast_message_blacklisted, Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+            })
+            .setNegativeButton("No", null);
+        return builder.create();
+    }
+
+
+    /**
+     * Method to create our really blacklist dialog
+     */
+    private AlertDialog reallyUnblacklistDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.really_unblacklist_dialog)
+            .setCancelable(false)
+            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    ContentValues values = new ContentValues();
+                    values.put(MessagesDbAdapter.KEY_BLACKLIST, 0);
+                    dbAdapter.updateItemByID(currentRowID, values);
+
+                    currentRowID = -1;
+                    fillListView(VIEW_MODE);
+                    toast = Toast.makeText(getApplicationContext(), R.string.toast_message_unblacklisted, Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+            })
+            .setNegativeButton("No", null);
+        return builder.create();
+    }
+
+
     @Override 
     public void onStart() {
         super.onStart();
@@ -269,6 +327,7 @@ public class MainActivity extends ListActivity {
         fillListView(VIEW_MODE);
 
         setupPreferences();
+
         // Create our attachments dir            
         // TODO
         // Make this configurable to SD card
@@ -314,7 +373,9 @@ public class MainActivity extends ListActivity {
         dbCursor.close();
         dbAdapter.close();
         try {
-            doUnbindService();
+            if (bound) {
+                doUnbindService();
+            }
         } catch (Throwable t) {
             log.debug("Failed to unbind from the service");
         }
@@ -333,13 +394,18 @@ public class MainActivity extends ListActivity {
         Cursor c = dbAdapter.returnItemByID(currentRowID);
         menu.setHeaderTitle(c.getString(c.getColumnIndexOrThrow(MessagesDbAdapter.KEY_TITLE)));
         int mine = c.getInt(c.getColumnIndexOrThrow(MessagesDbAdapter.KEY_MINE));
-        log.debug("Mine is: " + mine);
-        if (mine == 0) {
+
+        if (VIEW_MODE == 2) {
             MenuInflater inflater = getMenuInflater();
-            inflater.inflate(R.menu.message_list_context_noedit, menu);
+            inflater.inflate(R.menu.message_list_context_unblacklist, menu);
         } else {
-            MenuInflater inflater = getMenuInflater();
-            inflater.inflate(R.menu.message_list_context, menu);
+            if (mine == 0) {
+                MenuInflater inflater = getMenuInflater();
+                inflater.inflate(R.menu.message_list_context_noedit, menu);
+            } else {
+                MenuInflater inflater = getMenuInflater();
+                inflater.inflate(R.menu.message_list_context, menu);
+            }
         }
 
         c.close();
@@ -352,6 +418,12 @@ public class MainActivity extends ListActivity {
         switch (item.getItemId()) {
             case R.id.delete_message:
                 showDialog(DIALOG_REALLY_DELETE);
+                return true;
+            case R.id.blacklist_message:
+                showDialog(DIALOG_REALLY_BLACKLIST);
+                return true;
+            case R.id.unblacklist_message:
+                showDialog(DIALOG_REALLY_UNBLACKLIST);
                 return true;
             case R.id.edit_message:
                 editMessage();
@@ -424,9 +496,10 @@ public class MainActivity extends ListActivity {
             prefsEditor.commit();
 
             dbAdapter.initialPopulate();
+            fillListView(VIEW_MODE);
         }
         
-        this.showMessages = prefs.getBoolean("ShowMessages", true);
+        showMessages = prefs.getBoolean("ShowMessages", true);
 
         // Setup a listener for when preferences change
         preferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
@@ -451,6 +524,9 @@ public class MainActivity extends ListActivity {
                     } catch (RemoteException e) {
                         log.error("Unable to send scan frequency message: " + e);
                     }
+                } else if (key.equals("showMessages")) {
+                    showMessages = prefs.getBoolean("showMessages", true);
+                    fillListView(VIEW_MODE);
                 }
 
             }
@@ -492,6 +568,16 @@ public class MainActivity extends ListActivity {
                 tv.setText(R.string.message_list_header_text_outgoing);
 
                 return true;
+            case R.id.menu_view_blacklist:
+                VIEW_MODE = 2;
+                fillListView(VIEW_MODE);
+
+                // Update our header text view
+                tv = (TextView) findViewById(R.id.message_list_header_text);
+                tv.setText(R.string.message_list_header_text_blacklist);
+
+                return true;
+
             case R.id.menu_preferences:
                 editPreferences();
                 return true;
@@ -572,15 +658,21 @@ public class MainActivity extends ListActivity {
     }
 
     private void fillListView(int viewType) {
-        if (!this.showMessages) {
+        if (!(showMessages)) {
+            log.debug("We shouldn't be showing messages...");
             return;
         }
 
         if (viewType == 0) {
-            dbCursor = dbAdapter.all();
+            // Get the non-blacklisted messages
+            //dbCursor = dbAdapter.all(0);
+            dbCursor = dbAdapter.allNoBlacklist();
         } else if (viewType == 1) {
             dbCursor = dbAdapter.outgoing();
+        } else if (viewType == 2) {
+            dbCursor = dbAdapter.blacklist();
         }
+
         //startManagingCursor(dbCursor);
 
         TextView tv;

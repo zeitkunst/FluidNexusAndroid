@@ -43,7 +43,7 @@ public class MessagesDbHelper extends SQLiteOpenHelper {
 
                                      */
     private static final String DATABASE_CREATE =
-        "create table Messages (_id integer primary key autoincrement, type integer, title text, content text, message_hash text, time float, attachment_path text, attachment_original_filename text, mine bit);";
+        "create table Messages (_id integer primary key autoincrement, type integer, title text, content text, message_hash text, time float, attachment_path text, attachment_original_filename text, mine bit, blacklist bit default 0);";
     private static final String DATABASE_NAME = "FluidNexusDatabase.db";
     private static final String DATABASE_TABLE = "Messages";
     private static final int DATABASE_VERSION = 1;

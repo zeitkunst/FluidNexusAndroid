@@ -19,7 +19,8 @@ Data are sent over bluetooth without any transport-layer security.  We are looki
 
 = TODO =
 
-* Enabled adding of messages to "blacklist"
+* Make connection to service a singleton (I think this is fixed...)
+* Figure out why crash on orientation change and receive message over bluetooth
 * Implement zeroconf server and client functionality
 * Implement SQLCipher database encryption
 * Implement SSL/TLS over network modalities
