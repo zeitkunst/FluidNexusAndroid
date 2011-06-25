@@ -243,7 +243,7 @@ public class MainActivity extends ListActivity {
 
                     currentRowID = -1;
                     fillListView(VIEW_MODE);
-                    toast = Toast.makeText(getApplicationContext(), "Message deleted.", Toast.LENGTH_LONG);
+                    toast = Toast.makeText(getApplicationContext(), R.string.toast_message_deleted, Toast.LENGTH_SHORT);
                     toast.show();
                 }
             })

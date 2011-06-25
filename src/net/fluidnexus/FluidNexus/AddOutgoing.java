@@ -19,8 +19,14 @@
 
 package net.fluidnexus.FluidNexus;
 
+
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -53,6 +59,9 @@ public class AddOutgoing extends Activity {
     private static final int SELECT_AUDIO = 1;
     private static final int SELECT_IMAGE = 2;
     private static final int SELECT_VIDEO = 3;
+
+    private static final int DIALOG_SAVE = 0;
+    private boolean toSave = false;
 
     private int attachmentType = SELECT_TEXT;
     private Uri attachmentUri = null;
@@ -156,13 +165,6 @@ public class AddOutgoing extends Activity {
             }
         });
        
-        /*
-        attachmentButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                startActivityForResult(new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI), SELECT_IMAGE);
-            }
-        });
-        */
     }
 
     @Override
@@ -208,17 +210,72 @@ public class AddOutgoing extends Activity {
         return result;
     }
 
+    @Override
+    public void onBackPressed() {
+        // do something on back.
+        String title = titleEditText.getText().toString();
+        String message = messageEditText.getText().toString();
+
+        if (!(title.equals("")) || !(message.equals(""))) {
+            showDialog(DIALOG_SAVE);
+        } else {
+            setResult(RESULT_OK);
+            finish();
+        }
+    }
 
 
+    /**
+     * Method of creating dialogs for this activity
+     * @param id ID of the dialog to create
+     */
+    protected Dialog onCreateDialog(int id) {
+        Dialog dialog;
+
+        switch (id) {
+            case DIALOG_SAVE:
+                dialog = saveDialog();
+                break;
+            default:
+                dialog = null;
+        }
+
+        return dialog;
+    }
+
+
+    /**
+     * Method to create our save dialog
+     */
+    private AlertDialog saveDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Do you want to save this message?")
+            .setCancelable(false)
+            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    saveState();
+                    setResult(RESULT_OK);
+                    finish();
+                }
+            })
+            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    setResult(RESULT_OK);
+                    finish();
+
+                }    
+            });
+        return builder.create();
+    }
+
+    /**
+     * Save our state to the database
+     */
     private void saveState() {
         String title = titleEditText.getText().toString();
         String message = messageEditText.getText().toString();
 
-/*
-    public long add_new(int type,
-            String title,
-            String content, String attachment_path, String attachment_original_filename) {
-*/
+
         if (attachmentPath == null) {
             dbAdapter.add_new(0, title, message);
         } else {
