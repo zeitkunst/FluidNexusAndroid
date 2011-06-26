@@ -49,7 +49,6 @@ public class ViewMessage extends Activity {
         
         titleTextView = (TextView) findViewById(R.id.view_message_title);
         messageTextView = (TextView) findViewById(R.id.view_message_data);
-        Button backButton = (Button) findViewById(R.id.view_message_back);
         Button viewAttachmentButton = (Button) findViewById(R.id.view_message_attachment);
 
 
@@ -91,21 +90,13 @@ public class ViewMessage extends Activity {
         
                     }
                 });
-                viewAttachmentButton.setText("View " + attachment_original_filename);
+                viewAttachmentButton.setText(R.string.open_attachment_button_text + " " + attachment_original_filename);
 
             }
 
         } else {
             log.error("Unable to get any extras...this should never happen :-)");
         }
-        backButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                Bundle bundle = new Bundle();
-                /*setResult(RESULT_OK, null, bundle);*/
-                setResult(RESULT_OK);
-                finish();
-            }
-        });
 
     }
 

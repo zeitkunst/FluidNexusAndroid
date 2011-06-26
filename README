@@ -19,6 +19,7 @@ Data are sent over bluetooth without any transport-layer security.  We are looki
 
 = TODO =
 
+* Ensure that connecting to all paired devices works
 * Make connection to service a singleton (I think this is fixed...)
 * Figure out why crash on orientation change and receive message over bluetooth
 * Implement zeroconf server and client functionality

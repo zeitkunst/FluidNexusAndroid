@@ -50,13 +50,4 @@ android:text="TextView"
 >
 </TextView>
 </ScrollView>
-<Button
-android:id="@+id/view_message_back"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:text="@string/view_message_back"
-android:layout_alignParentBottom="true"
-android:layout_alignParentRight="true"
->
-</Button>
 </RelativeLayout>

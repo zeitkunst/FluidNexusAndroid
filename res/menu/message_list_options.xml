@@ -14,6 +14,7 @@
         android:alphabeticShortcut="o" />
     <item android:id="@+id/menu_view_blacklist"
         android:title="@string/menu_view_blacklist"
+        android:icon="@drawable/menu_blacklist"
         android:alphabeticShortcut="b" />
     <item android:id="@+id/menu_preferences"
         android:title="@string/menu_preferences"

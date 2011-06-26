@@ -34,6 +34,7 @@
     <string name="view_message_back">Back</string>
     <string name="save_message_button">Save</string>
     <string name="discard_message_button">Discard</string>
+    <string name="open_attachment_button_text">Open</string>
     <string name="title_edit_label">Title:</string>
     <string name="message_edit_label">Message:</string>
     <string name="attachment_add_label">Attachment:</string>
