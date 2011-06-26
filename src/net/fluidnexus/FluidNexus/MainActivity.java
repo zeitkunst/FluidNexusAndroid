@@ -73,7 +73,7 @@ import java.io.File;
  */
 
 public class MainActivity extends ListActivity {
-    private MessagesDbAdapter dbAdapter;
+    private MessagesDbAdapter dbAdapter = null;
     private Toast toast;
     
     private SharedPreferences prefs;
@@ -187,9 +187,6 @@ public class MainActivity extends ListActivity {
         setContentView(R.layout.message_list);
         registerForContextMenu(getListView());
 
-        log.verbose("starting up...");
-
-
         /*      
         // Regiser my receiver to NEW_MESSAGE action
         iFilter = new IntentFilter(getText(R.string.intent_new_message).toString());
@@ -204,6 +201,13 @@ public class MainActivity extends ListActivity {
         if (bluetoothAdapter == null) {
             Toast.makeText(this, "Bluetooth is not available; sending and receiving messages will not be possible", Toast.LENGTH_LONG).show();
         }
+
+        // Create our attachments dir            
+        // TODO
+        // Make this configurable to SD card
+        File dataDir = Environment.getExternalStorageDirectory();
+        attachmentsDir = new File(dataDir.getAbsolutePath() + "/FluidNexusAttachments");
+        attachmentsDir.mkdirs();
     }
 
     /**
@@ -320,20 +324,18 @@ public class MainActivity extends ListActivity {
 
     @Override 
     public void onStart() {
+        log.debug("IN ON START");
         super.onStart();
 
-        dbAdapter = new MessagesDbAdapter(this);
-        dbAdapter.open();
+        if (dbAdapter == null) {
+            dbAdapter = new MessagesDbAdapter(this);
+            dbAdapter.open();
+        }
+
         fillListView(VIEW_MODE);
 
         setupPreferences();
 
-        // Create our attachments dir            
-        // TODO
-        // Make this configurable to SD card
-        File dataDir = Environment.getExternalStorageDirectory();
-        attachmentsDir = new File(dataDir.getAbsolutePath() + "/FluidNexusAttachments");
-        attachmentsDir.mkdirs();
 
         if (bluetoothAdapter != null) {
             if (!bluetoothAdapter.isEnabled()) {
@@ -358,20 +360,25 @@ public class MainActivity extends ListActivity {
 
     @Override
     protected void onPause() {
+        log.debug("IN ON PAUSE");
         super.onPause();
     }
 
     @Override
     protected void onResume() {
+        log.debug("IN ON RESUME");
         super.onResume();
     }
 
     @Override
     protected void onDestroy() {
+        log.debug("IN ON DESTORY");
         super.onDestroy();
         prefs.unregisterOnSharedPreferenceChangeListener(preferenceChangeListener);
         dbCursor.close();
         dbAdapter.close();
+        dbAdapter = null;
+
         try {
             if (bound) {
                 doUnbindService();

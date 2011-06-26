@@ -71,8 +71,6 @@ import android.widget.Toast;
 
 /*
  * TODO
- * * Refactor database to allow for images, mime-types, sha-256
- * * Add blacklist database to prevent getting messages we don't want anymore
  * * Ensure multiple threads are opened for multiple hosts running the software
  * * * Figure out why it doesn't see any services for mooplop
  * * See if it's possible to manually enter paired devices to speed up creation of the network
@@ -93,7 +91,7 @@ public class BluetoothServiceVer3 extends Service {
 
     private BluetoothAdapter bluetoothAdapter;
 
-    private Set<BluetoothDevice> pairedDevices;
+    private HashSet<BluetoothDevice> pairedDevices = null;
 
     // Keeping track of items from the database
     private HashSet<String> currentHashes = new HashSet<String>();
@@ -159,6 +157,7 @@ public class BluetoothServiceVer3 extends Service {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+
                 // get bluetoothdevice object from intent
                 BluetoothDevice foundDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
@@ -178,6 +177,12 @@ public class BluetoothServiceVer3 extends Service {
                 // Clear out our device list
                 allDevicesBT.clear();
                 fnDevicesBT.clear();
+                if (pairedDevices != null) {
+                    for (BluetoothDevice tmp: pairedDevices) {
+                        allDevicesBT.add(tmp);
+                    }
+                }
+
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 setServiceState(STATE_DISCOVERY_FINISHED);
             }
@@ -251,7 +256,12 @@ public class BluetoothServiceVer3 extends Service {
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         state = STATE_NONE;
-        pairedDevices = bluetoothAdapter.getBondedDevices();
+
+        Set<BluetoothDevice> tmp = bluetoothAdapter.getBondedDevices();
+
+        for (BluetoothDevice device: tmp) {
+            allDevicesBT.add(device);
+        }
 
         btFoundFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         btFoundFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
@@ -602,23 +612,6 @@ public class BluetoothServiceVer3 extends Service {
 
             setServiceState(STATE_NONE);
         }
-
-        /**
-         * Run the actions to do with service discovery
-         */
-        /*
-        private void doServiceDiscovery() {
-            UUID tempUUID = UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
-
-            for (Vector currentDevice : allDevices) {
-                String name = (String) currentDevice.get(0);
-                String address = (String) currentDevice.get(1);
-                log.debug("Working on device " + name + " with address " + address);
-                BluetoothDevice btDevice = bluetoothAdapter.getRemoteDevice(address);
-                servicesFromDeviceAsync(btDevice);
-            }
-        }
-        */
 
         /** 
          * Cancel the thread
