@@ -162,7 +162,7 @@ public class MainActivity extends ListActivity {
 
                 // Send scan frequency on start
                 msg = Message.obtain(null, BluetoothServiceVer3.MSG_BLUETOOTH_SCAN_FREQUENCY);
-                msg.arg1 = Integer.parseInt(prefs.getString("bluetoothScanFrequency", "300"));
+                msg.arg1 = Integer.parseInt(prefs.getString("bluetoothScanFrequency", "120"));
                 msg.replyTo = messenger;
                 bluetoothService.send(msg);
 

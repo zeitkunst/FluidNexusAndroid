@@ -121,7 +121,7 @@ public class BluetoothServiceVer3 extends Service {
     public static final int MSG_NEW_MESSAGE_RECEIVED = 0x20;
     public static final int MSG_BLUETOOTH_SCAN_FREQUENCY = 0x30;
 
-    private int scanFrequency = 300;
+    private int scanFrequency = 120;
 
     // Target we publish for clients to send messages to
     final Messenger messenger = new Messenger(new IncomingHandler());
