@@ -28,8 +28,11 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+//import info.guardianproject.database.sqlcipher.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+//import info.guardianproject.database.sqlcipher.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
+//import info.guardianproject.database.sqlcipher.SQLiteQueryBuilder;
 import android.net.Uri;
 
 import net.fluidnexus.FluidNexus.Logger;
