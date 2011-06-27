@@ -143,7 +143,6 @@ public class MainActivity extends ListActivity {
             switch (msg.what) {
                 case BluetoothServiceVer3.MSG_NEW_MESSAGE_RECEIVED:
                     Toast.makeText(getApplicationContext(), R.string.toast_new_message_received, Toast.LENGTH_LONG).show();
-                    log.debug("Received MSG_NEW_MESSAGE_RECEIVED");
                     fillListView(VIEW_MODE);
                     break;
                 default:
@@ -163,7 +162,7 @@ public class MainActivity extends ListActivity {
 
                 // Send scan frequency on start
                 msg = Message.obtain(null, BluetoothServiceVer3.MSG_BLUETOOTH_SCAN_FREQUENCY);
-                msg.arg1 = Integer.parseInt(prefs.getString("bluetoothScanFrequency", "5"));
+                msg.arg1 = Integer.parseInt(prefs.getString("bluetoothScanFrequency", "300"));
                 msg.replyTo = messenger;
                 bluetoothService.send(msg);
 
@@ -380,7 +379,7 @@ public class MainActivity extends ListActivity {
                 doUnbindService();
             }
         } catch (Throwable t) {
-            log.debug("Failed to unbind from the service");
+            log.error("Failed to unbind from the service");
         }
 
     }
@@ -509,7 +508,6 @@ public class MainActivity extends ListActivity {
         // Setup a listener for when preferences change
         preferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences pref, String key) {
-                log.debug("changed key: " + key);
                 if (key.equals("enableBluetoothServicePref")) {
                     boolean tmp = prefs.getBoolean("enableBluetoothServicePref", true);
 
@@ -658,10 +656,6 @@ public class MainActivity extends ListActivity {
         startActivityForResult(intent, ACTIVITY_ADD_OUTGOING);
     }
 
-
-    public void setViewText(TextView v, String text) {
-        log.debug(text);
-    }
 
     private void fillListView(int viewType) {
         if (!(showMessages)) {

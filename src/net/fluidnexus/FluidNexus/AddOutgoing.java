@@ -148,9 +148,7 @@ public class AddOutgoing extends Activity {
         if ((requestCode == SELECT_IMAGE) || (requestCode == SELECT_AUDIO) || (requestCode == SELECT_VIDEO)) {
             if (resultCode == Activity.RESULT_OK) {
                 attachmentUri = data.getData();
-                log.debug("Attachment Uri: " + attachmentUri.toString());
                 attachmentPath = getRealPathFromURI(attachmentUri, resultCode);
-                log.debug("Attachment Path: " + attachmentPath);
                 attachmentLabel.setVisibility(View.VISIBLE);
                 attachmentLabel.setText(attachmentPath);
             }

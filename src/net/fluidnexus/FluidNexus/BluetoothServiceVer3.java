@@ -121,7 +121,7 @@ public class BluetoothServiceVer3 extends Service {
     public static final int MSG_NEW_MESSAGE_RECEIVED = 0x20;
     public static final int MSG_BLUETOOTH_SCAN_FREQUENCY = 0x30;
 
-    private int scanFrequency = 5;
+    private int scanFrequency = 300;
 
     // Target we publish for clients to send messages to
     final Messenger messenger = new Messenger(new IncomingHandler());
@@ -143,7 +143,8 @@ public class BluetoothServiceVer3 extends Service {
     public static final int STATE_SERVICES = 3; // we're discovering services
     public static final int STATE_CONNECTING = 4; // we're connecting other devices
     public static final int STATE_CONNECTED = 5; // we're connected and sending data
-    public static final int STATE_SERVICE_WAIT = 6; // we sleep for a bit before beginning the discovery process anew
+    public static final int STATE_WAIT_FOR_CONNECTIONS = 6; // we wait for all of the connection threads to finish
+    public static final int STATE_SERVICE_WAIT = 7; // we sleep for a bit before beginning the discovery process anew
     public static final int STATE_QUIT = 100; // we're done with everything
 
     private NotificationManager nm;
@@ -255,7 +256,6 @@ public class BluetoothServiceVer3 extends Service {
 
     @Override
     public void onCreate() {
-        log.debug("Service creating...");
         nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -313,7 +313,6 @@ public class BluetoothServiceVer3 extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        log.debug("Service destroying...");
         nm.cancel(NOTIFICATION);
         if (serviceThread != null) {
             serviceThread.cancel();
@@ -324,7 +323,6 @@ public class BluetoothServiceVer3 extends Service {
      * Show a notification while the service is running
      */
     private void showNotification() {
-        log.debug("Showing notification...");
         CharSequence text = getText(R.string.service_started);
 
         // Set icon, scrolling text, and timestamp
@@ -345,7 +343,7 @@ public class BluetoothServiceVer3 extends Service {
      * @param state Int that defines the current bluetooth service state
      */
     private synchronized void setServiceState(int newState) {
-        log.debug("Changing state from " + state + " to " + newState);
+        //log.debug("Changing state from " + state + " to " + newState);
         state = newState;
     }
 
@@ -473,6 +471,11 @@ public class BluetoothServiceVer3 extends Service {
                         case STATE_CONNECTING:
                             doConnectToDevices();
                             break;
+                        case STATE_WAIT_FOR_CONNECTIONS:
+                            if (connectedDevices.isEmpty()) {
+                                setServiceState(STATE_SERVICE_WAIT);
+                            }
+                            break;
                         case STATE_SERVICE_WAIT:
                             waitService();
                         default:
@@ -555,7 +558,7 @@ public class BluetoothServiceVer3 extends Service {
             try {
                 doDiscovery();
             } catch (Exception e) {
-                log.debug("some sort of exception: " + e);
+                log.error("some sort of exception: " + e);
             }
         }
 
@@ -602,7 +605,7 @@ public class BluetoothServiceVer3 extends Service {
                 connect(currentDevice);
             }
 
-            setServiceState(STATE_SERVICE_WAIT);
+            setServiceState(STATE_WAIT_FOR_CONNECTIONS);
 
         }
 
@@ -750,7 +753,6 @@ public class BluetoothServiceVer3 extends Service {
             String tmpNewState = Integer.toString(iNew);
             String tmpConnectedState = Integer.toString(iConnected);
             log.debug("Changing connected thread state from " + tmpConnectedState + " to " + tmpNewState);
-            //log.debug("Changing connected thread state from " + connectedState + " to " + newState);
             connectedState = newState;
         }
     
@@ -832,9 +834,6 @@ public class BluetoothServiceVer3 extends Service {
 
                 int count = 0;
                 for (Protos.FluidNexusMessage message : messages.getMessageList()) {
-                    log.debug("Got title: " + message.getMessageTitle());
-                    log.debug("Got content: " + message.getMessageContent());
-                    log.debug("Got timestamp: " + message.getMessageTimestamp());
 
                     if (message.hasMessageAttachmentOriginalFilename()) {
                         // TODO
@@ -905,7 +904,6 @@ public class BluetoothServiceVer3 extends Service {
                 // Get their hashes
                 HashSet<String> theirHashes = new HashSet<String>();
                 for (String hash : hashes.getMessageHashList()) {
-                    log.debug("Got hash: " + hash);
                     theirHashes.add(hash);
                 }
 
@@ -965,7 +963,6 @@ public class BluetoothServiceVer3 extends Service {
 
                 Protos.FluidNexusMessages messages = messagesBuilder.build();
 
-                log.debug("Message is: " + messages.toString());
                 byte[] messagesSerialized = messages.toByteArray();
                 int messagesSerializedLength = messagesSerialized.length;
                 log.debug("Writing messages length of: " + messagesSerializedLength);

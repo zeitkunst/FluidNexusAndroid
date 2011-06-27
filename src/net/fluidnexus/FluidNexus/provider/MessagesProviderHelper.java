@@ -56,11 +56,6 @@ public class MessagesProviderHelper {
     public Cursor allNoBlacklist() {
             Cursor c = cr.query(MessagesProvider.ALL_NOBLACKLIST_URI, MessagesProvider.ALL_PROJECTION, null, null, null);
             c.moveToFirst();
-            if (c == null) {
-                log.debug("cursor is null");
-            } else {
-                log.debug("cursor is " + c);
-            }
             return c;
     }
 
