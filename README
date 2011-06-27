@@ -20,8 +20,7 @@ Data are sent over bluetooth without any transport-layer security.  We are looki
 = TODO =
 
 * Ensure that connecting to all paired devices works
-* Make connection to service a singleton (I think this is fixed...)
-* Figure out why crash on orientation change and receive message over bluetooth
+* Fix cursor leak issue (even though I'm positive we close all cursors when we need to...)
 * Implement zeroconf server and client functionality
 * Implement SQLCipher database encryption
 * Implement SSL/TLS over network modalities
