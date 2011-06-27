@@ -34,12 +34,10 @@
                 <action android:name="net.fluidnexus.FluidNexus.BluetoothServiceVer3" />
             </intent-filter>
         </service>
+        <provider
+            android:authorities="net.fluidnexus.FluidNexus.provider.MessagesProvider"
+            android:multiprocess="true"
+            android:name="net.fluidnexus.FluidNexus.provider.MessagesProvider" />
 
     </application>
-    <!--        
-        <service android:name=".FluidNexusClient" />
-        <service android:name=".FluidNexusServer" />
-
-        -->
-
 </manifest> 

@@ -31,17 +31,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class MessagesDbHelper extends SQLiteOpenHelper {
     private static Logger log = Logger.getLogger("FluidNexus"); 
 
-    /*
-         message_type = Column('type', Integer, nullable = False, default = 0)
-             title = Column('title', String, nullable = False)
-                 content = Column('content', String, nullable = False)
-                     message_hash = Column('hash', String(length = 64), nullable = False, unique = True)
-                         time = Column('time', Float, default = float(0.0))
-                             attachment_path = Column('attachment_path', String, default = "")
-                                 attachment_original_filename = Column('attachment_original_filename',       String, default = "")
-                                     mine = Column('mine', Boolean, default = 0)
-
-                                     */
     private static final String DATABASE_CREATE =
         "create table Messages (_id integer primary key autoincrement, type integer, title text, content text, message_hash text, time float, attachment_path text, attachment_original_filename text, mine bit, blacklist bit default 0);";
     private static final String DATABASE_NAME = "FluidNexusDatabase.db";

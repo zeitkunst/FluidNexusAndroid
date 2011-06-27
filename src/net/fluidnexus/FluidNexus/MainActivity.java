@@ -24,6 +24,7 @@ import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -66,6 +67,8 @@ import android.bluetooth.BluetoothDevice;
 
 import java.io.File;
 
+import net.fluidnexus.FluidNexus.provider.MessagesProvider;
+import net.fluidnexus.FluidNexus.provider.MessagesProviderHelper;
 /*
  * TODO
  * * deal with the database somehow not being open when we receive the MSG_NEW_MESSAGE_RECEIVED message after an orientation change.  This is totally opaque to me.
@@ -74,6 +77,8 @@ import java.io.File;
 
 public class MainActivity extends ListActivity {
     private MessagesDbAdapter dbAdapter = null;
+    private MessagesProviderHelper messagesProviderHelper = null;
+
     private Toast toast;
     
     private SharedPreferences prefs;
@@ -327,6 +332,10 @@ public class MainActivity extends ListActivity {
         log.debug("IN ON START");
         super.onStart();
 
+        if (messagesProviderHelper == null) {
+            messagesProviderHelper = new MessagesProviderHelper(this);
+        }
+
         if (dbAdapter == null) {
             dbAdapter = new MessagesDbAdapter(this);
             dbAdapter.open();
@@ -502,7 +511,7 @@ public class MainActivity extends ListActivity {
             prefsEditor.putBoolean("FirstRun", false);
             prefsEditor.commit();
 
-            dbAdapter.initialPopulate();
+            messagesProviderHelper.initialPopulate();            
             fillListView(VIEW_MODE);
         }
         
@@ -602,15 +611,16 @@ public class MainActivity extends ListActivity {
     protected void onListItemClick(ListView l, View v, int position, long id) {
         // We will need to be careful later here about the different uses of position and rowID
         super.onListItemClick(l, v, position, id);
-        Cursor localCursor = dbCursor;
-        localCursor.moveToPosition(position);
+        //Cursor localCursor = dbCursor;    
+        Cursor localCursor = messagesProviderHelper.returnItemByID(id);
+        //localCursor.moveToPosition(position);
 
         Intent i = new Intent(this, ViewMessage.class);
-        i.putExtra(MessagesDbAdapter.KEY_ID, localCursor.getInt(localCursor.getColumnIndex(MessagesDbAdapter.KEY_ID)));
-        i.putExtra(MessagesDbAdapter.KEY_TITLE, localCursor.getString(localCursor.getColumnIndex(MessagesDbAdapter.KEY_TITLE)));
-        i.putExtra(MessagesDbAdapter.KEY_CONTENT, localCursor.getString(localCursor.getColumnIndex(MessagesDbAdapter.KEY_CONTENT)));
-        i.putExtra(MessagesDbAdapter.KEY_ATTACHMENT_ORIGINAL_FILENAME, localCursor.getString(localCursor.getColumnIndex(MessagesDbAdapter.KEY_ATTACHMENT_ORIGINAL_FILENAME)));
-        i.putExtra(MessagesDbAdapter.KEY_ATTACHMENT_PATH, localCursor.getString(localCursor.getColumnIndex(MessagesDbAdapter.KEY_ATTACHMENT_PATH)));
+        i.putExtra(MessagesProvider._ID, localCursor.getInt(localCursor.getColumnIndex(MessagesProvider._ID)));
+        i.putExtra(MessagesProvider.KEY_TITLE, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_TITLE)));
+        i.putExtra(MessagesProvider.KEY_CONTENT, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_CONTENT)));
+        i.putExtra(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME)));
+        i.putExtra(MessagesProvider.KEY_ATTACHMENT_PATH, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_PATH)));
         startActivityForResult(i, ACTIVITY_VIEW_MESSAGE);
         localCursor.close();
     }
@@ -670,33 +680,33 @@ public class MainActivity extends ListActivity {
             return;
         }
 
-        if (viewType == 0) {
-            // Get the non-blacklisted messages
-            //dbCursor = dbAdapter.all(0);
-            dbCursor = dbAdapter.allNoBlacklist();
-        } else if (viewType == 1) {
-            dbCursor = dbAdapter.outgoing();
-        } else if (viewType == 2) {
-            dbCursor = dbAdapter.blacklist();
-        }
 
         //startManagingCursor(dbCursor);
 
         TextView tv;
         tv = (TextView) findViewById(R.id.message_list_item);
         
-        String[] from = new String[] {MessagesDbAdapter.KEY_TITLE, MessagesDbAdapter.KEY_CONTENT, MessagesDbAdapter.KEY_MINE, MessagesDbAdapter.KEY_ATTACHMENT_ORIGINAL_FILENAME};
-        //String[] from = new String[] {MessagesDbAdapter.KEY_TITLE};
+        String[] from = new String[] {MessagesProvider.KEY_TITLE, MessagesProvider.KEY_CONTENT, MessagesProvider.KEY_MINE, MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME};
+        String[] projection = new String[] {MessagesProvider._ID, MessagesProvider.KEY_TITLE, MessagesProvider.KEY_CONTENT, MessagesProvider.KEY_MINE, MessagesProvider.KEY_ATTACHMENT_PATH, MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME};
         int[] to = new int[] {R.id.message_list_item, R.id.message_list_data, R.id.message_list_item_icon, R.id.message_list_attachment};
-        //int[] to = new int[] {R.id.message_list_item};
-        SimpleCursorAdapter messagesAdapter = new SimpleCursorAdapter(this, R.layout.message_list_item, dbCursor, from, to);
+
+        if (viewType == 0) {
+            // Get the non-blacklisted messages
+            dbCursor = managedQuery(MessagesProvider.ALL_NOBLACKLIST_URI, projection, null, null, null);
+        } else if (viewType == 1) {
+            dbCursor = managedQuery(MessagesProvider.OUTGOING_URI, projection, null, null, null);
+        } else if (viewType == 2) {
+            dbCursor = managedQuery(MessagesProvider.BLACKLIST_URI, projection, null, null, null);
+        }
+
+        SimpleCursorAdapter messagesAdapter = new SimpleCursorAdapter(getApplicationContext(), R.layout.message_list_item, dbCursor, from, to);
         ListView lv;
         lv = (ListView) getListView();
         lv.setSelection(0);
 
         messagesAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
             public boolean setViewValue(View view, Cursor cursor, int i) {
-                if (i == cursor.getColumnIndex(MessagesDbAdapter.KEY_CONTENT)) {
+                if (i == cursor.getColumnIndex(MessagesProvider.KEY_CONTENT)) {
                     String fullMessage = cursor.getString(i);
                     TextView tv = (TextView) view;
                     int stringLen = fullMessage.length();
@@ -709,7 +719,7 @@ public class MainActivity extends ListActivity {
                     return true;
                 }
 
-                if (i == cursor.getColumnIndex(MessagesDbAdapter.KEY_MINE)) {
+                if (i == cursor.getColumnIndex(MessagesProvider.KEY_MINE)) {
                     ImageView iv = (ImageView) view;
                     int mine = cursor.getInt(i);
 
@@ -722,10 +732,10 @@ public class MainActivity extends ListActivity {
                     return true;
                 }
 
-                if (i == cursor.getColumnIndex(MessagesDbAdapter.KEY_ATTACHMENT_ORIGINAL_FILENAME)) {
+                if (i == cursor.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME)) {
 
                     final String attachmentFilename = cursor.getString(i);
-                    final String attachmentPath = cursor.getString(cursor.getColumnIndex(MessagesDbAdapter.KEY_ATTACHMENT_PATH));
+                    final String attachmentPath = cursor.getString(cursor.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_PATH));
                     TextView viewAttachment = (TextView) view;
                    
                     if (attachmentFilename.equals("")) {
