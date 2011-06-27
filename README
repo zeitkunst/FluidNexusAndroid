@@ -17,12 +17,15 @@ This version stores messages in an unencrypted database on the phone.  We plan t
 
 Data are sent over bluetooth without any transport-layer security.  We are looking into implementing SSL/TLS for each of the network modalities.  You have been warned.
 
+= BLUETOOTH NOTE =
+
+On Android, making bluetooth connections to visible (discoverable), but unpaired, devices requires pairing beforehand.  This is unfortunate, but can be used to your advantage to create a "whitelist" of paired devices before using the system in the field.  It might be good to agree upon a pairing code ahead of time (one different from "1234", "0000", or the like) to enable pairing in the field.
+
+Once paired, the device does not have to be visible (discoverable) for the Android phone to connect to it.
+
 = TODO =
 
 * Implement wake locks so that the service can run even when the device is sleeping; create it so that we run an alarm, run the code, then "sleep" until the next alarm (thus getting rid of the thread sleep code).  Does this only happen when we're on battery power?
-* Check that we can create outbound RFCOMM sockets to unpaired devices
-* Check that we can connect to paired devices when they're not discoverable
-* Ensure that connecting to all paired devices works
 * Fix cursor leak issue (even though I'm positive we close all cursors when we need to...)
 * Implement zeroconf server and client functionality
 * Implement SQLCipher database encryption
