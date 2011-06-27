@@ -140,7 +140,7 @@ public class MainActivity extends ListActivity {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case BluetoothServiceVer3.MSG_NEW_MESSAGE_RECEIVED:
+                case BluetoothService.MSG_NEW_MESSAGE_RECEIVED:
                     Toast.makeText(getApplicationContext(), R.string.toast_new_message_received, Toast.LENGTH_LONG).show();
                     fillListView(VIEW_MODE);
                     break;
@@ -154,13 +154,13 @@ public class MainActivity extends ListActivity {
         public void onServiceConnected(ComponentName className, IBinder service) {
             bluetoothService = new Messenger(service);
             try {
-                Message msg = Message.obtain(null, BluetoothServiceVer3.MSG_REGISTER_CLIENT);
+                Message msg = Message.obtain(null, BluetoothService.MSG_REGISTER_CLIENT);
                 msg.replyTo = messenger;
                 bluetoothService.send(msg);
                 log.debug("Connected to service");
 
                 // Send scan frequency on start
-                msg = Message.obtain(null, BluetoothServiceVer3.MSG_BLUETOOTH_SCAN_FREQUENCY);
+                msg = Message.obtain(null, BluetoothService.MSG_BLUETOOTH_SCAN_FREQUENCY);
                 msg.arg1 = Integer.parseInt(prefs.getString("bluetoothScanFrequency", "120"));
                 msg.replyTo = messenger;
                 bluetoothService.send(msg);
@@ -439,7 +439,7 @@ public class MainActivity extends ListActivity {
     private void doBindService() {
         if (bound == false) {
             log.info("Binding to Fluid Nexus Bluetooth Service");
-            Intent i = new Intent(this, BluetoothServiceVer3.class);
+            Intent i = new Intent(this, BluetoothService.class);
             startService(i);
             bindService(i, bluetoothServiceConnection, Context.BIND_AUTO_CREATE);
             bound = true;
@@ -452,7 +452,7 @@ public class MainActivity extends ListActivity {
     private void doUnbindService() {
         if (bluetoothService != null) {
             try {
-                Message msg = Message.obtain(null, BluetoothServiceVer3.MSG_UNREGISTER_CLIENT);
+                Message msg = Message.obtain(null, BluetoothService.MSG_UNREGISTER_CLIENT);
                 msg.replyTo = messenger;
                 bluetoothService.send(msg);
             } catch (RemoteException e) {
@@ -507,14 +507,14 @@ public class MainActivity extends ListActivity {
                     boolean tmp = prefs.getBoolean("enableBluetoothServicePref", true);
 
                     if (tmp) {
-                        startService(new Intent(BluetoothServiceVer3.class.getName()));
+                        startService(new Intent(BluetoothService.class.getName()));
                     } else {
-                        stopService(new Intent(BluetoothServiceVer3.class.getName()));
+                        stopService(new Intent(BluetoothService.class.getName()));
                     }
                     enableBluetoothServicePref = tmp;
                 } else if (key.equals("bluetoothScanFrequency")) {
                     try {
-                        Message msg = Message.obtain(null, BluetoothServiceVer3.MSG_BLUETOOTH_SCAN_FREQUENCY);
+                        Message msg = Message.obtain(null, BluetoothService.MSG_BLUETOOTH_SCAN_FREQUENCY);
                         msg.arg1 = Integer.parseInt(prefs.getString("bluetoothScanFrequency", "5"));
                         msg.replyTo = messenger;
                         bluetoothService.send(msg);

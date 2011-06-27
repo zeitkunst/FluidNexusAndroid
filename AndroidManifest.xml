@@ -46,11 +46,11 @@
         <activity android:name=".AddOutgoing"></activity>
         <activity android:name=".Help"></activity>
         <activity android:name=".EditMessage"></activity>
-        <service android:name=".BluetoothServiceVer3"
+        <service android:name=".BluetoothService"
             android:process=":remote"
             android:permission="net.fluidnexus.FluidNexus.permission.BLUETOOTH_SERVICE">
             <intent-filter>
-                <action android:name="net.fluidnexus.FluidNexus.BluetoothServiceVer3" />
+                <action android:name="net.fluidnexus.FluidNexus.BluetoothService" />
             </intent-filter>
         </service>
         <provider

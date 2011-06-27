@@ -79,7 +79,7 @@ import net.fluidnexus.FluidNexus.provider.MessagesProviderHelper;
  * * Improve error handling dramatically
  */
 
-public class BluetoothServiceVer3 extends Service {
+public class BluetoothService extends Service {
     // Logging
     private static Logger log = Logger.getLogger("FluidNexus"); 
 
