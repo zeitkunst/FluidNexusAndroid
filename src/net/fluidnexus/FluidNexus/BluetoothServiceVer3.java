@@ -166,28 +166,25 @@ public class BluetoothServiceVer3 extends Service {
                 // get bluetoothdevice object from intent
                 BluetoothDevice foundDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
-                //if (pairedDevices.contains(foundDevice)) {
-                    //log.debug("Found device in paired list: " + foundDevice);
-                //} else {
+                if (allDevicesBT.contains(foundDevice)) {
+                    log.debug("Found device in paired list: " + foundDevice);
+                } else {
                     device.clear();
                     device.add(foundDevice.getName());
                     device.add(foundDevice.getAddress());
                     allDevicesBT.add(foundDevice);
                     // Print this info to the log, for now
                     log.info(foundDevice.getName() + " " + foundDevice.getAddress());
-                //}
+                }
 
                 
             } else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
                 // Clear out our device list
                 allDevicesBT.clear();
                 fnDevicesBT.clear();
-                if (pairedDevices != null) {
-                    for (BluetoothDevice tmp: pairedDevices) {
-                        allDevicesBT.add(tmp);
-                    }
-                }
+                
 
+                addPairedDevices();
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 setServiceState(STATE_DISCOVERY_FINISHED);
             }
@@ -261,12 +258,6 @@ public class BluetoothServiceVer3 extends Service {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         state = STATE_NONE;
 
-        Set<BluetoothDevice> tmp = bluetoothAdapter.getBondedDevices();
-
-        for (BluetoothDevice device: tmp) {
-            allDevicesBT.add(device);
-        }
-
         btFoundFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         btFoundFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
         btFoundFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
@@ -317,6 +308,18 @@ public class BluetoothServiceVer3 extends Service {
         if (serviceThread != null) {
             serviceThread.cancel();
         }
+    }
+
+    /**
+     * Add our paired devices to all devices
+     */
+    private void addPairedDevices() {
+        Set<BluetoothDevice> tmp = bluetoothAdapter.getBondedDevices();
+
+        for (BluetoothDevice device: tmp) {
+            allDevicesBT.add(device);
+        }
+
     }
 
     /**
@@ -466,7 +469,9 @@ public class BluetoothServiceVer3 extends Service {
                             break;
                         case STATE_DISCOVERY_FINISHED:
                             // If there discovery is finished, start trying to connect
-                            doServiceDiscovery();
+                            //doServiceDiscovery();
+                            fnDevicesBT = allDevicesBT;
+                            setServiceState(STATE_CONNECTING);
                             break;
                         case STATE_CONNECTING:
                             doConnectToDevices();
@@ -549,11 +554,6 @@ public class BluetoothServiceVer3 extends Service {
          */
         private void doStateNone() {
             // If we're at the beginning state, then start the discovery process
-            // TESTING
-            // Try and get hashes from the database
-            // TODO
-            // Only update this on a new intent from the activity
-
 
             try {
                 doDiscovery();
