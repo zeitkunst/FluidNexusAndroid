@@ -53,6 +53,7 @@ public class MessagesProvider extends ContentProvider {
     public static final String PATH_BLACKLIST = "/blacklist";
     public static final String PATH_MESSAGES = "/messages";
     public static final String PATH_MESSAGES_ID = "/messages/";
+    public static final String PATH_HASHES_STRING = "/hashes/";
     public static final Uri ALL_URI = Uri.parse(SCHEME + AUTHORITY + PATH_ALL);
     public static final Uri ALL_NOBLACKLIST_URI = Uri.parse(SCHEME + AUTHORITY + PATH_ALL_NOBLACKLIST);
     public static final Uri OUTGOING_URI = Uri.parse(SCHEME + AUTHORITY + PATH_OUTGOING);
@@ -61,19 +62,26 @@ public class MessagesProvider extends ContentProvider {
     public static final Uri MESSAGES_URI_ID_BASE = Uri.parse(SCHEME + AUTHORITY + PATH_MESSAGES_ID);
     public static final Uri MESSAGES_URI_ID_PATTERN = Uri.parse(SCHEME + AUTHORITY + PATH_MESSAGES_ID + "/#");
 
+    public static final Uri HASHES_URI_STRING_BASE = Uri.parse(SCHEME + AUTHORITY + PATH_HASHES_STRING);
+    public static final Uri HASHES_URI_STRING_PATTERN = Uri.parse(SCHEME + AUTHORITY + PATH_HASHES_STRING + "/*");
+
+
     // our content type
-    public static final String CONTENT_TYPE = "vnd.fluidnexus/vnd.message";
+    public static final String CONTENT_TYPE = "vnd.fluidnexus/vnd.fluidnexus.message";
 
     /**
      * Constants for the Uri matcher
      */
     public static final int MESSAGES_ID_PATH_POSITION = 1;
+    public static final int HASHES_STRING_PATH_POSITION = 1;
     private static final int ALL = 1;
     private static final int ALL_NOBLACKLIST = 2;
     private static final int OUTGOING = 3;
     private static final int BLACKLIST = 4;
     private static final int MESSAGES = 5;
     private static final int MESSAGES_ID = 6;
+    private static final int HASHES = 7;
+    private static final int HASHES_STRING = 8;
 
     /**
      * Keys for the database
@@ -94,6 +102,11 @@ public class MessagesProvider extends ContentProvider {
      */
 
     public static final String[] ALL_PROJECTION = new String[] {_ID, KEY_TYPE, KEY_TITLE, KEY_CONTENT, KEY_MESSAGE_HASH, KEY_TIME, KEY_ATTACHMENT_PATH, KEY_ATTACHMENT_ORIGINAL_FILENAME, KEY_MINE, KEY_BLACKLIST};
+
+    /**
+     * Hashes keys
+     */
+    public static final String[] HASHES_PROJECTION = new String[] {_ID, KEY_MESSAGE_HASH};
 
     /**
      * Projection map used to select columns from the database
@@ -129,6 +142,12 @@ public class MessagesProvider extends ContentProvider {
 
         // add a pattern for a particular message
         uriMatcher.addURI(AUTHORITY, "messages/#", MESSAGES_ID);
+
+        // add a pattern for hashes
+        uriMatcher.addURI(AUTHORITY, "hashes", HASHES);
+
+        // add a pattern for a particular hash 
+        uriMatcher.addURI(AUTHORITY, "hashes/*", HASHES_STRING);
 
         // Map each column to itself
         messagesProjectionMap = new HashMap<String, String>();
@@ -223,6 +242,11 @@ public class MessagesProvider extends ContentProvider {
                         _ID + "=" + uri.getPathSegments().get(MESSAGES_ID_PATH_POSITION)
                 );
                 break;
+            case HASHES_STRING:
+                qb.setProjectionMap(messagesProjectionMap);
+                qb.appendWhere(KEY_MESSAGE_HASH + "='" + uri.getPathSegments().get(HASHES_STRING_PATH_POSITION) + "'");
+                break;
+
             default:
                 // If the URI doesn't match any of the known patterns, throw an exception.
                 throw new IllegalArgumentException("Unknown URI " + uri);
@@ -262,6 +286,55 @@ public class MessagesProvider extends ContentProvider {
      */
     @Override
     public int update(Uri uri, ContentValues values, String where, String[] whereArgs) {
+        SQLiteDatabase db = messagesDbHelper.getWritableDatabase();
+        int count;
+        String finalWhere;
+
+        switch (uriMatcher.match(uri)) {
+            case MESSAGES:
+                count = db.update(
+                    DATABASE_TABLE,
+                    values,
+                    where,
+                    whereArgs
+                );
+                break;
+            case MESSAGES_ID:
+                // Create an introductory where clause
+                finalWhere = _ID + " = " + uri.getPathSegments().get(MESSAGES_ID_PATH_POSITION);
+
+                // If there were other wheres, add them in
+                if (where != null) {
+                    finalWhere = finalWhere + " AND " + where;
+                }
+
+                // Perform the delete
+                count = db.update(DATABASE_TABLE, values, finalWhere, whereArgs);
+                break;
+            case HASHES_STRING:
+                // Create an introductory where clause
+                finalWhere = _ID + " = " + uri.getPathSegments().get(HASHES_STRING_PATH_POSITION);
+
+                // If there were other wheres, add them in
+                if (where != null) {
+                    finalWhere = finalWhere + " AND " + where;
+                }
+
+                // Perform the delete
+                count = db.update(DATABASE_TABLE, values, finalWhere, whereArgs);
+                break;
+
+            default:
+                throw new IllegalArgumentException("Unknown URI " + uri);
+        }
+
+        /*
+         * Get a handle to the content resolver object to notify registered observers
+         */
+        getContext().getContentResolver().notifyChange(uri, null);
+
+
+        //db.close();
         return 0;
     }
 
@@ -270,7 +343,57 @@ public class MessagesProvider extends ContentProvider {
      */
      @Override
     public int delete(Uri uri, String where, String[] whereArgs) {
-        return 0;
+        SQLiteDatabase db = messagesDbHelper.getWritableDatabase();
+        String finalWhere;
+
+        int count;
+
+        switch (uriMatcher.match(uri)) {
+            case MESSAGES:
+                count = db.delete(
+                    DATABASE_TABLE,
+                    where,
+                    whereArgs
+                );
+                break;
+            case MESSAGES_ID:
+                // Create an introductory where clause
+                finalWhere = _ID + " = " + uri.getPathSegments().get(MESSAGES_ID_PATH_POSITION);
+
+                // If there were other wheres, add them in
+                if (where != null) {
+                    finalWhere = finalWhere + " AND " + where;
+                }
+
+                // Perform the delete
+                count = db.delete(DATABASE_TABLE, finalWhere, whereArgs);
+                break;
+            case HASHES_STRING:
+                // Create an introductory where clause
+                finalWhere = _ID + " = " + uri.getPathSegments().get(HASHES_STRING_PATH_POSITION);
+
+                // If there were other wheres, add them in
+                if (where != null) {
+                    finalWhere = finalWhere + " AND " + where;
+                }
+
+                // Perform the delete
+                count = db.delete(DATABASE_TABLE, finalWhere, whereArgs);
+                break;
+
+            default:
+                throw new IllegalArgumentException("Unknown URI " + uri);
+        }
+
+        /*
+         * Get a handle to the content resolver object to notify registered observers
+         */
+        getContext().getContentResolver().notifyChange(uri, null);
+        
+        //db.close();
+
+        // return number of rows deleted
+        return count;
 
     }
 
@@ -308,7 +431,7 @@ public class MessagesProvider extends ContentProvider {
             null,
             values
         );
-        db.close();
+        //db.close();
 
         // If the insert succeed, the rowID exists
         if (rowID > 0) {

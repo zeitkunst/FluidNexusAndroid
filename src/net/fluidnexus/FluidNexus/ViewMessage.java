@@ -30,6 +30,8 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import net.fluidnexus.FluidNexus.provider.MessagesProvider;
+
 public class ViewMessage extends Activity {
 
     private static Logger log = Logger.getLogger("FluidNexus"); 
@@ -54,10 +56,10 @@ public class ViewMessage extends Activity {
 
 
         if (extras != null) {
-            String title = extras.getString(MessagesDbAdapter.KEY_TITLE);
-            String message = extras.getString(MessagesDbAdapter.KEY_CONTENT); 
-            attachment_path = extras.getString(MessagesDbAdapter.KEY_ATTACHMENT_PATH);
-            attachment_original_filename = extras.getString(MessagesDbAdapter.KEY_ATTACHMENT_ORIGINAL_FILENAME); 
+            String title = extras.getString(MessagesProvider.KEY_TITLE);
+            String message = extras.getString(MessagesProvider.KEY_CONTENT); 
+            attachment_path = extras.getString(MessagesProvider.KEY_ATTACHMENT_PATH);
+            attachment_original_filename = extras.getString(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME); 
            
             if (title != null) {
                 titleTextView.setText(title);

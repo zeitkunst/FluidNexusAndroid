@@ -69,6 +69,9 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
 
+import net.fluidnexus.FluidNexus.provider.MessagesProvider;
+import net.fluidnexus.FluidNexus.provider.MessagesProviderHelper;
+
 /*
  * TODO
  * * Ensure multiple threads are opened for multiple hosts running the software
@@ -85,7 +88,8 @@ public class BluetoothServiceVer3 extends Service {
     private static Logger log = Logger.getLogger("FluidNexus"); 
 
     // For database access
-    private MessagesDbAdapter dbAdapter;
+    private MessagesProviderHelper messagesProviderHelper = null;
+
     private Cursor hashesCursor;
     private Cursor dataCursor;
 
@@ -275,8 +279,7 @@ public class BluetoothServiceVer3 extends Service {
         */
 
         // setup database object
-        dbAdapter = new MessagesDbAdapter(this);
-        dbAdapter.open();
+        messagesProviderHelper = new MessagesProviderHelper(this);
 
 
 
@@ -495,8 +498,9 @@ public class BluetoothServiceVer3 extends Service {
          * Update the hashes in our HashSet based on items from the database
          */
         public void updateHashes() {
-            hashesCursor = dbAdapter.services();
-            hashesCursor.moveToFirst();
+            //hashesCursor = dbAdapter.services();
+            //hashesCursor.moveToFirst();
+            hashesCursor = messagesProviderHelper.hashes();
 
             currentHashes = new HashSet<String>();
             currentHashes.clear();
@@ -517,11 +521,11 @@ public class BluetoothServiceVer3 extends Service {
          * Probably shouldn't do this atomically like this...
          */
         public void updateData() {
-            dataCursor = dbAdapter.outgoing();
+            dataCursor = messagesProviderHelper.outgoing();
             dataCursor.moveToFirst();
             currentData.clear();
 
-            String[] fields = new String[] {MessagesDbAdapter.KEY_MESSAGE_HASH, MessagesDbAdapter.KEY_TIME, MessagesDbAdapter.KEY_TITLE, MessagesDbAdapter.KEY_CONTENT};
+            String[] fields = new String[] {MessagesProvider.KEY_MESSAGE_HASH, MessagesProvider.KEY_TIME, MessagesProvider.KEY_TITLE, MessagesProvider.KEY_CONTENT};
             while (dataCursor.isAfterLast() == false) {
                 // I'm still not sure why I have to instantiate a new vector each time here, rather than using the local vector from earlier
                 // This is one of those things of java that just makes me want to pull my hair out...
@@ -845,7 +849,7 @@ public class BluetoothServiceVer3 extends Service {
                          *                                         attachmentFP.write(message.message_attachment)
                          *                                                             attachmentFP.close()
                          */
-                        String message_hash = dbAdapter.makeSHA256(message.getMessageTitle() + message.getMessageContent());
+                        String message_hash = messagesProviderHelper.makeSHA256(message.getMessageTitle() + message.getMessageContent());
 
                         String filenameArray[] = message.getMessageAttachmentOriginalFilename().split("\\.");
                         String extension = filenameArray[filenameArray.length-1];
@@ -863,9 +867,9 @@ public class BluetoothServiceVer3 extends Service {
 
 
 
-                        dbAdapter.add_received(0, message.getMessageTimestamp(), message.getMessageTitle(), message.getMessageContent(), destinationPath.getAbsolutePath(), message.getMessageAttachmentOriginalFilename());
+                        messagesProviderHelper.add_received(0, message.getMessageTimestamp(), message.getMessageTitle(), message.getMessageContent(), destinationPath.getAbsolutePath(), message.getMessageAttachmentOriginalFilename());
                     } else {
-                        dbAdapter.add_received(0, message.getMessageTimestamp(), message.getMessageTitle(), message.getMessageContent());
+                        messagesProviderHelper.add_received(0, message.getMessageTimestamp(), message.getMessageTitle(), message.getMessageContent());
                     }
                     count += 1;
                 }
@@ -927,13 +931,13 @@ public class BluetoothServiceVer3 extends Service {
                 for (String currentHash: hashesToSend) {
                     Protos.FluidNexusMessage.Builder messageBuilder = Protos.FluidNexusMessage.newBuilder();
 
-                    Cursor localCursor = dbAdapter.returnItemBasedOnHash(currentHash);
+                    Cursor localCursor = messagesProviderHelper.returnItemBasedOnHash(currentHash);
         
-                    String title = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesDbAdapter.KEY_TITLE));
-                    String content = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesDbAdapter.KEY_CONTENT));
-                    Float timestamp = localCursor.getFloat(localCursor.getColumnIndexOrThrow(MessagesDbAdapter.KEY_TIME));
-                    String attachmentPath = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesDbAdapter.KEY_ATTACHMENT_PATH));
-                    String attachmentOriginalFilename = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesDbAdapter.KEY_ATTACHMENT_ORIGINAL_FILENAME));
+                    String title = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_TITLE));
+                    String content = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_CONTENT));
+                    Float timestamp = localCursor.getFloat(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_TIME));
+                    String attachmentPath = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_ATTACHMENT_PATH));
+                    String attachmentOriginalFilename = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME));
                     localCursor.close();
 
                     messageBuilder.setMessageTitle(title);

@@ -48,12 +48,15 @@ import android.widget.TextView;
 
 import java.io.File;
 
+import net.fluidnexus.FluidNexus.provider.MessagesProvider;
+import net.fluidnexus.FluidNexus.provider.MessagesProviderHelper;
 public class EditMessage extends Activity {
+
+    private MessagesProviderHelper messagesProviderHelper = null;
 
     private static Logger log = Logger.getLogger("FluidNexus"); 
     private EditText titleEditText;
     private EditText messageEditText;
-    private MessagesDbAdapter dbAdapter;  
     private long id = -1;
 
     // Activity result codes
@@ -80,10 +83,7 @@ public class EditMessage extends Activity {
 
         super.onCreate(icicle);
 
-
-        // Create database instance
-        dbAdapter = new MessagesDbAdapter(this);
-        dbAdapter.open();
+        messagesProviderHelper = new MessagesProviderHelper(this);
 
         setContentView(R.layout.message_edit);
         setTitle(R.string.message_edit_title);
@@ -103,12 +103,12 @@ public class EditMessage extends Activity {
         attachmentSpinner.setAdapter(adapter);
 
         if (extras != null) {
-            id = extras.getInt(MessagesDbAdapter.KEY_ID);
-            originalTitle = extras.getString(MessagesDbAdapter.KEY_TITLE);
-            originalMessage = extras.getString(MessagesDbAdapter.KEY_CONTENT); 
-            originalAttachmentPath = extras.getString(MessagesDbAdapter.KEY_ATTACHMENT_PATH); 
-            originalAttachmentOriginalFilename = extras.getString(MessagesDbAdapter.KEY_ATTACHMENT_ORIGINAL_FILENAME); 
-            originalType = extras.getInt(MessagesDbAdapter.KEY_TYPE); 
+            id = extras.getInt(MessagesProvider._ID);
+            originalTitle = extras.getString(MessagesProvider.KEY_TITLE);
+            originalMessage = extras.getString(MessagesProvider.KEY_CONTENT); 
+            originalAttachmentPath = extras.getString(MessagesProvider.KEY_ATTACHMENT_PATH); 
+            originalAttachmentOriginalFilename = extras.getString(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME); 
+            originalType = extras.getInt(MessagesProvider.KEY_TYPE); 
             attachmentType = originalType;
             
             if (originalTitle != null) {
@@ -187,8 +187,8 @@ public class EditMessage extends Activity {
         removeAttachmentButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 attachmentLabel.setVisibility(View.GONE);
-                attachmentUri = null;
-                attachmentPath = null;
+                attachmentUri = null; 
+                attachmentPath = "";
             }
         });
     }
@@ -267,17 +267,23 @@ public class EditMessage extends Activity {
         String message = messageEditText.getText().toString();
 
         ContentValues values = new ContentValues();
-        values.put(MessagesDbAdapter.KEY_TITLE, title);
-        values.put(MessagesDbAdapter.KEY_CONTENT, message);
-        values.put(MessagesDbAdapter.KEY_MESSAGE_HASH, MessagesDbAdapter.makeMD5(title + message));
+        values.put(MessagesProvider.KEY_TITLE, title);
+        values.put(MessagesProvider.KEY_CONTENT, message);
+        values.put(MessagesProvider.KEY_MESSAGE_HASH, MessagesProviderHelper.makeSHA256(title + message));
 
         if (attachmentPath != null) {
-            File file = new File(attachmentPath);
-            values.put(MessagesDbAdapter.KEY_ATTACHMENT_PATH, attachmentPath);
-            values.put(MessagesDbAdapter.KEY_ATTACHMENT_ORIGINAL_FILENAME, file.getName());
+            if (attachmentPath.equals("")) {
+                values.put(MessagesProvider.KEY_ATTACHMENT_PATH, "");
+                values.put(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME, "");
+
+            } else {
+                File file = new File(attachmentPath);
+                values.put(MessagesProvider.KEY_ATTACHMENT_PATH, attachmentPath);
+                values.put(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME, file.getName());
+            }
         }
         
-        dbAdapter.updateItemByID(id, values);
+        messagesProviderHelper.updateItemByID(id, values);
     }
 
     /**

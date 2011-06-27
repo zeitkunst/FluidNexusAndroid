@@ -76,7 +76,7 @@ import net.fluidnexus.FluidNexus.provider.MessagesProviderHelper;
  */
 
 public class MainActivity extends ListActivity {
-    private MessagesDbAdapter dbAdapter = null;
+    private Cursor c = null;
     private MessagesProviderHelper messagesProviderHelper = null;
 
     private Toast toast;
@@ -128,8 +128,6 @@ public class MainActivity extends ListActivity {
     static final int MSG_MESSAGE_DELETED = 0xF1;
 
     private boolean showMessages = true;
-
-    private Cursor dbCursor;
 
     private BluetoothAdapter bluetoothAdapter = null;
     private boolean enableBluetoothServicePref = true;
@@ -248,16 +246,16 @@ public class MainActivity extends ListActivity {
             .setCancelable(false)
             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    Cursor c = dbAdapter.returnItemByID(currentRowID);
-                    String attachmentPath = c.getString(c.getColumnIndex(MessagesDbAdapter.KEY_ATTACHMENT_PATH));
-                    c.close();
+                    Cursor localCursor = messagesProviderHelper.returnItemByID(currentRowID);
+                    String attachmentPath = localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_PATH));
+                    localCursor.close();
                     
                     if (!(attachmentPath.equals(""))) {
                         File f = new File(attachmentPath);
                         f.delete();
                     }
 
-                    dbAdapter.deleteById(currentRowID);
+                    messagesProviderHelper.deleteById(currentRowID);
 
                     // TODO
                     // move to instance method
@@ -289,8 +287,8 @@ public class MainActivity extends ListActivity {
             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     ContentValues values = new ContentValues();
-                    values.put(MessagesDbAdapter.KEY_BLACKLIST, 1);
-                    dbAdapter.updateItemByID(currentRowID, values);
+                    values.put(MessagesProvider.KEY_BLACKLIST, 1);
+                    messagesProviderHelper.updateItemByID(currentRowID, values);
 
                     currentRowID = -1;
                     fillListView(VIEW_MODE);
@@ -313,8 +311,8 @@ public class MainActivity extends ListActivity {
             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     ContentValues values = new ContentValues();
-                    values.put(MessagesDbAdapter.KEY_BLACKLIST, 0);
-                    dbAdapter.updateItemByID(currentRowID, values);
+                    values.put(MessagesProvider.KEY_BLACKLIST, 0);
+                    messagesProviderHelper.updateItemByID(currentRowID, values);
 
                     currentRowID = -1;
                     fillListView(VIEW_MODE);
@@ -329,16 +327,10 @@ public class MainActivity extends ListActivity {
 
     @Override 
     public void onStart() {
-        log.debug("IN ON START");
         super.onStart();
 
         if (messagesProviderHelper == null) {
             messagesProviderHelper = new MessagesProviderHelper(this);
-        }
-
-        if (dbAdapter == null) {
-            dbAdapter = new MessagesDbAdapter(this);
-            dbAdapter.open();
         }
 
         fillListView(VIEW_MODE);
@@ -369,24 +361,19 @@ public class MainActivity extends ListActivity {
 
     @Override
     protected void onPause() {
-        log.debug("IN ON PAUSE");
         super.onPause();
     }
 
     @Override
     protected void onResume() {
-        log.debug("IN ON RESUME");
         super.onResume();
     }
 
     @Override
     protected void onDestroy() {
-        log.debug("IN ON DESTORY");
         super.onDestroy();
         prefs.unregisterOnSharedPreferenceChangeListener(preferenceChangeListener);
-        dbCursor.close();
-        dbAdapter.close();
-        dbAdapter = null;
+        c.close();
 
         try {
             if (bound) {
@@ -407,9 +394,10 @@ public class MainActivity extends ListActivity {
         super.onCreateContextMenu(menu, v, menuInfo);
         AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
         currentRowID = info.id;
-        Cursor c = dbAdapter.returnItemByID(currentRowID);
-        menu.setHeaderTitle(c.getString(c.getColumnIndexOrThrow(MessagesDbAdapter.KEY_TITLE)));
-        int mine = c.getInt(c.getColumnIndexOrThrow(MessagesDbAdapter.KEY_MINE));
+        
+        Cursor localCursor = messagesProviderHelper.returnItemByID(currentRowID);
+        menu.setHeaderTitle(localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_TITLE)));
+        int mine = localCursor.getInt(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_MINE));
 
         if (VIEW_MODE == 2) {
             MenuInflater inflater = getMenuInflater();
@@ -424,7 +412,7 @@ public class MainActivity extends ListActivity {
             }
         }
 
-        c.close();
+        localCursor.close();
     }
 
     @Override
@@ -487,17 +475,18 @@ public class MainActivity extends ListActivity {
      * Only edit messages that are outgoing
      */
     private void editMessage() {
-        Cursor c = dbAdapter.returnItemByID(currentRowID);
+
+        Cursor localCursor = messagesProviderHelper.returnItemByID(currentRowID);
 
         Intent i = new Intent(this, EditMessage.class);
-        i.putExtra(MessagesDbAdapter.KEY_ID, c.getInt(c.getColumnIndex(MessagesDbAdapter.KEY_ID)));
-        i.putExtra(MessagesDbAdapter.KEY_TYPE, c.getInt(c.getColumnIndex(MessagesDbAdapter.KEY_TYPE)));
-        i.putExtra(MessagesDbAdapter.KEY_TITLE, c.getString(c.getColumnIndex(MessagesDbAdapter.KEY_TITLE)));
-        i.putExtra(MessagesDbAdapter.KEY_CONTENT, c.getString(c.getColumnIndex(MessagesDbAdapter.KEY_CONTENT)));
-        i.putExtra(MessagesDbAdapter.KEY_ATTACHMENT_ORIGINAL_FILENAME, c.getString(c.getColumnIndex(MessagesDbAdapter.KEY_ATTACHMENT_ORIGINAL_FILENAME)));
-        i.putExtra(MessagesDbAdapter.KEY_ATTACHMENT_PATH, c.getString(c.getColumnIndex(MessagesDbAdapter.KEY_ATTACHMENT_PATH)));
+        i.putExtra(MessagesProvider._ID, localCursor.getInt(localCursor.getColumnIndex(MessagesProvider._ID)));
+        i.putExtra(MessagesProvider.KEY_TYPE, localCursor.getInt(localCursor.getColumnIndex(MessagesProvider.KEY_TYPE)));
+        i.putExtra(MessagesProvider.KEY_TITLE, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_TITLE)));
+        i.putExtra(MessagesProvider.KEY_CONTENT, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_CONTENT)));
+        i.putExtra(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME)));
+        i.putExtra(MessagesProvider.KEY_ATTACHMENT_PATH, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_PATH)));
 
-        c.close();
+        localCursor.close();
         startActivityForResult(i, ACTIVITY_EDIT_MESSAGE);
 
     }
@@ -611,7 +600,6 @@ public class MainActivity extends ListActivity {
     protected void onListItemClick(ListView l, View v, int position, long id) {
         // We will need to be careful later here about the different uses of position and rowID
         super.onListItemClick(l, v, position, id);
-        //Cursor localCursor = dbCursor;    
         Cursor localCursor = messagesProviderHelper.returnItemByID(id);
         //localCursor.moveToPosition(position);
 
@@ -621,6 +609,7 @@ public class MainActivity extends ListActivity {
         i.putExtra(MessagesProvider.KEY_CONTENT, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_CONTENT)));
         i.putExtra(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME)));
         i.putExtra(MessagesProvider.KEY_ATTACHMENT_PATH, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_PATH)));
+        c.close();
         startActivityForResult(i, ACTIVITY_VIEW_MESSAGE);
         localCursor.close();
     }
@@ -681,31 +670,30 @@ public class MainActivity extends ListActivity {
         }
 
 
-        //startManagingCursor(dbCursor);
-
         TextView tv;
         tv = (TextView) findViewById(R.id.message_list_item);
         
         String[] from = new String[] {MessagesProvider.KEY_TITLE, MessagesProvider.KEY_CONTENT, MessagesProvider.KEY_MINE, MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME};
         String[] projection = new String[] {MessagesProvider._ID, MessagesProvider.KEY_TITLE, MessagesProvider.KEY_CONTENT, MessagesProvider.KEY_MINE, MessagesProvider.KEY_ATTACHMENT_PATH, MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME};
         int[] to = new int[] {R.id.message_list_item, R.id.message_list_data, R.id.message_list_item_icon, R.id.message_list_attachment};
-
+        
         if (viewType == 0) {
             // Get the non-blacklisted messages
-            dbCursor = managedQuery(MessagesProvider.ALL_NOBLACKLIST_URI, projection, null, null, null);
+            c = messagesProviderHelper.allNoBlacklist();
         } else if (viewType == 1) {
-            dbCursor = managedQuery(MessagesProvider.OUTGOING_URI, projection, null, null, null);
+            c = messagesProviderHelper.outgoing();
         } else if (viewType == 2) {
-            dbCursor = managedQuery(MessagesProvider.BLACKLIST_URI, projection, null, null, null);
+            c = messagesProviderHelper.blacklist();
         }
 
-        SimpleCursorAdapter messagesAdapter = new SimpleCursorAdapter(getApplicationContext(), R.layout.message_list_item, dbCursor, from, to);
+        SimpleCursorAdapter messagesAdapter = new SimpleCursorAdapter(this, R.layout.message_list_item, c, from, to);
         ListView lv;
         lv = (ListView) getListView();
         lv.setSelection(0);
 
         messagesAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
             public boolean setViewValue(View view, Cursor cursor, int i) {
+            
                 if (i == cursor.getColumnIndex(MessagesProvider.KEY_CONTENT)) {
                     String fullMessage = cursor.getString(i);
                     TextView tv = (TextView) view;
@@ -753,6 +741,6 @@ public class MainActivity extends ListActivity {
         });
 
         setListAdapter(messagesAdapter);
-        
+
     }
 }

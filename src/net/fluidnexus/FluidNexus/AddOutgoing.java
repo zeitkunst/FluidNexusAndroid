@@ -42,17 +42,14 @@ import android.widget.TextView;
 
 import java.io.File;
 
-/*
- * TODO
- * * create menu for saving message
- * * capture back button so that we can warn user if they haven't saved a changed message
- */
+import net.fluidnexus.FluidNexus.provider.MessagesProviderHelper;
+
 public class AddOutgoing extends Activity {
 
     private static Logger log = Logger.getLogger("FluidNexus"); 
     private EditText titleEditText;
     private EditText messageEditText;
-    private MessagesDbAdapter dbAdapter;  
+    private MessagesProviderHelper messagesProviderHelper = null;
 
     // Activity result codes
     private static final int SELECT_TEXT = 0;
@@ -71,8 +68,7 @@ public class AddOutgoing extends Activity {
     protected void onCreate(Bundle icicle) {
 
         super.onCreate(icicle);
-        dbAdapter = new MessagesDbAdapter(this);
-        dbAdapter.open();
+        messagesProviderHelper = new MessagesProviderHelper(this);
 
         setContentView(R.layout.message_edit);
         setTitle(R.string.message_add_outgoing_title);
@@ -256,10 +252,10 @@ public class AddOutgoing extends Activity {
 
 
         if (attachmentPath == null) {
-            dbAdapter.add_new(0, title, message);
+            messagesProviderHelper.add_new(0, title, message);
         } else {
             File file = new File(attachmentPath);
-            dbAdapter.add_new(attachmentType, title, message, attachmentPath, file.getName());
+            messagesProviderHelper.add_new(attachmentType, title, message, attachmentPath, file.getName());
         }
 
     }
