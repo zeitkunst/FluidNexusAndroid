@@ -107,4 +107,11 @@ BLUETOOTH SIMULATION: For the purposes of this competition, I have simulated Blu
 MESSAGE FORWARDING: Right now we only implement broadcast-style forwarding; future versions will allow the creation of pre-defined groups for more limited distribution.  The forwarding algorithm works by reappropriating the advertisement of Bluetooth services to advertise hashes of already-received messages.  This is similar to what many insects do in the wild, by leaving traces of prior activity in an area, known as stigmergy.  Thus messages leave traces of where they\'ve been, via the advertisement of their hashes, thus greatly increasing the efficiency of this broadcast-style forwarding algorithm.  For more information, please see the PDF documentation available online ( http://fluidnexus.net/media/pdf/FluidNexusAndroid.pdf ).
     </string>
 
+    <string name="ro_perm_label">read messages</string>
+    <string name="ro_perm_desc">Allows applications to read messages from the Fluid Nexus content provider.</string>
+    <string name="wo_perm_label">write messages</string>
+    <string name="wo_perm_desc">Allows applications to write messages to the Fluid Nexus content provider.</string>
+    <string name="bt_perm_label">start bluetooth service</string>
+    <string name="bt_perm_desc">Allows applications to start bluetooth service via intent.</string>
+
 </resources>
