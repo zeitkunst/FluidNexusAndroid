@@ -140,13 +140,10 @@ public class EditMessage extends Activity {
         attachmentSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView adapter, View v, int i, long l) {
-                // TODO
-                // Make this less brittle...
                 if (i == 0) {
                     attachmentType = SELECT_TEXT;
                 } else if (i == 1) {
                     attachmentType = SELECT_AUDIO;
-
                 } else if (i == 2) {
                     attachmentType = SELECT_IMAGE;
                 } else if (i == 3) {
@@ -288,8 +285,6 @@ public class EditMessage extends Activity {
 
     /**
      * Check if the text has changed
-     * TODO is this going to be inefficient for very large bodies of text?
-     * There is a problem with using the TextWatcher, as it is called even for events not from the keyboard.  Not sure how to use this otherwise.
      * @return true if it has, false otherwise
      */
     private boolean checkIfTextChanged() {

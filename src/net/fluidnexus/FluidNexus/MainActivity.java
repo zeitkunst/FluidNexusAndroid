@@ -71,7 +71,6 @@ import net.fluidnexus.FluidNexus.provider.MessagesProvider;
 import net.fluidnexus.FluidNexus.provider.MessagesProviderHelper;
 /*
  * TODO
- * * deal with the database somehow not being open when we receive the MSG_NEW_MESSAGE_RECEIVED message after an orientation change.  This is totally opaque to me.
  * * deal with new binding to the service when clicking on the notification; this shouldn't happen
  */
 
@@ -256,8 +255,6 @@ public class MainActivity extends ListActivity {
 
                     messagesProviderHelper.deleteById(currentRowID);
 
-                    // TODO
-                    // move to instance method
                     try {
                         // Send message to service to note that a new message has been created
                         Message msg = Message.obtain(null, MSG_MESSAGE_DELETED);
@@ -470,8 +467,6 @@ public class MainActivity extends ListActivity {
 
     /**
      * Open up a new activity to edit the message
-     * TODO
-     * Only edit messages that are outgoing
      */
     private void editMessage() {
 
@@ -621,8 +616,6 @@ public class MainActivity extends ListActivity {
                 fillListView(VIEW_MODE);
                 break;
             case(ACTIVITY_ADD_OUTGOING):
-                // TODO
-                // move this to an instance method
                 try {
                     // Send message to service to note that a new message has been created
                     Message msg = Message.obtain(null, MSG_NEW_MESSAGE_CREATED);

@@ -74,12 +74,8 @@ import net.fluidnexus.FluidNexus.provider.MessagesProviderHelper;
 
 /*
  * TODO
- * * Ensure multiple threads are opened for multiple hosts running the software
- * * * Figure out why it doesn't see any services for mooplop
  * * See if it's possible to manually enter paired devices to speed up creation of the network
  * * Abstract the sending of data over to sockets so that it works with any modality (zeroconf, ad-hoc, etc.)
- * * Setup 3 threads: one server (listen), one client for discovery, one client for paired devices
- * * * There's something about the paired logic below that doesn't quite work right...
  * * Improve error handling dramatically
  */
 
@@ -514,9 +510,8 @@ public class BluetoothServiceVer3 extends Service {
             currentHashes.clear();
 
             while (hashesCursor.isAfterLast() == false) {
-                // TODO
-                // change this to get the item based on the column name
-                currentHashes.add(hashesCursor.getString(1));
+                // Get the hash from the cursor
+                currentHashes.add(hashesCursor.getString(hashesCursor.getColumnIndex(MessagesProvider.KEY_MESSAGE_HASH)));
                 hashesCursor.moveToNext();
             }
             hashesCursor.close();
@@ -828,6 +823,9 @@ public class BluetoothServiceVer3 extends Service {
             try {
                 int messageSize = inputStream.readInt();
                 byte[] messagesArray = new byte[messageSize];
+                
+                // TODO
+                // Read this in in chunks, update progress bar in notification
                 inputStream.readFully(messagesArray, 0, messageSize);
 
                 Protos.FluidNexusMessages messages = Protos.FluidNexusMessages.parseFrom(messagesArray);
@@ -842,12 +840,6 @@ public class BluetoothServiceVer3 extends Service {
                         File attachmentsDir = new File(dataDir.getAbsolutePath() + "/FluidNexusAttachments");
                         attachmentsDir.mkdirs();
                         
-                        // Open up a file for writing
-                        /* message_attachment_path = os.path.join(self.attachmentsDir, message_hash)
-                         *                     attachmentFP = open(message_attachment_path, "wb")
-                         *                                         attachmentFP.write(message.message_attachment)
-                         *                                                             attachmentFP.close()
-                         */
                         String message_hash = messagesProviderHelper.makeSHA256(message.getMessageTitle() + message.getMessageContent());
 
                         String filenameArray[] = message.getMessageAttachmentOriginalFilename().split("\\.");
@@ -969,6 +961,9 @@ public class BluetoothServiceVer3 extends Service {
                 writeCommand(MESSAGES);
                 outputStream.writeInt(messagesSerializedLength);
                 outputStream.flush();
+
+                // TODO
+                // Write this out via chunks, update progress bar in intent
                 outputStream.write(messagesSerialized, 0, messagesSerializedLength);
                 outputStream.flush();
 
@@ -990,8 +985,6 @@ public class BluetoothServiceVer3 extends Service {
             while (getConnectedState() != STATE_QUIT) {
                 switch(getConnectedState()) {
                     case STATE_WRITE_HELO:
-                        // TODO
-                        // better error handling
                         writeCommand(HELO);
                         setConnectedState(STATE_READ_HELO);
                         break;

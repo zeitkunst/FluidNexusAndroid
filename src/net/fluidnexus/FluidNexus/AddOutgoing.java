@@ -89,8 +89,6 @@ public class AddOutgoing extends Activity {
         attachmentSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView adapter, View v, int i, long l) {
-                // TODO
-                // Make this less brittle...
                 if (i == 0) {
                     attachmentType = SELECT_TEXT;
                 } else if (i == 1) {
