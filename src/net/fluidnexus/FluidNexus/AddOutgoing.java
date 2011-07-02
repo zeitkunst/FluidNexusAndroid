@@ -32,6 +32,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -39,6 +40,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 
@@ -220,13 +222,19 @@ public class AddOutgoing extends Activity {
      */
     private AlertDialog saveDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Do you want to save this message?")
+        builder.setMessage(R.string.really_save_dialog)
             .setCancelable(false)
             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    saveState();
-                    setResult(RESULT_OK);
-                    finish();
+                    int result = saveState();
+                    if (result != 0) {
+                        setResult(RESULT_OK);
+                        finish();
+                    } else {
+                        Toast t = Toast.makeText(getApplicationContext(), R.string.same_dialog, Toast.LENGTH_LONG);
+                        t.setGravity(Gravity.CENTER, 0, 0);
+                        t.show();
+                    }
                 }
             })
             .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -242,10 +250,17 @@ public class AddOutgoing extends Activity {
     /**
      * Save our state to the database
      */
-    private void saveState() {
+    private int saveState() {
         String title = titleEditText.getText().toString();
         String message = messageEditText.getText().toString();
-
+        
+        String message_hash = MessagesProviderHelper.makeSHA256(title + message);
+        Cursor c = messagesProviderHelper.returnItemBasedOnHash(message_hash);
+        if (c.getCount() != 0) {
+            c.close();
+            return 0;
+        }
+        c.close();
 
         if (attachmentPath == null) {
             messagesProviderHelper.add_new(0, title, message);
@@ -254,6 +269,7 @@ public class AddOutgoing extends Activity {
             messagesProviderHelper.add_new(attachmentType, title, message, attachmentPath, file.getName());
         }
 
+        return 1;
     }
 
 }

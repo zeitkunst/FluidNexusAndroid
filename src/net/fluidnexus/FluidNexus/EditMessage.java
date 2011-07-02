@@ -37,6 +37,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -45,6 +46,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 
@@ -66,6 +68,8 @@ public class EditMessage extends Activity {
     private static final int SELECT_VIDEO = 3;
 
     private static final int DIALOG_SAVE = 0;
+    private static final int DIALOG_SAME = 1;
+    private int DIALOG_RESULT = -1;
 
     private int attachmentType = SELECT_TEXT;
     private Uri attachmentUri = null;
@@ -259,7 +263,7 @@ public class EditMessage extends Activity {
     /**
      * Save the state of our edited message in the database
      */
-    private void saveState() {
+    private int saveState() {
         String title = titleEditText.getText().toString();
         String message = messageEditText.getText().toString();
 
@@ -279,8 +283,8 @@ public class EditMessage extends Activity {
                 values.put(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME, file.getName());
             }
         }
-        
-        messagesProviderHelper.updateItemByID(id, values);
+
+        return messagesProviderHelper.updateItemByID(id, values);
     }
 
     /**
@@ -330,20 +334,25 @@ public class EditMessage extends Activity {
      */
     private AlertDialog saveDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Do you want to save this message?")
+        builder.setMessage(R.string.really_save_dialog)
             .setCancelable(false)
             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    saveState();
-                    setResult(RESULT_OK);
-                    finish();
+                    int result = saveState();
+                    if (result != 0) {
+                        setResult(RESULT_OK);
+                        finish();
+                    } else {
+                        Toast t = Toast.makeText(getApplicationContext(), R.string.same_dialog, Toast.LENGTH_LONG);
+                        t.setGravity(Gravity.CENTER, 0, 0);
+                        t.show();
+                    }
                 }
             })
             .setNegativeButton("No", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     setResult(RESULT_OK);
                     finish();
-
                 }    
             });
         return builder.create();

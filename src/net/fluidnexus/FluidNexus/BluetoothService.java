@@ -221,6 +221,7 @@ public class BluetoothService extends Service {
                     break;
                 case MSG_UNREGISTER_CLIENT:
                     log.debug("Removing client: " + msg.replyTo);
+                    clients.remove(msg.replyTo);
                     break;
                 case MSG_BLUETOOTH_SCAN_FREQUENCY:
                     log.debug("Changing scan frequency to: " + msg.arg1);

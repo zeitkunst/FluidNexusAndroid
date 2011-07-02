@@ -226,6 +226,14 @@ public class MessagesProviderHelper {
      */
     public int updateItemByID(long id, ContentValues cv) {
         Uri uri = ContentUris.withAppendedId(MessagesProvider.MESSAGES_URI_ID_BASE, id);
+
+        Cursor c = returnItemBasedOnHash(cv.getAsString(MessagesProvider.KEY_MESSAGE_HASH));
+        if (c.getCount() != 0) {
+            c.close();
+            return 0;
+        }
+        c.close();
+
         return cr.update(uri, cv, null, null);
 
     }
