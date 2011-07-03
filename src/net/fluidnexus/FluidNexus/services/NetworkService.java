@@ -78,7 +78,6 @@ import net.fluidnexus.FluidNexus.R;
 /*
  * TODO
  * * See if it's possible to manually enter paired devices to speed up creation of the network
- * * Abstract the sending of data over to sockets so that it works with any modality (zeroconf, ad-hoc, etc.)
  * * Improve error handling dramatically
  */
 
@@ -119,8 +118,10 @@ public class NetworkService extends Service {
     public static final int MSG_UNREGISTER_CLIENT = 0x11;
     public static final int MSG_NEW_MESSAGE_RECEIVED = 0x20;
     public static final int MSG_BLUETOOTH_SCAN_FREQUENCY = 0x30;
+    public static final int MSG_ZEROCONF_SCAN_FREQUENCY = 0x40;
 
-    private int scanFrequency = 120;
+    private int bluetoothScanFrequency = 120;
+    private int zeroconfScanFrequency = 120;
 
     // Target we publish for clients to send messages to
     final Messenger messenger = new Messenger(new IncomingHandler());
@@ -227,9 +228,14 @@ public class NetworkService extends Service {
                     clients.remove(msg.replyTo);
                     break;
                 case MSG_BLUETOOTH_SCAN_FREQUENCY:
-                    log.debug("Changing scan frequency to: " + msg.arg1);
-                    scanFrequency = msg.arg1;
+                    log.debug("Changing bluetooth scan frequency to: " + msg.arg1);
+                    bluetoothScanFrequency = msg.arg1;
                     break;
+                case MSG_ZEROCONF_SCAN_FREQUENCY:
+                    log.debug("Changing zeroconf scan frequency to: " + msg.arg1);
+                    zeroconfScanFrequency = msg.arg1;
+                    break;
+
                 case MainActivity.MSG_NEW_MESSAGE_CREATED:
                     if (serviceThread != null) {
                         serviceThread.updateHashes();
@@ -604,8 +610,8 @@ public class NetworkService extends Service {
 
         private void waitService() {
             try {
-                log.debug("Service thread sleeping for " + scanFrequency + " seconds...");
-                this.sleep(scanFrequency * 1000);
+                log.debug("Service thread sleeping for " + bluetoothScanFrequency + " seconds...");
+                this.sleep(bluetoothScanFrequency * 1000);
             } catch (InterruptedException e) {
                 log.error("Thread sleeping interrupted: " + e);
             }

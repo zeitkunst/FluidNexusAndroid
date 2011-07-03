@@ -61,7 +61,7 @@ import net.fluidnexus.FluidNexus.provider.MessagesProviderHelper;
 import net.fluidnexus.FluidNexus.Logger;
 import net.fluidnexus.FluidNexus.Protos;
 
-public class ServiceThread extends Thread {
+public class ProtocolThread extends Thread {
     private static Logger log = Logger.getLogger("FluidNexus"); 
     public Socket socket = null;
     public DataInputStream inputStream = null;
@@ -120,7 +120,7 @@ public class ServiceThread extends Thread {
     public static final int CONNECT_THREAD_FINISHED = 0x30;
     public static final int UPDATE_HASHES = 0x31;
 
-    public ServiceThread(Context ctx, Handler givenHandler, ArrayList<Messenger> givenClients) {
+    public ProtocolThread(Context ctx, Handler givenHandler, ArrayList<Messenger> givenClients) {
         threadHandler = givenHandler;
 
         clients = givenClients;

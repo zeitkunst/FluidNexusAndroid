@@ -66,7 +66,7 @@ import net.fluidnexus.FluidNexus.Logger;
  * TODO
  * probably need to move some of the socket creation bits to another part of the class
  */
-public class BluetoothClientThread extends ServiceThread {
+public class BluetoothClientThread extends ProtocolThread {
     private static Logger log = Logger.getLogger("FluidNexus"); 
     private final BluetoothSocket socket;
     private final BluetoothDevice device;
@@ -178,7 +178,7 @@ public class BluetoothClientThread extends ServiceThread {
         // TODO
         // seems like this could potentially be a race condition...
         log.info("Closing the socket and ending the thread");
-        Message msg = threadHandler.obtainMessage(ServiceThread.CONNECT_THREAD_FINISHED);
+        Message msg = threadHandler.obtainMessage(ProtocolThread.CONNECT_THREAD_FINISHED);
         Bundle bundle = new Bundle();
         bundle.putString("address", device.getAddress());
         msg.setData(bundle);
