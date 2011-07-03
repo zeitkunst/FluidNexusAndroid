@@ -33,6 +33,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -231,7 +232,11 @@ public class AddOutgoing extends Activity {
                         setResult(RESULT_OK);
                         finish();
                     } else {
-                        Toast t = Toast.makeText(getApplicationContext(), R.string.same_dialog, Toast.LENGTH_LONG);
+                        LayoutInflater inflater = getLayoutInflater();
+                        View toastRoot = inflater.inflate(R.layout.toast_same_warning, null);
+                        Toast t = new Toast(getApplicationContext());
+                        t.setView(toastRoot);
+                        t.setDuration(Toast.LENGTH_LONG);
                         t.setGravity(Gravity.CENTER, 0, 0);
                         t.show();
                     }
