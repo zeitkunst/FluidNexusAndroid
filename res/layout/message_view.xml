@@ -23,13 +23,20 @@ android:textSize="16sp"
 android:layout_alignParentLeft="true"
 >
 </TextView>
+<ImageView
+    android:id="@+id/view_message_attachment_icon"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:scaleType="center"
+android:layout_below="@+id/view_message_title"
+    android:src="@drawable/attachment_icon" />
 <Button
 android:id="@+id/view_message_attachment"
 android:layout_width="wrap_content"
 android:layout_height="wrap_content"
 android:text="View Attachment"
-android:layout_alignParentLeft="true"
 android:layout_below="@+id/view_message_title"
+android:layout_toRightOf="@+id/view_message_attachment_icon"
 >
 </Button>
 </RelativeLayout>

@@ -339,7 +339,7 @@ public class EditMessage extends Activity {
             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     int result = saveState();
-                    if (result != 0) {
+                    if ((result != 0)) {
                         setResult(RESULT_OK);
                         finish();
                     } else {

@@ -28,6 +28,7 @@ import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import net.fluidnexus.FluidNexus.provider.MessagesProvider;
@@ -52,6 +53,7 @@ public class ViewMessage extends Activity {
         titleTextView = (TextView) findViewById(R.id.view_message_title);
         messageTextView = (TextView) findViewById(R.id.view_message_data);
         Button viewAttachmentButton = (Button) findViewById(R.id.view_message_attachment);
+        ImageView attachmentIconView = (ImageView) findViewById(R.id.view_message_attachment_icon);
 
 
 
@@ -72,6 +74,7 @@ public class ViewMessage extends Activity {
 
             if (attachment_path.equals("")) {
                 viewAttachmentButton.setVisibility(View.GONE);
+                attachmentIconView.setVisibility(View.GONE);
             } else {
                 viewAttachmentButton.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View view) {
