@@ -69,7 +69,7 @@
     <string name="intent_send_messages_completed">net.fluidnexus.FluidNexus.SEND_MESSAGES_COMPLETED</string>
     <string name="service_started">Fluid Nexus service started</string>
     <string name="service_stopped">Fluid Nexus service stopped</string>
-    <string name="service_label">Fluid Nexus Bluetooth service</string>
+    <string name="service_label">Fluid Nexus Network service</string>
     <string name="preferences">Fluid Nexus Preferences</string>
     <string name="preferences_category_interface">Interface</string>
     <string name="preferences_category_network">Network</string>
@@ -113,7 +113,12 @@ MESSAGE FORWARDING: Right now we only implement broadcast-style forwarding; futu
     <string name="ro_perm_desc">Allows applications to read messages from the Fluid Nexus content provider.</string>
     <string name="wo_perm_label">write messages</string>
     <string name="wo_perm_desc">Allows applications to write messages to the Fluid Nexus content provider.</string>
+    <string name="network_perm_label">start network service</string>
+    <string name="network_perm_desc">Allows applications to start the network service via intent.</string>
+
     <string name="bt_perm_label">start bluetooth service</string>
     <string name="bt_perm_desc">Allows applications to start bluetooth service via intent.</string>
+    <string name="zeroconf_perm_label">start zerconf service</string>
+    <string name="zeroconf_perm_desc">Allows applications to start zeroconf service via intent.</string>
 
 </resources>

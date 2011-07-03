@@ -69,6 +69,7 @@ import java.io.File;
 
 import net.fluidnexus.FluidNexus.provider.MessagesProvider;
 import net.fluidnexus.FluidNexus.provider.MessagesProviderHelper;
+import net.fluidnexus.FluidNexus.services.NetworkService;
 /*
  * TODO
  * * deal with new binding to the service when clicking on the notification; this shouldn't happen
@@ -123,8 +124,8 @@ public class MainActivity extends ListActivity {
     private boolean bound = false;
 
     // Messages to the bluetooth service
-    static final int MSG_NEW_MESSAGE_CREATED = 0xF0;
-    static final int MSG_MESSAGE_DELETED = 0xF1;
+    public static final int MSG_NEW_MESSAGE_CREATED = 0xF0;
+    public static final int MSG_MESSAGE_DELETED = 0xF1;
 
     private boolean showMessages = true;
 
@@ -140,7 +141,7 @@ public class MainActivity extends ListActivity {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case BluetoothService.MSG_NEW_MESSAGE_RECEIVED:
+                case NetworkService.MSG_NEW_MESSAGE_RECEIVED:
                     Toast.makeText(getApplicationContext(), R.string.toast_new_message_received, Toast.LENGTH_LONG).show();
                     fillListView(VIEW_MODE);
                     break;
@@ -154,13 +155,13 @@ public class MainActivity extends ListActivity {
         public void onServiceConnected(ComponentName className, IBinder service) {
             bluetoothService = new Messenger(service);
             try {
-                Message msg = Message.obtain(null, BluetoothService.MSG_REGISTER_CLIENT);
+                Message msg = Message.obtain(null, NetworkService.MSG_REGISTER_CLIENT);
                 msg.replyTo = messenger;
                 bluetoothService.send(msg);
                 log.debug("Connected to service");
 
                 // Send scan frequency on start
-                msg = Message.obtain(null, BluetoothService.MSG_BLUETOOTH_SCAN_FREQUENCY);
+                msg = Message.obtain(null, NetworkService.MSG_BLUETOOTH_SCAN_FREQUENCY);
                 msg.arg1 = Integer.parseInt(prefs.getString("bluetoothScanFrequency", "120"));
                 msg.replyTo = messenger;
                 bluetoothService.send(msg);
@@ -439,7 +440,7 @@ public class MainActivity extends ListActivity {
     private void doBindService() {
         if (bound == false) {
             log.info("Binding to Fluid Nexus Bluetooth Service");
-            Intent i = new Intent(this, BluetoothService.class);
+            Intent i = new Intent(this, NetworkService.class);
             startService(i);
             bindService(i, bluetoothServiceConnection, Context.BIND_AUTO_CREATE);
             bound = true;
@@ -452,7 +453,7 @@ public class MainActivity extends ListActivity {
     private void doUnbindService() {
         if (bluetoothService != null) {
             try {
-                Message msg = Message.obtain(null, BluetoothService.MSG_UNREGISTER_CLIENT);
+                Message msg = Message.obtain(null, NetworkService.MSG_UNREGISTER_CLIENT);
                 msg.replyTo = messenger;
                 bluetoothService.send(msg);
             } catch (RemoteException e) {
@@ -507,14 +508,14 @@ public class MainActivity extends ListActivity {
                     boolean tmp = prefs.getBoolean("enableBluetoothServicePref", true);
 
                     if (tmp) {
-                        startService(new Intent(BluetoothService.class.getName()));
+                        startService(new Intent(NetworkService.class.getName()));
                     } else {
-                        stopService(new Intent(BluetoothService.class.getName()));
+                        stopService(new Intent(NetworkService.class.getName()));
                     }
                     enableBluetoothServicePref = tmp;
                 } else if (key.equals("bluetoothScanFrequency")) {
                     try {
-                        Message msg = Message.obtain(null, BluetoothService.MSG_BLUETOOTH_SCAN_FREQUENCY);
+                        Message msg = Message.obtain(null, NetworkService.MSG_BLUETOOTH_SCAN_FREQUENCY);
                         msg.arg1 = Integer.parseInt(prefs.getString("bluetoothScanFrequency", "5"));
                         msg.replyTo = messenger;
                         bluetoothService.send(msg);

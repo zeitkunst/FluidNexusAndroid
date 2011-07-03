@@ -12,15 +12,15 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"></uses-permission>
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"></uses-permission>
     <uses-permission android:name="android.permission.VIBRATE"></uses-permission>
-    <uses-permission android:name="net.fluidnexus.FluidNexus.permission.BLUETOOTH_SERVICE"></uses-permission>
+    <uses-permission android:name="net.fluidnexus.FluidNexus.permission.NETWORK_SERVICE"></uses-permission>
 
     <uses-feature android:name="android.hardware.bluetooth" android:required="false"/>
     <uses-feature android:name="android.hardware.wifi" android:required="false"/>
 
-    <permission android:name="net.fluidnexus.FluidNexus.permission.BLUETOOTH_SERVICE"
+    <permission android:name="net.fluidnexus.FluidNexus.permission.NETWORK_SERVICE"
         android:protectionLevel="dangerous"
-        android:label="@string/bt_perm_label"
-        android:description="@string/bt_perm_desc" />
+        android:label="@string/network_perm_label"
+        android:description="@string/network_perm_desc" />
 
     <permission android:name="net.fluidnexus.FluidNexus.permission.READ_ONLY"
         android:protectionLevel="dangerous"
@@ -46,11 +46,11 @@
         <activity android:name=".AddOutgoing"></activity>
         <activity android:name=".Help"></activity>
         <activity android:name=".EditMessage"></activity>
-        <service android:name=".BluetoothService"
+        <service android:name=".services.NetworkService"
             android:process=":remote"
-            android:permission="net.fluidnexus.FluidNexus.permission.BLUETOOTH_SERVICE">
+            android:permission="net.fluidnexus.FluidNexus.permission.NETWORK_SERVICE">
             <intent-filter>
-                <action android:name="net.fluidnexus.FluidNexus.BluetoothService" />
+                <action android:name="net.fluidnexus.FluidNexus.services.NetworkService" />
             </intent-filter>
         </service>
         <provider

@@ -129,8 +129,8 @@ public class ServiceThread extends Thread {
         // setup database object
         messagesProviderHelper = new MessagesProviderHelper(context);
 
-        updateHashes();
-        updateData();
+        //updateHashes();
+        //updateData();
 
         setConnectedState(STATE_START);
     }
@@ -149,6 +149,19 @@ public class ServiceThread extends Thread {
         outputStream = os;
     }
 
+    /**
+     * Set our hashes
+     */
+    public void setHashes(HashSet<String> givenHashes) {
+        currentHashes = givenHashes;
+    }
+
+    /**
+     * Set our data
+     */
+    public void setData(ArrayList<Vector> givenData) {
+        currentData = givenData;
+    }
 
 
     /**

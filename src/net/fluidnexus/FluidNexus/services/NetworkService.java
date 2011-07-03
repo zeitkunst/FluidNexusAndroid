@@ -17,7 +17,7 @@
  */
 
 
-package net.fluidnexus.FluidNexus;
+package net.fluidnexus.FluidNexus.services;
 
 import java.lang.reflect.Method;
 import java.io.BufferedInputStream;
@@ -71,7 +71,9 @@ import android.widget.Toast;
 
 import net.fluidnexus.FluidNexus.provider.MessagesProvider;
 import net.fluidnexus.FluidNexus.provider.MessagesProviderHelper;
-import net.fluidnexus.FluidNexus.services.BluetoothClientThread;
+import net.fluidnexus.FluidNexus.Logger;
+import net.fluidnexus.FluidNexus.MainActivity;
+import net.fluidnexus.FluidNexus.R;
 
 /*
  * TODO
@@ -80,7 +82,7 @@ import net.fluidnexus.FluidNexus.services.BluetoothClientThread;
  * * Improve error handling dramatically
  */
 
-public class BluetoothService extends Service {
+public class NetworkService extends Service {
     // Logging
     private static Logger log = Logger.getLogger("FluidNexus"); 
 
@@ -270,8 +272,6 @@ public class BluetoothService extends Service {
         // setup database object
         messagesProviderHelper = new MessagesProviderHelper(this);
 
-
-
         // Show a notification regarding the service
         showNotification();
 
@@ -444,15 +444,6 @@ public class BluetoothService extends Service {
         };
 
         /**
-         * Try to connect to our paired devices, first
-         */
-        private void doPairedConnect() {
-            for (BluetoothDevice pairedDevice: pairedDevices) {
-                connect(pairedDevice);
-            }
-        }
-
-        /**
          * Begin the thread, and thus the service main loop
          */
         public void run() {
@@ -497,6 +488,8 @@ public class BluetoothService extends Service {
             // State the thread that connects to the remove device only if we're not already connecting
             //ConnectThread connectThread = new ConnectThread(device, threadHandler);
             BluetoothClientThread connectThread = new BluetoothClientThread(getApplicationContext(), device, threadHandler, clients);
+            connectThread.setHashes(currentHashes);
+            connectThread.setData(currentData);
             connectedDevices.add(device);            
             connectThread.start();
         }
@@ -596,7 +589,9 @@ public class BluetoothService extends Service {
             // Find those new devices that we haven't already connected to
             HashSet<BluetoothDevice> difference = new HashSet<BluetoothDevice>(fnDevicesBT);
             difference.removeAll(connectedDevices);
-
+            
+            updateHashes();
+            updateData();
             for (BluetoothDevice currentDevice : difference) {
                 log.debug("Trying to connect to " + currentDevice.getName() + " with address " + currentDevice.getAddress());
 
