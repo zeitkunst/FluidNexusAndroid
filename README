@@ -23,6 +23,12 @@ On Android, making bluetooth connections to visible (discoverable), but unpaired
 
 Once paired, the device does not have to be visible (discoverable) for the Android phone to connect to it.
 
+= LICENSING =
+
+The google protobuf library is licensed under the BSD 2-Clause license.
+
+The jmdns library is licensed under Apache V2.0 or LGPL and is based on the modified version by twitwi (https://github.com/twitwi/AndroidDnssdDemo).
+
 = TODO =
 
 * Implement a "public" message type (with TTL) that would be sent to a central FN website for a public stream?
