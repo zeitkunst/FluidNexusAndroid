@@ -16,7 +16,6 @@
  *
  */
 
-
 package net.fluidnexus.FluidNexus.services;
 
 import java.lang.reflect.Method;
@@ -251,35 +250,36 @@ public class BluetoothServiceThread extends ServiceThread {
      */
     @Override
     public void run() {
-
-            while (getServiceState() != STATE_QUIT) {
-                switch (getServiceState()) {
-                    case STATE_NONE:
-                        doStateNone();
-                        break;
-                    case STATE_DISCOVERY:
-                        // If we're discovering things, just continue
-                        break;
-                    case STATE_DISCOVERY_FINISHED:
-                        // If there discovery is finished, start trying to connect
-                        //doServiceDiscovery();
-                        fnDevicesBT = allDevicesBT;
-                        setServiceState(STATE_CONNECTING);
-                        break;
-                    case STATE_CONNECTING:
-                        doConnectToDevices();
-                        break;
-                    case STATE_WAIT_FOR_CONNECTIONS:
-                        if (connectedDevices.isEmpty()) {
-                            setServiceState(STATE_SERVICE_WAIT);
-                        }
-                        break;
-                    case STATE_SERVICE_WAIT:
-                        waitService();
-                    default:
-                        break;
-                }
+        
+        while (getServiceState() != STATE_QUIT) {
+            switch (getServiceState()) {
+                case STATE_NONE:
+                    doStateNone();
+                    break;
+                case STATE_DISCOVERY:
+                    // If we're discovering things, just continue
+                    break;
+                case STATE_DISCOVERY_FINISHED:
+                    // If there discovery is finished, start trying to connect
+                    //doServiceDiscovery();
+                    fnDevicesBT = allDevicesBT;
+                    setServiceState(STATE_CONNECTING);
+                    break;
+                case STATE_CONNECTING:
+                    doConnectToDevices();
+                    break;
+                case STATE_WAIT_FOR_CONNECTIONS:
+                    if (connectedDevices.isEmpty()) {
+                        setServiceState(STATE_SERVICE_WAIT);
+                    }
+                    break;
+                case STATE_SERVICE_WAIT:
+                    waitService();
+                    break;
+                default:
+                    break;
             }
+        }
     }
 
     /**

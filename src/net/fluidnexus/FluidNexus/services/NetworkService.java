@@ -94,6 +94,7 @@ public class NetworkService extends Service {
 
 
     private BluetoothServiceThread bluetoothServiceThread = null;
+    private ZeroconfServiceThread zeroconfServiceThread = null;
 
     // keeps track of connected clients
     // will likely always be only a single client, but what the hey
@@ -176,6 +177,14 @@ public class NetworkService extends Service {
                     bluetoothEnabled = msg.arg1;
                     break;
                 case MSG_ZEROCONF_ENABLED:
+                    if (msg.arg1 != zeroconfEnabled) {
+                        if ((msg.arg1 == 1) && (zeroconfServiceThread == null)) {
+                            zeroconfServiceThread = new ZeroconfServiceThread(getApplicationContext(), clients);
+                            log.info("Starting our zeroconf service thread...");
+                            zeroconfServiceThread.start();
+                        } 
+
+                    }
                     zeroconfEnabled = msg.arg1;
                     break;
                 case MainActivity.MSG_NEW_MESSAGE_CREATED:

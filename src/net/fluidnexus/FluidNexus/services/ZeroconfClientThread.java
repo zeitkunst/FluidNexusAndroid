@@ -19,6 +19,8 @@
 
 package net.fluidnexus.FluidNexus.services;
 
+import javax.jmdns.JmDNS;
+import javax.jmdns.ServiceInfo;
 
 import java.lang.reflect.Method;
 import java.io.BufferedInputStream;
@@ -32,6 +34,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 import java.util.ArrayList;
@@ -44,11 +48,10 @@ import java.util.Vector;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothServerSocket;
-import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.wifi.WifiManager;
+import android.net.wifi.WifiManager.MulticastLock;
 import android.os.Environment;
 import android.os.Bundle;
 import android.os.Handler;
@@ -61,22 +64,18 @@ import net.fluidnexus.FluidNexus.provider.MessagesProvider;
 import net.fluidnexus.FluidNexus.provider.MessagesProviderHelper;
 import net.fluidnexus.FluidNexus.Logger;
 
+
 /**
  * Thread that actually sends data to a connected device
- * TODO
- * probably need to move some of the socket creation bits to another part of the class
  */
-public class BluetoothClientThread extends ProtocolThread {
+public class ZeroconfClientThread extends ProtocolThread {
     private static Logger log = Logger.getLogger("FluidNexus"); 
-    private final BluetoothSocket socket;
-    private final BluetoothDevice device;
 
-    //private DataInputStream inputStream = null;
-    //private DataOutputStream outputStream = null;
+    public Socket socket = null;
+    private String host = null;
+    private int port = 0;
 
     private ArrayList<String> hashList = new ArrayList<String>();
-
-    private final Handler threadHandler;
 
     private char connectedState = 0x00;
 
@@ -105,43 +104,26 @@ public class BluetoothClientThread extends ProtocolThread {
     // will likely always be only a single client, but what the hey
     ArrayList<Messenger> clients = new ArrayList<Messenger>();
 
-    public BluetoothClientThread(Context ctx, BluetoothDevice remoteDevice, Handler givenHandler, ArrayList<Messenger> givenClients) {
+
+    public ZeroconfClientThread(Context ctx, Handler givenHandler, ArrayList<Messenger> givenClients, String givenHost, int givenPort) {
+
         super(ctx, givenHandler, givenClients);
-        setName("ConnectThread: " + remoteDevice.getAddress());
-        device = remoteDevice;
-        threadHandler = givenHandler;
-
-        BluetoothSocket tmp = null;
+        setName("ZeroconfClientThread");
         
-        clients = givenClients;
+        host = givenHost;
+        port = givenPort;
 
-        context = ctx;
+        try {
+            socket = new Socket(host, port);
+        } catch (UnknownHostException e) {
+            log.error("Unknown host.");
+            cleanupConnection();
+        } catch (IOException e) {
+            log.error("Unable to create new socket.");
+            cleanupConnection();
+        }
 
         setConnectedState(STATE_START);
-        // Get our socket to the remove device
-        try {
-            tmp = device.createRfcommSocketToServiceRecord(FluidNexusUUID);
-        } catch (IOException e) {
-            log.error("create() failed: " + e);
-            cleanupConnection();
-        }
-
-        // Save our socket
-        socket = tmp;
-
-        // Try to connect
-        try {
-            socket.connect();
-        } catch (IOException e) {
-            // Try to close the socket
-            try {
-                socket.close();
-            } catch (IOException e2) {
-                log.error("unable to close() socket during connection failure: " + e2);
-            }
-            cleanupConnection();
-        }
-
 
         DataInputStream tmpIn = null;
         DataOutputStream tmpOut = null;
@@ -153,9 +135,6 @@ public class BluetoothClientThread extends ProtocolThread {
             log.error("Temp stream sockets not created");
             cleanupConnection();
         }
-
-        //inputStream = tmpIn;
-        //outputStream = tmpOut;
 
         setInputStream(tmpIn);
         setOutputStream(tmpOut);
@@ -172,7 +151,7 @@ public class BluetoothClientThread extends ProtocolThread {
         try {
             socket.close();
         } catch (IOException e) {
-            log.error("close() of ConnectedThread socket failed: " + e);
+            log.error("close() of ZeroconfClientThread socket failed: " + e);
         }
 
         // TODO
@@ -180,18 +159,16 @@ public class BluetoothClientThread extends ProtocolThread {
         log.info("Closing the socket and ending the thread");
         Message msg = threadHandler.obtainMessage(ProtocolThread.CONNECT_THREAD_FINISHED);
         Bundle bundle = new Bundle();
-        bundle.putString("address", device.getAddress());
+        bundle.putString("host", host);
         msg.setData(bundle);
         threadHandler.sendMessage(msg);
         setConnectedState(STATE_QUIT);
     }
 
-    /**
-     * Our thread's run method
-     */
     @Override
     public void run() {
-        log.info("Begin BluetoothClientThread");
+
+        log.info("Begin ZeroconfClientThread");
         
         char command = 0x00;            
         while (super.getConnectedState() != STATE_QUIT) {
@@ -270,8 +247,5 @@ public class BluetoothClientThread extends ProtocolThread {
 
         // We're done here
         cleanupConnection();
-
     }
-
 }
-
