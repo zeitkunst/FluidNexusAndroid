@@ -301,7 +301,7 @@ public class ZeroconfServiceThread extends ServiceThread {
                     }
                     break;
                 case STATE_SERVICE_WAIT:
-                    //waitService();
+                    waitService();
                     break;
                 default:
                     break;
