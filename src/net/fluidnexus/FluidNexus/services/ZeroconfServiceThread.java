@@ -96,6 +96,7 @@ public class ZeroconfServiceThread extends ServiceThread {
     // Our zeroconf type
     private static final String zeroconfServiceName = "Fluid Nexus";
     private static final String zeroconfType = "_fluidnexus._tcp.local.";
+    private static final int zeroconfPort = 17894;
 
     /**
      * Handler that receives information from the threads
@@ -215,7 +216,7 @@ public class ZeroconfServiceThread extends ServiceThread {
             jmdns = JmDNS.create();
 
             if (serverThread != null) {
-                serviceInfo = ServiceInfo.create(zeroconfType, zeroconfServiceName, 0, "Fluid Nexus Zeroconf server for android");
+                serviceInfo = ServiceInfo.create(zeroconfType, zeroconfServiceName, zeroconfPort, "Fluid Nexus Zeroconf server for android");
                 jmdns.registerService(serviceInfo);
             }
             
