@@ -88,20 +88,10 @@ public class NetworkService extends Service {
     // For database access
     private MessagesProviderHelper messagesProviderHelper = null;
 
-    private HashSet<BluetoothDevice> pairedDevices = null;
-
     // Keeping track of items from the database
     private HashSet<String> currentHashes = new HashSet<String>();
     private ArrayList<Vector> currentData = new ArrayList<Vector>();
 
-
-    private HashSet<BluetoothDevice> allDevicesBT = new HashSet<BluetoothDevice>();
-    private HashSet<BluetoothDevice> fnDevicesBT = new HashSet<BluetoothDevice>();
-    private HashSet<BluetoothDevice> connectedDevices = new HashSet<BluetoothDevice>();
-    private Vector<String> device = new Vector<String>();
-
-    private IntentFilter btFoundFilter;
-    private IntentFilter sdpFilter;
 
     private BluetoothServiceThread bluetoothServiceThread = null;
 
@@ -113,9 +103,13 @@ public class NetworkService extends Service {
     public static final int MSG_NEW_MESSAGE_RECEIVED = 0x20;
     public static final int MSG_BLUETOOTH_SCAN_FREQUENCY = 0x30;
     public static final int MSG_ZEROCONF_SCAN_FREQUENCY = 0x40;
+    public static final int MSG_BLUETOOTH_ENABLED = 0x50;
+    public static final int MSG_ZEROCONF_ENABLED = 0x60;
 
     private int bluetoothScanFrequency = 120;
     private int zeroconfScanFrequency = 120;
+    private int bluetoothEnabled = 0;
+    private int zeroconfEnabled = 0;
 
     // Target we publish for clients to send messages to
     final Messenger messenger = new Messenger(new IncomingHandler());
@@ -161,7 +155,29 @@ public class NetworkService extends Service {
                     log.debug("Changing zeroconf scan frequency to: " + msg.arg1);
                     zeroconfScanFrequency = msg.arg1;
                     break;
-
+                case MSG_BLUETOOTH_ENABLED:
+                    if (msg.arg1 != bluetoothEnabled) {
+                        // If the received value is not what we currently have, then we need to start or stop the service
+                        if ((msg.arg1 == 1) && (bluetoothServiceThread == null)) {
+                            bluetoothServiceThread = new BluetoothServiceThread(getApplicationContext(), clients);
+                            log.info("Starting our bluetooth service thread for discovered and paired devices...");
+                            bluetoothServiceThread.start();
+                        } 
+                        /*
+                        else {
+                            // TODO
+                            // this doesn't work as desired
+                            log.info("Stopping bluetooth service thread");
+                            bluetoothServiceThread.cancel();
+                            bluetoothServiceThread = null;
+                        }
+                        */
+                    }
+                    bluetoothEnabled = msg.arg1;
+                    break;
+                case MSG_ZEROCONF_ENABLED:
+                    zeroconfEnabled = msg.arg1;
+                    break;
                 case MainActivity.MSG_NEW_MESSAGE_CREATED:
                     if (bluetoothServiceThread != null) {
                         bluetoothServiceThread.updateHashes();
@@ -193,14 +209,6 @@ public class NetworkService extends Service {
 
         // Show a notification regarding the service
         showNotification();
-
-        if (bluetoothServiceThread == null) {
-            boolean paired = true;
-            bluetoothServiceThread = new BluetoothServiceThread(getApplicationContext(), clients);
-            log.debug("Starting our bluetooth service thread for discovered and paired devices...");
-            bluetoothServiceThread.start();
-        }
-
     }
 
     @Override

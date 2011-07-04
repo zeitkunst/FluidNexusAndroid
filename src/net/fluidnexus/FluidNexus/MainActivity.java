@@ -118,8 +118,8 @@ public class MainActivity extends ListActivity {
     private static final int MENU_HELP_ID = Menu.FIRST + 5;
     private static final int MENU_BLACKLIST_ID = Menu.FIRST + 5;
 
-    // messages from bluetooth service
-    Messenger bluetoothService = null;
+    // messages to/from bluetooth service
+    Messenger networkService = null;
     final Messenger messenger = new Messenger(new IncomingHandler());
     private boolean bound = false;
 
@@ -151,20 +151,38 @@ public class MainActivity extends ListActivity {
         }
     }
 
-    private ServiceConnection bluetoothServiceConnection = new ServiceConnection() {
+    private ServiceConnection networkServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
-            bluetoothService = new Messenger(service);
+            networkService = new Messenger(service);
             try {
                 Message msg = Message.obtain(null, NetworkService.MSG_REGISTER_CLIENT);
                 msg.replyTo = messenger;
-                bluetoothService.send(msg);
+                networkService.send(msg);
                 log.debug("Connected to service");
 
-                // Send scan frequency on start
+                // Send bluetooth scan frequency on start
                 msg = Message.obtain(null, NetworkService.MSG_BLUETOOTH_SCAN_FREQUENCY);
                 msg.arg1 = Integer.parseInt(prefs.getString("bluetoothScanFrequency", "120"));
                 msg.replyTo = messenger;
-                bluetoothService.send(msg);
+                networkService.send(msg);
+
+                // Send zeroconf scan frequency on start
+                msg = Message.obtain(null, NetworkService.MSG_ZEROCONF_SCAN_FREQUENCY);
+                msg.arg1 = Integer.parseInt(prefs.getString("zeroconfScanFrequency", "120"));
+                msg.replyTo = messenger;
+                networkService.send(msg);
+
+                // Send bluetooth enabled bit on start
+                msg = Message.obtain(null, NetworkService.MSG_BLUETOOTH_ENABLED);
+                msg.arg1 = (prefs.getBoolean("enableBluetoothServicePref", false))? 1 : 0;
+                msg.replyTo = messenger;
+                networkService.send(msg);
+
+                // Send zeroconf enabled bit on start
+                msg = Message.obtain(null, NetworkService.MSG_ZEROCONF_ENABLED);
+                msg.arg1 = (prefs.getBoolean("enableZeroconfServicePref", false)) ? 1 : 0;
+                msg.replyTo = messenger;
+                networkService.send(msg);
 
             } catch (RemoteException e) {
                 // Here, the service has crashed even before we were able to connect
@@ -173,7 +191,7 @@ public class MainActivity extends ListActivity {
 
         public void onServiceDisconnected(ComponentName className) {
             // Called when the connection to the service has been unexpectedly closed
-            bluetoothService = null;
+            networkService = null;
             log.debug("Disconnected from service");
         }
 
@@ -259,7 +277,7 @@ public class MainActivity extends ListActivity {
                     try {
                         // Send message to service to note that a new message has been created
                         Message msg = Message.obtain(null, MSG_MESSAGE_DELETED);
-                        bluetoothService.send(msg);
+                        networkService.send(msg);
                     } catch (RemoteException e) {
                         // Here, the service has crashed even before we were able to connect
                     }
@@ -343,17 +361,15 @@ public class MainActivity extends ListActivity {
                 toast.show();
             } else {
                 /*
-                if (bluetoothService == null) {
+                if (networkService == null) {
                     setupFluidNexusBluetoothService();
                 }
                 */
             }
         }
 
-        enableBluetoothServicePref = prefs.getBoolean("enableBluetoothServicePref", true);
-        if (enableBluetoothServicePref) {
-            doBindService();
-        }
+        // Bind to the network service
+        doBindService();
     }
 
     @Override
@@ -439,10 +455,10 @@ public class MainActivity extends ListActivity {
      */
     private void doBindService() {
         if (bound == false) {
-            log.info("Binding to Fluid Nexus Bluetooth Service");
+            log.info("Binding to Fluid Nexus Network Service");
             Intent i = new Intent(this, NetworkService.class);
             startService(i);
-            bindService(i, bluetoothServiceConnection, Context.BIND_AUTO_CREATE);
+            bindService(i, networkServiceConnection, Context.BIND_AUTO_CREATE);
             bound = true;
         }
     }
@@ -451,16 +467,16 @@ public class MainActivity extends ListActivity {
      * Unbind to the service
      */
     private void doUnbindService() {
-        if (bluetoothService != null) {
+        if (networkService != null) {
             try {
                 Message msg = Message.obtain(null, NetworkService.MSG_UNREGISTER_CLIENT);
                 msg.replyTo = messenger;
-                bluetoothService.send(msg);
+                networkService.send(msg);
             } catch (RemoteException e) {
                 // nothing special to do if the service has already stopped for some reason
             }
 
-            unbindService(bluetoothServiceConnection);
+            unbindService(networkServiceConnection);
             log.info("Unbound to the Fluid Nexus Bluetooth Service");
         }
     }
@@ -506,19 +522,22 @@ public class MainActivity extends ListActivity {
             public void onSharedPreferenceChanged(SharedPreferences pref, String key) {
                 if (key.equals("enableBluetoothServicePref")) {
                     boolean tmp = prefs.getBoolean("enableBluetoothServicePref", true);
-
-                    if (tmp) {
-                        startService(new Intent(NetworkService.class.getName()));
-                    } else {
-                        stopService(new Intent(NetworkService.class.getName()));
+                    try {
+                        // Send bluetooth enabled bit
+                        Message msg = Message.obtain(null, NetworkService.MSG_BLUETOOTH_ENABLED);
+                        msg.arg1 = (prefs.getBoolean("enableBluetoothServicePref", false))? 1 : 0;
+                        msg.replyTo = messenger;
+                        networkService.send(msg);
+                        enableBluetoothServicePref = tmp;
+                    } catch (RemoteException e) {
+                        log.error("Unable to send MSG_BLUETOOTH_ENABLED");
                     }
-                    enableBluetoothServicePref = tmp;
                 } else if (key.equals("bluetoothScanFrequency")) {
                     try {
                         Message msg = Message.obtain(null, NetworkService.MSG_BLUETOOTH_SCAN_FREQUENCY);
                         msg.arg1 = Integer.parseInt(prefs.getString("bluetoothScanFrequency", "5"));
                         msg.replyTo = messenger;
-                        bluetoothService.send(msg);
+                        networkService.send(msg);
 
                     } catch (RemoteException e) {
                         log.error("Unable to send scan frequency message: " + e);
@@ -620,7 +639,7 @@ public class MainActivity extends ListActivity {
                 try {
                     // Send message to service to note that a new message has been created
                     Message msg = Message.obtain(null, MSG_NEW_MESSAGE_CREATED);
-                    bluetoothService.send(msg);
+                    networkService.send(msg);
                 } catch (RemoteException e) {
                     // Here, the service has crashed even before we were able to connect
                 }

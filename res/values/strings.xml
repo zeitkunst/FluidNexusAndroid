@@ -74,6 +74,7 @@
     <string name="preferences_category_interface">Interface</string>
     <string name="preferences_category_network">Network</string>
     <string name="preferences_category_bluetooth">Bluetooth</string>
+    <string name="preferences_category_zeroconf">Zeroconf</string>
     <string name="preferences_show_messages">Show messages?</string>
     <string name="preferences_show_messages_summary">Whether or not to show messages in the interface.</string>
     <string name="preferences_enable_bluetooth_service">Bluetooth Service</string>
@@ -84,6 +85,9 @@
     <string name="preferences_enable_adhocwifi_service_summary">Whether or not the Ad-Hoc Wifi service is enabled.  This service will run even when the application has ended.  This feature is under development.</string>
     <string name="preferences_bluetooth_scan_frequency">Scan Frequency</string>
     <string name="preferences_bluetooth_scan_frequency_summary">How often to scan for other devices.  Shorter durations will severely impact battery life.</string>
+    <string name="preferences_zeroconf_scan_frequency">Scan Frequency</string>
+    <string name="preferences_zeroconf_scan_frequency_summary">How often to scan for other devices.  Shorter durations will severely impact battery life.</string>
+
 
     <string name="help_help_text">There are two types of messages in Fluid Nexus.  The first, \"outgoing\", are messages you have created and that are designed to be the first ones sent to other nearby phones.  These are indicated by the icon with the arrow pointing  left, outside of the device.  The second are messages that you have received from other phones; these are indicated by the icon without the arrow.  Your phone will try and send these messages after it has sent all of the messages marked as outgoing.\n
 \n

@@ -18,7 +18,6 @@
         <CheckBoxPreference
             android:title="@string/preferences_enable_zeroconf_service"
             android:defaultValue="true"
-            android:enabled="false"
             android:summary="@string/preferences_enable_zeroconf_service_summary"
             android:key="enableZeroconfServicePref" />
         <CheckBoxPreference
@@ -38,4 +37,14 @@
             android:entries="@array/scan_frequency_names"
             android:entryValues="@array/scan_frequency_values" />
     </PreferenceCategory>
+    <PreferenceCategory android:title="@string/preferences_category_zeroconf">
+        <ListPreference 
+            android:title="@string/preferences_zeroconf_scan_frequency"
+            android:summary="@string/preferences_zeroconf_scan_frequency_summary"
+            android:defaultValue="300"
+            android:key="zeroconfScanFrequency"
+            android:entries="@array/scan_frequency_names"
+            android:entryValues="@array/scan_frequency_values" />
+    </PreferenceCategory>
+
 </PreferenceScreen>
