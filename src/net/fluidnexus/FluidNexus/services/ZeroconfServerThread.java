@@ -34,6 +34,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.ServerSocket;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 import java.util.ArrayList;
@@ -78,6 +79,8 @@ public class ZeroconfServerThread extends ProtocolThread {
 
     private char connectedState = 0x00;
 
+    private ServerSocket serverSocket;
+
     private final char STATE_START = 0x00;
     private final char STATE_WRITE_HELO = 0x10;
     private final char STATE_READ_HELO = 0x20;        
@@ -112,6 +115,8 @@ public class ZeroconfServerThread extends ProtocolThread {
     private MulticastLock lock = null;
     private WifiManager wifiManager = null;
 
+    private static final int ZEROCONF_PORT = 17894;
+
     public ZeroconfServerThread(Context ctx, Handler givenHandler, ArrayList<Messenger> givenClients) {
 
         super(ctx, givenHandler, givenClients);
@@ -119,8 +124,42 @@ public class ZeroconfServerThread extends ProtocolThread {
         wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         lock = wifiManager.createMulticastLock("ZeroconfServerLock");
         lock.setReferenceCounted(true);
-        
-        //advertiseService();
+
+
+        try {
+            serverSocket = new ServerSocket(ZEROCONF_PORT);
+        } catch (IOException e) {
+            log.error("Unable to create new server socket.");
+            cleanupConnection();
+        }
+
+    }
+
+    /**
+     * Do the client accept work
+     */
+    private void doClientAccept() {
+
+        try {
+            socket = serverSocket.accept();
+        } catch (IOException e) {
+            log.debug("Accept failed");
+            cleanupConnection();
+        }
+
+        DataInputStream tmpIn = null;
+        DataOutputStream tmpOut = null;
+
+        try {
+            tmpIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+            tmpOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+        } catch (IOException e) {
+            log.error("Temp stream sockets not created");
+            cleanupConnection();
+        }
+
+        setInputStream(tmpIn);
+        setOutputStream(tmpOut);
     }
 
     /**
@@ -140,10 +179,105 @@ public class ZeroconfServerThread extends ProtocolThread {
         lock.release();
     }
 
+
+    /**
+     * Cleanup the connection and exit out of main loop
+     */
+    @Override
+    public void cleanupConnection() {
+        try {
+            socket.close();
+            serverSocket.close();
+        } catch (IOException e) {
+            log.error("close() of ZeroconfServerThread socket failed: " + e);
+        }
+
+        setConnectedState(STATE_QUIT);
+    }
+
     @Override
     public void run() {
-        while (true) {
 
+        log.info("Begin Zeroconf server thread");
+        
+        char command = 0x00;            
+        while (super.getConnectedState() != STATE_QUIT) {
+            switch(super.getConnectedState()) {
+                case STATE_START:
+                    doClientAccept();
+                    super.setConnectedState(STATE_READ_HELO);
+                    break;
+                case STATE_READ_HELO:
+                    command = readCommand();
+                    if (command != HELO) {
+                        log.error("Received unexpected command: " + command);
+                        cleanupConnection();
+                    } else {
+                        super.setConnectedState(STATE_WRITE_HELO);
+                    }
+                    break;
+                case STATE_WRITE_HELO:
+                    writeCommand(HELO);
+                    super.setConnectedState(STATE_READ_HASHES);
+                    break;
+                case STATE_READ_HASHES:
+                    command = readCommand();
+                    if (command != HASHES) {
+                        log.error("Received unexpected command: " + command);
+                        cleanupConnection();
+                    } else {
+                        readHashes();
+                    }
+                    break;
+                case STATE_WRITE_MESSAGES:
+                    writeMessages();
+                    break;
+                case STATE_READ_SWITCH:
+                    command = readCommand();
+                    if (command != SWITCH) {
+                        log.error("Received unexpected command: " + command);
+                        cleanupConnection();
+                    } else {
+                        super.setConnectedState(STATE_WRITE_DONE);
+                    }
+                    break;
+                case STATE_WRITE_HASHES:
+                    writeHashes();
+                    break;
+                case STATE_READ_MESSAGES:
+                    command = readCommand();
+                    if (command != MESSAGES) {
+                        log.error("Received unexpected command: " + command);
+                        cleanupConnection();
+                    } else {
+                        readMessages();
+                    }
+                    break;
+                case STATE_WRITE_SWITCH:
+                    writeCommand(SWITCH);
+                    super.setConnectedState(STATE_READ_DONE);
+                    break;
+                case STATE_READ_DONE:
+                    command = readCommand();
+                    if (command != DONE) {
+                        log.error("Received unexpected command: " + command);
+                        cleanupConnection();
+                    } else {
+                        super.setConnectedState(STATE_WRITE_DONE);
+                    }
+
+                    break;
+                case STATE_WRITE_DONE:
+                    writeCommand(DONE);
+                    super.setConnectedState(STATE_QUIT);
+                    break;
+                default:
+                    cleanupConnection();
+                    break;
+            }            
         }
+
+        // We're done here
+        cleanupConnection();
     }
 }

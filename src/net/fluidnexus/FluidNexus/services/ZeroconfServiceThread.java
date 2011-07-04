@@ -94,6 +94,7 @@ public class ZeroconfServiceThread extends ServiceThread {
     private WifiManager wifiManager = null;
 
     // Our zeroconf type
+    private static final String zeroconfServiceName = "Fluid Nexus";
     private static final String zeroconfType = "_fluidnexus._tcp.local.";
 
     /**
@@ -127,7 +128,9 @@ public class ZeroconfServiceThread extends ServiceThread {
     public ZeroconfServiceThread(Context ctx, ArrayList<Messenger> givenClients) {
         
         super(ctx, givenClients);
-
+        
+        // TODO
+        // deal with what happens if wifi isn't enabled
         setName("ZeroconfServiceThread");
         wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         lock = wifiManager.createMulticastLock("ZeroconfServiceLock");
@@ -136,19 +139,54 @@ public class ZeroconfServiceThread extends ServiceThread {
         updateHashes();
         updateData();
 
-        /*
-         * skip the server for now...
+
+
         if (serverThread == null) {
+
             serverThread = new ZeroconfServerThread(ctx, threadHandler, clients);
             serverThread.setHashes(currentHashes);
             serverThread.setData(currentData);
             serverThread.start();
         }
-        */
 
         setServiceState(STATE_NONE);
     }
 
+
+    /**
+     * Set the listener for mDNS results
+     */
+    private void setListener() {
+        serviceListener = new ServiceListener() {
+                @Override
+                public void serviceResolved(ServiceEvent ev) {
+                    String additions = "";
+                    if (ev.getInfo().getInetAddresses() != null && ev.getInfo().getInetAddresses().length > 0) {
+                        log.debug("Number of addresses: " + ev.getInfo().getInetAddresses().length);
+                        additions = ev.getInfo().getInetAddresses()[0].getHostAddress();
+                        log.debug("Service resolved: " + ev.getInfo().getQualifiedName() + " port: " + ev.getInfo().getPort() + "; additions: " + additions);
+                        String host = additions;
+                        int port = ev.getInfo().getPort();
+                        // Connect to the device
+                        if (!(ev.getInfo().getQualifiedName().equals(zeroconfServiceName + "." + zeroconfType))) {
+                            connect(host, port);
+                        }
+                    }
+                }
+
+                @Override
+                public void serviceRemoved(ServiceEvent ev) {
+                    log.debug("Service removed: " + ev.getName());
+                }
+
+                @Override
+                public void serviceAdded(ServiceEvent event) {
+                    // required to force serviceResolved to be called again (after the first search)
+                    jmdns.requestServiceInfo(event.getType(), event.getName(), 1);
+                }
+            };
+
+    }
 
     /**
      * Set the state of the bluetooth service
@@ -175,31 +213,14 @@ public class ZeroconfServiceThread extends ServiceThread {
         lock.acquire();
         try {
             jmdns = JmDNS.create();
-            jmdns.addServiceListener(zeroconfType, serviceListener = new ServiceListener() {
-                @Override
-                public void serviceResolved(ServiceEvent ev) {
-                    String additions = "";
-                    if (ev.getInfo().getInetAddresses() != null && ev.getInfo().getInetAddresses().length > 0) {
-                        additions = ev.getInfo().getInetAddresses()[0].getHostAddress();
-                        log.debug("Service resolved: " + ev.getInfo().getQualifiedName() + " port: " + ev.getInfo().getPort() + "; additions: " + additions);
-                        String host = additions;
-                        int port = ev.getInfo().getPort();
-                        // Connect to the device
-                        connect(host, port);
-                    }
-                }
 
-                @Override
-                public void serviceRemoved(ServiceEvent ev) {
-                    log.debug("Service removed: " + ev.getName());
-                }
-
-                @Override
-                public void serviceAdded(ServiceEvent event) {
-                    // required to force serviceResolved to be called again (after the first search)
-                    jmdns.requestServiceInfo(event.getType(), event.getName(), 1);
-                }
-            });
+            if (serverThread != null) {
+                serviceInfo = ServiceInfo.create(zeroconfType, zeroconfServiceName, 0, "Fluid Nexus Zeroconf server for android");
+                jmdns.registerService(serviceInfo);
+            }
+            
+            setListener();
+            jmdns.addServiceListener(zeroconfType, serviceListener);
             setServiceState(STATE_WAIT_FOR_CONNECTIONS);
         } catch (IOException e) {
             log.error("Some sort of problem trying to start our service listeners.");
@@ -223,6 +244,8 @@ public class ZeroconfServiceThread extends ServiceThread {
     }
 
     private void waitService() {
+        jmdns.removeServiceListener(zeroconfType, serviceListener);
+        serviceListener = null;
         lock.release();
         try {
             log.debug("Service thread sleeping for " + getScanFrequency() + " seconds...");
@@ -232,6 +255,32 @@ public class ZeroconfServiceThread extends ServiceThread {
         }
 
         setServiceState(STATE_NONE);
+    }
+
+    /**
+     * Unregister our service on message to quit
+     */
+    public void unregisterService() {
+        if (jmdns != null) {
+            if (getServiceState() != STATE_SERVICE_WAIT) {
+                lock.acquire();
+            }
+
+            if (serviceListener != null) {
+                jmdns.removeServiceListener(zeroconfType, serviceListener);
+                serviceListener = null;
+            }
+
+            jmdns.unregisterAllServices();
+            try {
+                jmdns.close();
+            } catch (IOException e) {
+                log.error("Unable to close jmdns.");
+            }
+    
+            jmdns = null;
+            lock.release();
+        }
     }
 
     /**
@@ -251,7 +300,7 @@ public class ZeroconfServiceThread extends ServiceThread {
                     }
                     break;
                 case STATE_SERVICE_WAIT:
-                    waitService();
+                    //waitService();
                     break;
                 default:
                     break;

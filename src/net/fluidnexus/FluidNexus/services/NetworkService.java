@@ -250,6 +250,10 @@ public class NetworkService extends Service {
         if (bluetoothServiceThread != null) {
             bluetoothServiceThread.cancel();
         }
+        if (zeroconfServiceThread != null) {
+            zeroconfServiceThread.unregisterService();
+            zeroconfServiceThread.cancel();
+        }
     }
 
 
