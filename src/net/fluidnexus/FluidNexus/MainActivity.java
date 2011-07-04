@@ -160,27 +160,17 @@ public class MainActivity extends ListActivity {
                 networkService.send(msg);
                 log.debug("Connected to service");
 
-                // Send bluetooth scan frequency on start
-                msg = Message.obtain(null, NetworkService.MSG_BLUETOOTH_SCAN_FREQUENCY);
-                msg.arg1 = Integer.parseInt(prefs.getString("bluetoothScanFrequency", "120"));
-                msg.replyTo = messenger;
-                networkService.send(msg);
-
-                // Send zeroconf scan frequency on start
-                msg = Message.obtain(null, NetworkService.MSG_ZEROCONF_SCAN_FREQUENCY);
-                msg.arg1 = Integer.parseInt(prefs.getString("zeroconfScanFrequency", "120"));
-                msg.replyTo = messenger;
-                networkService.send(msg);
-
                 // Send bluetooth enabled bit on start
                 msg = Message.obtain(null, NetworkService.MSG_BLUETOOTH_ENABLED);
                 msg.arg1 = (prefs.getBoolean("enableBluetoothServicePref", false))? 1 : 0;
+                msg.arg2 = Integer.parseInt(prefs.getString("bluetoothScanFrequency", "120"));
                 msg.replyTo = messenger;
                 networkService.send(msg);
 
                 // Send zeroconf enabled bit on start
                 msg = Message.obtain(null, NetworkService.MSG_ZEROCONF_ENABLED);
                 msg.arg1 = (prefs.getBoolean("enableZeroconfServicePref", false)) ? 1 : 0;
+                msg.arg2 = Integer.parseInt(prefs.getString("zeroconfScanFrequency", "120"));
                 msg.replyTo = messenger;
                 networkService.send(msg);
 

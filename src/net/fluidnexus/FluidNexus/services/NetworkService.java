@@ -107,8 +107,6 @@ public class NetworkService extends Service {
     public static final int MSG_BLUETOOTH_ENABLED = 0x50;
     public static final int MSG_ZEROCONF_ENABLED = 0x60;
 
-    private int bluetoothScanFrequency = 120;
-    private int zeroconfScanFrequency = 120;
     private int bluetoothEnabled = 0;
     private int zeroconfEnabled = 0;
 
@@ -150,17 +148,22 @@ public class NetworkService extends Service {
                     break;
                 case MSG_BLUETOOTH_SCAN_FREQUENCY:
                     log.debug("Changing bluetooth scan frequency to: " + msg.arg1);
-                    bluetoothScanFrequency = msg.arg1;
+                    if (bluetoothServiceThread != null) {
+                        bluetoothServiceThread.setScanFrequency(msg.arg1);
+                    }
                     break;
                 case MSG_ZEROCONF_SCAN_FREQUENCY:
                     log.debug("Changing zeroconf scan frequency to: " + msg.arg1);
-                    zeroconfScanFrequency = msg.arg1;
+                    if (zeroconfServiceThread != null) {
+                        zeroconfServiceThread.setScanFrequency(msg.arg1);
+                    }
                     break;
                 case MSG_BLUETOOTH_ENABLED:
                     if (msg.arg1 != bluetoothEnabled) {
                         // If the received value is not what we currently have, then we need to start or stop the service
                         if ((msg.arg1 == 1) && (bluetoothServiceThread == null)) {
                             bluetoothServiceThread = new BluetoothServiceThread(getApplicationContext(), clients);
+                            bluetoothServiceThread.setScanFrequency(msg.arg2);
                             log.info("Starting our bluetooth service thread for discovered and paired devices...");
                             bluetoothServiceThread.start();
                         } 
@@ -180,6 +183,7 @@ public class NetworkService extends Service {
                     if (msg.arg1 != zeroconfEnabled) {
                         if ((msg.arg1 == 1) && (zeroconfServiceThread == null)) {
                             zeroconfServiceThread = new ZeroconfServiceThread(getApplicationContext(), clients);
+                            zeroconfServiceThread.setScanFrequency(msg.arg2);
                             log.info("Starting our zeroconf service thread...");
                             zeroconfServiceThread.start();
                         } 
@@ -192,6 +196,12 @@ public class NetworkService extends Service {
                         bluetoothServiceThread.updateHashes();
                         bluetoothServiceThread.updateData();
                     }
+
+                    if (zeroconfServiceThread != null) {
+                        zeroconfServiceThread.updateHashes();
+                        zeroconfServiceThread.updateData();
+                    }
+
                     log.debug("MSG_NEW_MESSAGE_CREATED received");
                     break;
                 case MainActivity.MSG_MESSAGE_DELETED:
@@ -200,6 +210,12 @@ public class NetworkService extends Service {
                         bluetoothServiceThread.updateHashes();
                         bluetoothServiceThread.updateData();
                     }
+
+                    if (zeroconfServiceThread != null) {
+                        zeroconfServiceThread.updateHashes();
+                        zeroconfServiceThread.updateData();
+                    }
+
                     break;
                 default:
                     super.handleMessage(msg);

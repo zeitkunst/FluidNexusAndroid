@@ -165,20 +165,21 @@ public class ZeroconfClientThread extends ProtocolThread {
         setConnectedState(STATE_QUIT);
     }
 
+    // TODO
+    // Change to pass a function to a method in the superclass that would call our own cleanupConnection
     @Override
     public void run() {
-
-        log.info("Begin ZeroconfClientThread");
+        log.info("Begin Zeroconf client thread");
         
         char command = 0x00;            
         while (super.getConnectedState() != STATE_QUIT) {
             switch(super.getConnectedState()) {
                 case STATE_WRITE_HELO:
-                    super.writeCommand(HELO);
+                    writeCommand(HELO);
                     super.setConnectedState(STATE_READ_HELO);
                     break;
                 case STATE_READ_HELO:
-                    command = super.readCommand();
+                    command = readCommand();
                     if (command != HELO) {
                         log.error("Received unexpected command: " + command);
                         cleanupConnection();
@@ -187,37 +188,37 @@ public class ZeroconfClientThread extends ProtocolThread {
                     }
                     break;
                 case STATE_WRITE_HASHES:
-                    super.writeHashes();
+                    writeHashes();
                     break;
                 case STATE_READ_MESSAGES:
-                    command = super.readCommand();
+                    command = readCommand();
                     if (command != MESSAGES) {
                         log.error("Received unexpected command: " + command);
                         cleanupConnection();
                     } else {
-                        super.readMessages();
+                        readMessages();
                     }
 
                     break;
                 case STATE_WRITE_SWITCH:
-                    super.writeCommand(SWITCH);
+                    writeCommand(SWITCH);
                     super.setConnectedState(STATE_READ_HASHES);
                     break;
                 case STATE_READ_HASHES:
-                    command = super.readCommand();
+                    command = readCommand();
                     if (command != HASHES) {
                         log.error("Received unexpected command: " + command);
                         cleanupConnection();
                     } else {
-                        super.readHashes();
+                        readHashes();
                     }
 
                     break;
                 case STATE_WRITE_MESSAGES:
-                    super.writeMessages();
+                    writeMessages();
                     break;
                 case STATE_READ_SWITCH:
-                    command = super.readCommand();
+                    command = readCommand();
                     if (command != SWITCH) {
                         log.error("Received unexpected command: " + command);
                         cleanupConnection();
@@ -226,11 +227,11 @@ public class ZeroconfClientThread extends ProtocolThread {
                     }
                     break;
                 case STATE_WRITE_DONE:
-                    super.writeCommand(DONE);
+                    writeCommand(DONE);
                     super.setConnectedState(STATE_READ_DONE);
                     break;
                 case STATE_READ_DONE:
-                    command = super.readCommand();
+                    command = readCommand();
                     if (command != DONE) {
                         log.error("Received unexpected command: " + command);
                         cleanupConnection();

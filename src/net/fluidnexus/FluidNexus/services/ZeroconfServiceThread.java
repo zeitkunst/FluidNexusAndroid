@@ -223,6 +223,7 @@ public class ZeroconfServiceThread extends ServiceThread {
     }
 
     private void waitService() {
+        lock.release();
         try {
             log.debug("Service thread sleeping for " + getScanFrequency() + " seconds...");
             this.sleep(getScanFrequency() * 1000);
