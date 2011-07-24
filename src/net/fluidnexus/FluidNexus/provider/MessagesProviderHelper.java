@@ -27,16 +27,16 @@ public class MessagesProviderHelper {
             float now = (float) (System.currentTimeMillis()/1000);        
             add_new(0,
                 "Witness to the event",
-                "I saw them being taken away in the car--just swooped up like that.  (This is an example of a message we have created that is just marked as 'outgoing'.  The system can be easily used for spreading personal testimonials like this one.)");
-            add_received(0, now,
+                "I saw them being taken away in the car--just swooped up like that.  (This is an example of a message we have created that is just marked as 'outgoing'.  The system can be easily used for spreading personal testimonials like this one.)", false, 0);
+            add_received(0, now, now,
                "Schedule a meeting",
-                "We need to schedule a meeting soon.  Send a message around with the title [S] and good times to meet.  (This is an example of using the system to surreptitiously spread information about covert meetings.)");
-            add_received(0, now,
+                "We need to schedule a meeting soon.  Send a message around with the title [S] and good times to meet.  (This is an example of using the system to surreptitiously spread information about covert meetings.)", false, 0);
+            add_received(0, now, now,
                 "Building materials",
-                "Some 2x4's and other sundry items seen around Walker Terrace.  (In the aftermath of a disaster, knowing where there might be temporary sources of material is very important.)");
-            add_received(0, now,
+                "Some 2x4's and other sundry items seen around Walker Terrace.  (In the aftermath of a disaster, knowing where there might be temporary sources of material is very important.)", false, 0);
+            add_received(0, now, now,
                 "Universal Declaration of Human Rights",
-                "All human beings are born free and equal in dignity and rights.They are endowed with reason and conscience and should act towards one another in a spirit of brotherhood.  (In repressive regimes the system could be used to spread texts or other media that would be considered subversive.).  Everyone is entitled to all the rights and freedoms set forth in this Declaration, without distinction of any kind, such as race, colour, sex, language, religion, political or other opinion, national or social origin, property, birth or other status. Furthermore, no distinction shall be made on the basis of the political, jurisdictional or international status of the country or territory to which a person belongs, whether it be independent, trust, non-self-governing or under any other limitation of sovereignty....");
+                "All human beings are born free and equal in dignity and rights.They are endowed with reason and conscience and should act towards one another in a spirit of brotherhood.  (In repressive regimes the system could be used to spread texts or other media that would be considered subversive.).  Everyone is entitled to all the rights and freedoms set forth in this Declaration, without distinction of any kind, such as race, colour, sex, language, religion, political or other opinion, national or social origin, property, birth or other status. Furthermore, no distinction shall be made on the basis of the political, jurisdictional or international status of the country or territory to which a person belongs, whether it be independent, trust, non-self-governing or under any other limitation of sovereignty....", false, 0);
 
     }
 
@@ -58,6 +58,16 @@ public class MessagesProviderHelper {
             c.moveToFirst();
             return c;
     }
+
+    /**
+     * Get our public messages
+     */
+    public Cursor publicMessages() {
+            Cursor c = cr.query(MessagesProvider.PUBLIC_URI, MessagesProvider.ALL_PROJECTION, null, null, null);
+            c.moveToFirst();
+            return c;
+    }
+
 
     /**
      * Get our outgoing messages
@@ -93,8 +103,10 @@ public class MessagesProviderHelper {
      * @param type Type of the message
      * @param title Title of the message
      * @param content Content of the message
+     * @param publicMessage Whether or not the message is public (to be posted to the Nexus)
+     * @param ttl TTL of the public message (defualt 0)
      */
-    public Uri add_new(int type, String title, String content) {
+    public Uri add_new(int type, String title, String content, boolean publicMessage, int ttl) {
 
         float now = (float) (System.currentTimeMillis()/1000);
         ContentValues values = new ContentValues();
@@ -103,10 +115,13 @@ public class MessagesProviderHelper {
         values.put(MessagesProvider.KEY_CONTENT, content);
         values.put(MessagesProvider.KEY_MESSAGE_HASH, makeSHA256(title + content));
         values.put(MessagesProvider.KEY_TIME, now);
+        values.put(MessagesProvider.KEY_RECEIVED_TIME, now);
         values.put(MessagesProvider.KEY_ATTACHMENT_PATH, "");
         values.put(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME, "");
         values.put(MessagesProvider.KEY_MINE, 1);
         values.put(MessagesProvider.KEY_BLACKLIST, 0);
+        values.put(MessagesProvider.KEY_PUBLIC, publicMessage);
+        values.put(MessagesProvider.KEY_TTL, ttl);
 
         return cr.insert(MessagesProvider.MESSAGES_URI, values);
     }
@@ -119,10 +134,13 @@ public class MessagesProviderHelper {
      * @param content Content of the message
      * @param attachment_path Path to the (local) attachment
      * @param attachment_original_filename Original filename of attachment
+     * @param publicMessage Whether or not the message is public (to be posted to the Nexus)
+     * @param ttl TTL of the public message (defualt 0)
+
      */
     public Uri add_new(int type,
             String title,
-            String content, String attachment_path, String attachment_original_filename) {
+            String content, String attachment_path, String attachment_original_filename, boolean publicMessage, int ttl) {
 
         float now = (float) (System.currentTimeMillis()/1000);
 
@@ -132,10 +150,13 @@ public class MessagesProviderHelper {
         values.put(MessagesProvider.KEY_CONTENT, content);
         values.put(MessagesProvider.KEY_MESSAGE_HASH, makeSHA256(title + content));
         values.put(MessagesProvider.KEY_TIME, now);
+        values.put(MessagesProvider.KEY_RECEIVED_TIME, now);
         values.put(MessagesProvider.KEY_ATTACHMENT_PATH, attachment_path);
         values.put(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME, attachment_original_filename);
         values.put(MessagesProvider.KEY_MINE, 1);
         values.put(MessagesProvider.KEY_BLACKLIST, 0);
+        values.put(MessagesProvider.KEY_PUBLIC, publicMessage);
+        values.put(MessagesProvider.KEY_TTL, ttl);
 
         return cr.insert(MessagesProvider.MESSAGES_URI, values);
     }
@@ -145,8 +166,10 @@ public class MessagesProviderHelper {
      * @param type Type of the message
      * @param title Title of the message
      * @param content Content of the message
-     */
-    public Uri add_received(int type, float now, String title, String content) {
+     * @param publicMessage Whether or not the message is public (to be posted to the Nexus)
+     * @param ttl TTL of the public message (defualt 0)
+    */
+    public Uri add_received(int type, float now, float received_time, String title, String content, boolean publicMessage, int ttl) {
 
         ContentValues values = new ContentValues();
         values.put(MessagesProvider.KEY_TYPE, 0);
@@ -154,10 +177,13 @@ public class MessagesProviderHelper {
         values.put(MessagesProvider.KEY_CONTENT, content);
         values.put(MessagesProvider.KEY_MESSAGE_HASH, makeSHA256(title + content));
         values.put(MessagesProvider.KEY_TIME, now);
+        values.put(MessagesProvider.KEY_RECEIVED_TIME, received_time);
         values.put(MessagesProvider.KEY_ATTACHMENT_PATH, "");
         values.put(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME, "");
         values.put(MessagesProvider.KEY_MINE, 0);
         values.put(MessagesProvider.KEY_BLACKLIST, 0);
+        values.put(MessagesProvider.KEY_PUBLIC, publicMessage);
+        values.put(MessagesProvider.KEY_TTL, ttl);
 
         return cr.insert(MessagesProvider.MESSAGES_URI, values);
 
@@ -170,11 +196,12 @@ public class MessagesProviderHelper {
      * @param content Content of the message
      * @param attachment_path Path to the (local) attachment
      * @param attachment_original_filename Original filename of attachment
-
+     * @param publicMessage Whether or not the message is public (to be posted to the Nexus)
+     * @param ttl TTL of the public message (defualt 0)
      */
-    public Uri add_received(int type, float timestamp,
+    public Uri add_received(int type, float timestamp, float received_timestamp,
             String title,
-            String content, String attachment_path, String attachment_original_filename) {
+            String content, String attachment_path, String attachment_original_filename, boolean publicMessage, int ttl) {
     
         ContentValues values = new ContentValues();
         values.put(MessagesProvider.KEY_TYPE, type);
@@ -182,10 +209,13 @@ public class MessagesProviderHelper {
         values.put(MessagesProvider.KEY_CONTENT, content);
         values.put(MessagesProvider.KEY_MESSAGE_HASH, makeSHA256(title + content));
         values.put(MessagesProvider.KEY_TIME, timestamp);
+        values.put(MessagesProvider.KEY_RECEIVED_TIME, received_timestamp);
         values.put(MessagesProvider.KEY_ATTACHMENT_PATH, attachment_path);
         values.put(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME, attachment_original_filename);
         values.put(MessagesProvider.KEY_MINE, 0);
         values.put(MessagesProvider.KEY_BLACKLIST, 0);
+        values.put(MessagesProvider.KEY_PUBLIC, publicMessage);
+        values.put(MessagesProvider.KEY_TTL, ttl);
 
         return cr.insert(MessagesProvider.MESSAGES_URI, values);
     }

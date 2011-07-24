@@ -380,6 +380,13 @@ public final class Protos {
     public boolean hasMessageTimestamp() { return hasMessageTimestamp; }
     public float getMessageTimestamp() { return messageTimestamp_; }
     
+    // optional float message_received_timestamp = 10;
+    public static final int MESSAGE_RECEIVED_TIMESTAMP_FIELD_NUMBER = 10;
+    private boolean hasMessageReceivedTimestamp;
+    private float messageReceivedTimestamp_ = 0F;
+    public boolean hasMessageReceivedTimestamp() { return hasMessageReceivedTimestamp; }
+    public float getMessageReceivedTimestamp() { return messageReceivedTimestamp_; }
+    
     // optional string message_hash = 4;
     public static final int MESSAGE_HASH_FIELD_NUMBER = 4;
     private boolean hasMessageHash;
@@ -400,6 +407,20 @@ public final class Protos {
     private boolean messageMine_ = false;
     public boolean hasMessageMine() { return hasMessageMine; }
     public boolean getMessageMine() { return messageMine_; }
+    
+    // optional bool message_public = 16;
+    public static final int MESSAGE_PUBLIC_FIELD_NUMBER = 16;
+    private boolean hasMessagePublic;
+    private boolean messagePublic_ = false;
+    public boolean hasMessagePublic() { return hasMessagePublic; }
+    public boolean getMessagePublic() { return messagePublic_; }
+    
+    // optional int32 message_ttl = 17 [default = 0];
+    public static final int MESSAGE_TTL_FIELD_NUMBER = 17;
+    private boolean hasMessageTtl;
+    private int messageTtl_ = 0;
+    public boolean hasMessageTtl() { return hasMessageTtl; }
+    public int getMessageTtl() { return messageTtl_; }
     
     // optional .FluidNexus.FluidNexusMessage.MessageType message_type = 7;
     public static final int MESSAGE_TYPE_FIELD_NUMBER = 7;
@@ -459,6 +480,15 @@ public final class Protos {
       if (hasMessageAttachmentOriginalFilename()) {
         output.writeString(9, getMessageAttachmentOriginalFilename());
       }
+      if (hasMessageReceivedTimestamp()) {
+        output.writeFloat(10, getMessageReceivedTimestamp());
+      }
+      if (hasMessagePublic()) {
+        output.writeBool(16, getMessagePublic());
+      }
+      if (hasMessageTtl()) {
+        output.writeInt32(17, getMessageTtl());
+      }
     }
     
     private int memoizedSerializedSize = -1;
@@ -502,6 +532,18 @@ public final class Protos {
       if (hasMessageAttachmentOriginalFilename()) {
         size += com.google.protobuf.CodedOutputStream
           .computeStringSize(9, getMessageAttachmentOriginalFilename());
+      }
+      if (hasMessageReceivedTimestamp()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(10, getMessageReceivedTimestamp());
+      }
+      if (hasMessagePublic()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(16, getMessagePublic());
+      }
+      if (hasMessageTtl()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(17, getMessageTtl());
       }
       memoizedSerializedSize = size;
       return size;
@@ -656,6 +698,9 @@ public final class Protos {
         if (other.hasMessageTimestamp()) {
           setMessageTimestamp(other.getMessageTimestamp());
         }
+        if (other.hasMessageReceivedTimestamp()) {
+          setMessageReceivedTimestamp(other.getMessageReceivedTimestamp());
+        }
         if (other.hasMessageHash()) {
           setMessageHash(other.getMessageHash());
         }
@@ -664,6 +709,12 @@ public final class Protos {
         }
         if (other.hasMessageMine()) {
           setMessageMine(other.getMessageMine());
+        }
+        if (other.hasMessagePublic()) {
+          setMessagePublic(other.getMessagePublic());
+        }
+        if (other.hasMessageTtl()) {
+          setMessageTtl(other.getMessageTtl());
         }
         if (other.hasMessageType()) {
           setMessageType(other.getMessageType());
@@ -732,6 +783,18 @@ public final class Protos {
               setMessageAttachmentOriginalFilename(input.readString());
               break;
             }
+            case 85: {
+              setMessageReceivedTimestamp(input.readFloat());
+              break;
+            }
+            case 128: {
+              setMessagePublic(input.readBool());
+              break;
+            }
+            case 136: {
+              setMessageTtl(input.readInt32());
+              break;
+            }
           }
         }
       }
@@ -797,6 +860,24 @@ public final class Protos {
         return this;
       }
       
+      // optional float message_received_timestamp = 10;
+      public boolean hasMessageReceivedTimestamp() {
+        return result.hasMessageReceivedTimestamp();
+      }
+      public float getMessageReceivedTimestamp() {
+        return result.getMessageReceivedTimestamp();
+      }
+      public Builder setMessageReceivedTimestamp(float value) {
+        result.hasMessageReceivedTimestamp = true;
+        result.messageReceivedTimestamp_ = value;
+        return this;
+      }
+      public Builder clearMessageReceivedTimestamp() {
+        result.hasMessageReceivedTimestamp = false;
+        result.messageReceivedTimestamp_ = 0F;
+        return this;
+      }
+      
       // optional string message_hash = 4;
       public boolean hasMessageHash() {
         return result.hasMessageHash();
@@ -854,6 +935,42 @@ public final class Protos {
       public Builder clearMessageMine() {
         result.hasMessageMine = false;
         result.messageMine_ = false;
+        return this;
+      }
+      
+      // optional bool message_public = 16;
+      public boolean hasMessagePublic() {
+        return result.hasMessagePublic();
+      }
+      public boolean getMessagePublic() {
+        return result.getMessagePublic();
+      }
+      public Builder setMessagePublic(boolean value) {
+        result.hasMessagePublic = true;
+        result.messagePublic_ = value;
+        return this;
+      }
+      public Builder clearMessagePublic() {
+        result.hasMessagePublic = false;
+        result.messagePublic_ = false;
+        return this;
+      }
+      
+      // optional int32 message_ttl = 17 [default = 0];
+      public boolean hasMessageTtl() {
+        return result.hasMessageTtl();
+      }
+      public int getMessageTtl() {
+        return result.getMessageTtl();
+      }
+      public Builder setMessageTtl(int value) {
+        result.hasMessageTtl = true;
+        result.messageTtl_ = value;
+        return this;
+      }
+      public Builder clearMessageTtl() {
+        result.hasMessageTtl = false;
+        result.messageTtl_ = 0;
         return this;
       }
       

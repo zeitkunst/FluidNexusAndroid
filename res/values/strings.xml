@@ -15,11 +15,13 @@
     <string name="message_edit_title">Edit Message (Fluid Nexus)</string>
     <string name="message_view_outgoing_title">View Outgoing Messages (Fluid Nexus)</string>
     <string name="message_list_header_text_all">ALL MESSAGES</string>
+    <string name="message_list_header_text_public">PUBLIC MESSAGES</string>
     <string name="message_list_header_text_outgoing">OUTGOING MESSAGES</string>
     <string name="message_list_header_text_blacklist">BLACKLISTED MESSAGES</string>
     <string name="menu_message_list_context_title">Context menu</string>
     <string name="menu_add_message">Add Outgoing</string>
     <string name="menu_view_all">View All</string>
+    <string name="menu_view_public">View Public</string>
     <string name="menu_view_outgoing">View Outgoing</string>
     <string name="menu_view_blacklist">View Blacklist</string>
     <string name="menu_delete">Delete Message</string>
@@ -75,6 +77,7 @@
     <string name="preferences_category_network">Network</string>
     <string name="preferences_category_bluetooth">Bluetooth</string>
     <string name="preferences_category_zeroconf">Zeroconf</string>
+    <string name="preferences_category_nexus">Nexus</string>
     <string name="preferences_show_messages">Show messages?</string>
     <string name="preferences_show_messages_summary">Whether or not to show messages in the interface.</string>
     <string name="preferences_enable_bluetooth_service">Bluetooth Service</string>
@@ -87,6 +90,12 @@
     <string name="preferences_bluetooth_scan_frequency_summary">How often to scan for other devices.  Shorter durations will severely impact battery life.</string>
     <string name="preferences_zeroconf_scan_frequency">Scan Frequency</string>
     <string name="preferences_zeroconf_scan_frequency_summary">How often to scan for other devices.  Shorter durations will severely impact battery life.</string>
+    <string name="preferences_nexus_key">Nexus Key</string>
+    <string name="preferences_nexus_key_summary">The key provided by to you on the Fluid Nexus website for posting to the Nexus</string>
+    <string name="preferences_nexus_key_title">Nexus Key</string>
+    <string name="preferences_nexus_secret">Nexus Secret</string>
+    <string name="preferences_nexus_secret_summary">The secret provided by to you on the Fluid Nexus website for posting to the Nexus</string>
+    <string name="preferences_nexus_secret_title">Nexus Secret</string>
 
 
     <string name="help_help_text">There are two types of messages in Fluid Nexus.  The first, \"outgoing\", are messages you have created and that are designed to be the first ones sent to other nearby phones.  These are indicated by the icon with the arrow pointing  left, outside of the device.  The second are messages that you have received from other phones; these are indicated by the icon without the arrow.  Your phone will try and send these messages after it has sent all of the messages marked as outgoing.\n

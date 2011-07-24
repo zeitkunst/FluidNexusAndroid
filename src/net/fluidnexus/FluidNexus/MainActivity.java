@@ -194,6 +194,10 @@ public class MainActivity extends ListActivity {
         super.onCreate(icicle);
         log.verbose("unfreezing...");
 
+        if (messagesProviderHelper == null) {
+            messagesProviderHelper = new MessagesProviderHelper(this);
+        }
+
         setContentView(R.layout.message_list);
         registerForContextMenu(getListView());
 
@@ -333,10 +337,6 @@ public class MainActivity extends ListActivity {
     @Override 
     public void onStart() {
         super.onStart();
-
-        if (messagesProviderHelper == null) {
-            messagesProviderHelper = new MessagesProviderHelper(this);
-        }
 
         fillListView(VIEW_MODE);
 
@@ -567,8 +567,18 @@ public class MainActivity extends ListActivity {
                 tv.setText(R.string.message_list_header_text_all);
 
                 return true;
-            case R.id.menu_view_outgoing:
+            case R.id.menu_view_public:
                 VIEW_MODE = 1;
+                fillListView(VIEW_MODE);
+
+                // Update our header text view
+                tv = (TextView) findViewById(R.id.message_list_header_text);
+                tv.setText(R.string.message_list_header_text_public);
+
+                return true;
+
+            case R.id.menu_view_outgoing:
+                VIEW_MODE = 2;
                 fillListView(VIEW_MODE);
 
                 // Update our header text view
@@ -577,7 +587,7 @@ public class MainActivity extends ListActivity {
 
                 return true;
             case R.id.menu_view_blacklist:
-                VIEW_MODE = 2;
+                VIEW_MODE = 3;
                 fillListView(VIEW_MODE);
 
                 // Update our header text view
@@ -671,15 +681,17 @@ public class MainActivity extends ListActivity {
         tv = (TextView) findViewById(R.id.message_list_item);
         
         String[] from = new String[] {MessagesProvider.KEY_TITLE, MessagesProvider.KEY_CONTENT, MessagesProvider.KEY_MINE, MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME};
-        String[] projection = new String[] {MessagesProvider._ID, MessagesProvider.KEY_TITLE, MessagesProvider.KEY_CONTENT, MessagesProvider.KEY_MINE, MessagesProvider.KEY_ATTACHMENT_PATH, MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME};
+        String[] projection = new String[] {MessagesProvider._ID, MessagesProvider.KEY_TITLE, MessagesProvider.KEY_CONTENT, MessagesProvider.KEY_MINE, MessagesProvider.KEY_ATTACHMENT_PATH, MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME, MessagesProvider.KEY_PUBLIC};
         int[] to = new int[] {R.id.message_list_item, R.id.message_list_data, R.id.message_list_item_icon, R.id.message_list_attachment};
         
         if (viewType == 0) {
             // Get the non-blacklisted messages
             c = messagesProviderHelper.allNoBlacklist();
         } else if (viewType == 1) {
-            c = messagesProviderHelper.outgoing();
+            c = messagesProviderHelper.publicMessages();
         } else if (viewType == 2) {
+            c = messagesProviderHelper.outgoing();
+        } else if (viewType == 3) {
             c = messagesProviderHelper.blacklist();
         }
 
@@ -707,12 +719,24 @@ public class MainActivity extends ListActivity {
                 if (i == cursor.getColumnIndex(MessagesProvider.KEY_MINE)) {
                     ImageView iv = (ImageView) view;
                     int mine = cursor.getInt(i);
+                    boolean publicMessage = cursor.getInt(cursor.getColumnIndex(MessagesProvider.KEY_PUBLIC)) > 0;
 
                     if (mine == 0) {
-                        iv.setImageResource(R.drawable.menu_all_list_icon);
+                        if (publicMessage) {
+                            iv.setImageResource(R.drawable.menu_public_other);
+                        } else {
+                            iv.setImageResource(R.drawable.menu_all_list_icon);
+                        }
                     } else if (mine == 1) {
-                        iv.setImageResource(R.drawable.menu_view_list_icon);
+                        if (publicMessage) {
+
+                            iv.setImageResource(R.drawable.menu_public);
+                        } else {
+                            iv.setImageResource(R.drawable.menu_view_list_icon);
+                        }
                     }
+
+                    
                     
                     return true;
                 }

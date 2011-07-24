@@ -46,5 +46,22 @@
             android:entries="@array/scan_frequency_names"
             android:entryValues="@array/scan_frequency_values" />
     </PreferenceCategory>
+    <PreferenceCategory android:title="@string/preferences_category_nexus">
+        <EditTextPreference
+            android:name="@string/preferences_nexus_key"
+            android:summary="@string/preferences_nexus_key_summary"
+            android:defaultValue=""
+            android:maxLength="20"
+            android:title="@string/preferences_nexus_key_title"
+            android:key="nexusKeyPref" />
+        <EditTextPreference
+            android:name="@string/preferences_nexus_secret"
+            android:summary="@string/preferences_nexus_secret_summary"
+            android:defaultValue=""
+            android:maxLength="20"
+            android:title="@string/preferences_nexus_secret_title"
+            android:key="nexusSecretPref" />
+
+    </PreferenceCategory>
 
 </PreferenceScreen>

@@ -194,7 +194,7 @@ public class ProtocolThread extends Thread {
         dataCursor.moveToFirst();
         currentData.clear();
 
-        String[] fields = new String[] {MessagesProvider.KEY_MESSAGE_HASH, MessagesProvider.KEY_TIME, MessagesProvider.KEY_TITLE, MessagesProvider.KEY_CONTENT};
+        String[] fields = new String[] {MessagesProvider.KEY_MESSAGE_HASH, MessagesProvider.KEY_TIME, MessagesProvider.KEY_RECEIVED_TIME, MessagesProvider.KEY_TITLE, MessagesProvider.KEY_CONTENT};
         while (dataCursor.isAfterLast() == false) {
             // I'm still not sure why I have to instantiate a new vector each time here, rather than using the local vector from earlier
             // This is one of those things of java that just makes me want to pull my hair out...
@@ -369,9 +369,9 @@ public class ProtocolThread extends Thread {
 
 
 
-                    messagesProviderHelper.add_received(0, message.getMessageTimestamp(), message.getMessageTitle(), message.getMessageContent(), destinationPath.getAbsolutePath(), message.getMessageAttachmentOriginalFilename());
+                    messagesProviderHelper.add_received(0, message.getMessageTimestamp(), message.getMessageReceivedTimestamp(), message.getMessageTitle(), message.getMessageContent(), destinationPath.getAbsolutePath(), message.getMessageAttachmentOriginalFilename(), message.getMessagePublic(), message.getMessageTtl());
                 } else {
-                    messagesProviderHelper.add_received(0, message.getMessageTimestamp(), message.getMessageTitle(), message.getMessageContent());
+                    messagesProviderHelper.add_received(0, message.getMessageTimestamp(), message.getMessageReceivedTimestamp(), message.getMessageTitle(), message.getMessageContent(), message.getMessagePublic(), message.getMessageTtl());
                 }
                 count += 1;
             }
@@ -437,6 +437,7 @@ public class ProtocolThread extends Thread {
                 String title = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_TITLE));
                 String content = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_CONTENT));
                 Float timestamp = localCursor.getFloat(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_TIME));
+                Float received_timestamp = localCursor.getFloat(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_RECEIVED_TIME));
                 String attachmentPath = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_ATTACHMENT_PATH));
                 String attachmentOriginalFilename = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME));
                 localCursor.close();
@@ -444,6 +445,7 @@ public class ProtocolThread extends Thread {
                 messageBuilder.setMessageTitle(title);
                 messageBuilder.setMessageContent(content);
                 messageBuilder.setMessageTimestamp(timestamp);
+                messageBuilder.setMessageReceivedTimestamp(received_timestamp);
 
                 if (!(attachmentPath.equals(""))) {
                     File file = new File(attachmentPath);

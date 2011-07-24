@@ -52,6 +52,7 @@ public class MessagesProvider extends ContentProvider {
     public static final String SCHEME = "content://";
     public static final String PATH_ALL = "/all";
     public static final String PATH_ALL_NOBLACKLIST = "/allNoBlacklist";
+    public static final String PATH_PUBLIC = "/public";
     public static final String PATH_OUTGOING = "/outgoing";
     public static final String PATH_BLACKLIST = "/blacklist";
     public static final String PATH_MESSAGES = "/messages";
@@ -59,6 +60,7 @@ public class MessagesProvider extends ContentProvider {
     public static final String PATH_HASHES_STRING = "/hashes/";
     public static final Uri ALL_URI = Uri.parse(SCHEME + AUTHORITY + PATH_ALL);
     public static final Uri ALL_NOBLACKLIST_URI = Uri.parse(SCHEME + AUTHORITY + PATH_ALL_NOBLACKLIST);
+    public static final Uri PUBLIC_URI = Uri.parse(SCHEME + AUTHORITY + PATH_PUBLIC);
     public static final Uri OUTGOING_URI = Uri.parse(SCHEME + AUTHORITY + PATH_OUTGOING);
     public static final Uri BLACKLIST_URI = Uri.parse(SCHEME + AUTHORITY + PATH_BLACKLIST);
     public static final Uri MESSAGES_URI = Uri.parse(SCHEME + AUTHORITY + PATH_MESSAGES);
@@ -85,6 +87,7 @@ public class MessagesProvider extends ContentProvider {
     private static final int MESSAGES_ID = 6;
     private static final int HASHES = 7;
     private static final int HASHES_STRING = 8;
+    private static final int PUBLIC = 9;
 
     /**
      * Keys for the database
@@ -95,16 +98,20 @@ public class MessagesProvider extends ContentProvider {
     public static final String KEY_CONTENT = "content";
     public static final String KEY_MESSAGE_HASH= "message_hash";
     public static final String KEY_TIME = "time";
+    public static final String KEY_RECEIVED_TIME = "received_time";
     public static final String KEY_ATTACHMENT_PATH = "attachment_path";
     public static final String KEY_ATTACHMENT_ORIGINAL_FILENAME = "attachment_original_filename";
     public static final String KEY_MINE = "mine";
     public static final String KEY_BLACKLIST = "blacklist";
+    public static final String KEY_PUBLIC = "public";
+    public static final String KEY_TTL = "ttl";
+    public static final String KEY_UPLOADED = "uploaded";
 
     /**
      * All keys for querying
      */
 
-    public static final String[] ALL_PROJECTION = new String[] {_ID, KEY_TYPE, KEY_TITLE, KEY_CONTENT, KEY_MESSAGE_HASH, KEY_TIME, KEY_ATTACHMENT_PATH, KEY_ATTACHMENT_ORIGINAL_FILENAME, KEY_MINE, KEY_BLACKLIST};
+    public static final String[] ALL_PROJECTION = new String[] {_ID, KEY_TYPE, KEY_TITLE, KEY_CONTENT, KEY_MESSAGE_HASH, KEY_TIME, KEY_RECEIVED_TIME, KEY_ATTACHMENT_PATH, KEY_ATTACHMENT_ORIGINAL_FILENAME, KEY_MINE, KEY_BLACKLIST, KEY_PUBLIC, KEY_TTL, KEY_UPLOADED};
 
     /**
      * Hashes keys
@@ -134,6 +141,9 @@ public class MessagesProvider extends ContentProvider {
         // add pattern for all messages without blacklisted ones
         uriMatcher.addURI(AUTHORITY, "allNoBlacklist", ALL_NOBLACKLIST);
 
+        // add pattern for public messages
+        uriMatcher.addURI(AUTHORITY, "public", PUBLIC);
+
         // add pattern for outgoing messages
         uriMatcher.addURI(AUTHORITY, "outgoing", OUTGOING);
 
@@ -160,10 +170,14 @@ public class MessagesProvider extends ContentProvider {
         messagesProjectionMap.put(KEY_CONTENT, KEY_CONTENT);
         messagesProjectionMap.put(KEY_MESSAGE_HASH, KEY_MESSAGE_HASH);
         messagesProjectionMap.put(KEY_TIME, KEY_TIME);
+        messagesProjectionMap.put(KEY_RECEIVED_TIME, KEY_RECEIVED_TIME);
         messagesProjectionMap.put(KEY_ATTACHMENT_PATH, KEY_ATTACHMENT_PATH);
         messagesProjectionMap.put(KEY_ATTACHMENT_ORIGINAL_FILENAME, KEY_ATTACHMENT_ORIGINAL_FILENAME);
         messagesProjectionMap.put(KEY_MINE, KEY_MINE);
         messagesProjectionMap.put(KEY_BLACKLIST, KEY_BLACKLIST);
+        messagesProjectionMap.put(KEY_PUBLIC, KEY_PUBLIC);
+        messagesProjectionMap.put(KEY_TTL, KEY_TTL);
+        messagesProjectionMap.put(KEY_UPLOADED, KEY_UPLOADED);
     }
 
 
@@ -176,7 +190,7 @@ public class MessagesProvider extends ContentProvider {
         private static Logger log = Logger.getLogger("FluidNexus"); 
     
         private static final String DATABASE_CREATE =
-            "create table Messages (_id integer primary key autoincrement, type integer, title text, content text, message_hash text, time float, attachment_path text, attachment_original_filename text, mine bit, blacklist bit default 0);";
+            "create table Messages (_id integer primary key autoincrement, type integer, title text, content text, message_hash text, time float, received_time float, attachment_path text, attachment_original_filename text, mine bit, blacklist bit default 0, public bit default 0, ttl integer default 0, uploaded bit default 0);";
     
         public MessagesDbHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -227,6 +241,12 @@ public class MessagesProvider extends ContentProvider {
                 qb.setProjectionMap(messagesProjectionMap);
                 qb.appendWhere(KEY_BLACKLIST + "=0");
                 break;
+            case PUBLIC:
+                qb.setProjectionMap(messagesProjectionMap);
+                qb.appendWhere(
+                        KEY_PUBLIC + "=1"
+                );
+                break;
             case OUTGOING:
                 qb.setProjectionMap(messagesProjectionMap);
                 qb.appendWhere(
@@ -256,7 +276,7 @@ public class MessagesProvider extends ContentProvider {
         }
 
         if (sortOrder == null) {
-            sortOrder = "time DESC";
+            sortOrder = "received_time DESC";
         }
 
         // Open in read mode since no changes are to be done

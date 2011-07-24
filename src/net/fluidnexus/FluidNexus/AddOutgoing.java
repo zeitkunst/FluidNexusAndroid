@@ -268,10 +268,10 @@ public class AddOutgoing extends Activity {
         c.close();
 
         if (attachmentPath == null) {
-            messagesProviderHelper.add_new(0, title, message);
+            messagesProviderHelper.add_new(0, title, message, false, 0);
         } else {
             File file = new File(attachmentPath);
-            messagesProviderHelper.add_new(attachmentType, title, message, attachmentPath, file.getName());
+            messagesProviderHelper.add_new(attachmentType, title, message, attachmentPath, file.getName(), false, 0);
         }
 
         return 1;
