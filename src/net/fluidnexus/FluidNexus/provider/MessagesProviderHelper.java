@@ -258,7 +258,7 @@ public class MessagesProviderHelper {
         Uri uri = ContentUris.withAppendedId(MessagesProvider.MESSAGES_URI_ID_BASE, id);
 
         Cursor c = returnItemBasedOnHash(cv.getAsString(MessagesProvider.KEY_MESSAGE_HASH));
-        if (c.getCount() == 0) {
+        if (c.getCount() > 0) {
             c.close();
             return 0;
         }
@@ -268,6 +268,28 @@ public class MessagesProviderHelper {
         return 1; 
 
     }
+
+    /**
+     * Mark an item as public
+     */
+    public int setPublic(long id, ContentValues cv) {
+        Uri uri = ContentUris.withAppendedId(MessagesProvider.MESSAGES_URI_ID_BASE, id);
+
+        Cursor c = returnItemBasedOnHash(cv.getAsString(MessagesProvider.KEY_MESSAGE_HASH));
+
+        // Check to see if the message actually exists
+        if (c.getCount() == 0) {
+            c.close();
+            return 0;
+        }
+        c.close();
+
+        // Otherwise, update
+        int result = cr.update(uri, cv, null, null);
+        return 1; 
+
+    }
+
 
     /**
      * Make a SHA-256 hash of the input string
