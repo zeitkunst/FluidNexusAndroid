@@ -54,10 +54,16 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import org.apache.http.NameValuePair;
+import org.apache.http.HttpVersion;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.entity.mime.content.ContentBody;
+import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -189,20 +195,6 @@ public class NexusServiceThread extends ServiceThread {
                         
                         String attachment_path = c.getString(c.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_PATH));
     
-                        if (!attachment_path.equals("")) {
-                            File file = new File(attachment_path);
-                            FileInputStream fin = new FileInputStream(file);
-                            BufferedInputStream bin = new BufferedInputStream(fin);
-                            int length = (int) file.length();
-    
-                            // TODO
-                            // Is there a better way of doing this, other than reading everything in at once?
-                            byte[] data = new byte[length];
-                            bin.read(data, 0, length);
-                            String dataBase64 = Base64.encodeBytes(data);
-                            message.put("message_attachment", dataBase64);
-                            message.put("message_attachment_original_filename", c.getString(c.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME)));
-                        }
     
                         //String serializedMessage = message.toString();
 
@@ -216,21 +208,45 @@ public class NexusServiceThread extends ServiceThread {
                         JSONObject object = new JSONObject(response);
                         String nonce = object.getString("nonce");
 
-                        //HttpParameters p = new HttpParameters();
-                        //TreeSet<String> s = new TreeSet<String>();
-                        //s.add(CALLBACK_URL);
-                        //p.put("message", serializedMessage); 
-                        //consumer.setAdditionalParameters(p);
-
                         // Then, take our nonce and key and put them in the message
                         message.put("message_nonce", nonce);
                         message.put("message_key", key);
+
+                        // Setup our multipart entity
+                        MultipartEntity entity = new MultipartEntity();
+
+                        // Deal with file attachment
+                        if (!attachment_path.equals("")) {
+                            File file = new File(attachment_path);
+                            ContentBody cbFile = new FileBody(file);
+                            entity.addPart("message_attachment", cbFile);
+                            // add the original filename to the message
+                            message.put("message_attachment_original_filename", c.getString(c.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME)));
+
+                            //FileInputStream fin = new FileInputStream(file);
+                            //BufferedInputStream bin = new BufferedInputStream(fin);
+                            //int length = (int) file.length();
+    
+                            // TODO
+                            // Is there a better way of doing this, other than reading everything in at once?
+                            //byte[] data = new byte[length];
+                            //bin.read(data, 0, length);
+                            //String dataBase64 = Base64.encodeBytes(data);
+                        }
+
                         String serializedMessage = message.toString();
+                        ContentBody messageBody = new StringBody(serializedMessage);
+                        entity.addPart("message", messageBody);
+
                         HttpPost message_request = new HttpPost(NEXUS_MESSAGE_URL);
-                        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
-                        nameValuePairs.add(new BasicNameValuePair("message", serializedMessage));
-                        message_request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+                        message_request.setEntity(entity);
+
+                        //List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
+                        //nameValuePairs.add(new BasicNameValuePair("message", serializedMessage));
+                        //message_request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
                         client = new DefaultHttpClient();
+                        client.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+
                         response = client.execute(message_request, new BasicResponseHandler());
                         object = new JSONObject(response);
                         boolean message_result = object.getBoolean("result");
