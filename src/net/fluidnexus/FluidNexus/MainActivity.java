@@ -206,6 +206,23 @@ public class MainActivity extends ListActivity {
                 msg.replyTo = messenger;
                 networkService.send(msg);
 
+                // Send bit for starting nexus service
+                msg = Message.obtain(null, NetworkService.MSG_NEXUS_START);
+                msg.arg1 = (prefs.getBoolean("enableNexusServicePref", false)) ? 1 : 0;
+                // TODO
+                // Make this configurable?
+                //msg.arg2 = Integer.parseInt(prefs.getString("zeroconfScanFrequency", "120"));
+                msg.arg2 = 120;
+                Bundle bundle = new Bundle();
+                bundle.putString("key", prefs.getString("nexusKeyPref", ""));
+                bundle.putString("secret", prefs.getString("nexusSecretPref", ""));
+                bundle.putString("token", prefs.getString("nexusTokenPref", ""));
+                bundle.putString("token_secret", prefs.getString("nexusTokenSecretPref", ""));
+                msg.setData(bundle);
+                msg.replyTo = messenger;
+                networkService.send(msg);
+
+
             } catch (RemoteException e) {
                 // Here, the service has crashed even before we were able to connect
             }

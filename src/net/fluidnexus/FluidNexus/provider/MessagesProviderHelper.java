@@ -258,7 +258,7 @@ public class MessagesProviderHelper {
         Uri uri = ContentUris.withAppendedId(MessagesProvider.MESSAGES_URI_ID_BASE, id);
 
         Cursor c = returnItemBasedOnHash(cv.getAsString(MessagesProvider.KEY_MESSAGE_HASH));
-        if (c.getCount() != 0) {
+        if (c.getCount() == 0) {
             c.close();
             return 0;
         }

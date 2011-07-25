@@ -26,6 +26,11 @@
             android:enabled="false"
             android:summary="@string/preferences_enable_adhocwifi_service_summary"
             android:key="enableAdhocwifiServicePref" />
+        <CheckBoxPreference
+            android:title="@string/preferences_enable_nexus_service"
+            android:defaultValue="true"
+            android:summary="@string/preferences_enable_nexus_service_summary"
+            android:key="enableNexusServicePref" />
 
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/preferences_category_bluetooth">

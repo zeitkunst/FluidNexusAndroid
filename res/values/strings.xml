@@ -89,6 +89,9 @@
     <string name="preferences_enable_zeroconf_service_summary">Whether or not the zeroconf service is enabled.  This service will run even when the application has ended.  This feature is under development.</string>
     <string name="preferences_enable_adhocwifi_service">Ad-Hoc Wifi Service</string>
     <string name="preferences_enable_adhocwifi_service_summary">Whether or not the Ad-Hoc Wifi service is enabled.  This service will run even when the application has ended.  This feature is under development.</string>
+    <string name="preferences_enable_nexus_service">Nexus Service</string>
+    <string name="preferences_enable_nexus_service_summary">Whether or not the application tries to post public messages to the Nexus.  This feature requires some sort of access to the internet over Wifi, but will still run without problems if Wifi is not enabled</string>
+
     <string name="preferences_bluetooth_scan_frequency">Scan Frequency</string>
     <string name="preferences_bluetooth_scan_frequency_summary">How often to scan for other devices.  Shorter durations will severely impact battery life.</string>
     <string name="preferences_zeroconf_scan_frequency">Scan Frequency</string>

@@ -95,6 +95,7 @@ public class NetworkService extends Service {
 
     private BluetoothServiceThread bluetoothServiceThread = null;
     private ZeroconfServiceThread zeroconfServiceThread = null;
+    private NexusServiceThread nexusServiceThread = null;
 
     // keeps track of connected clients
     // will likely always be only a single client, but what the hey
@@ -106,9 +107,11 @@ public class NetworkService extends Service {
     public static final int MSG_ZEROCONF_SCAN_FREQUENCY = 0x40;
     public static final int MSG_BLUETOOTH_ENABLED = 0x50;
     public static final int MSG_ZEROCONF_ENABLED = 0x60;
+    public static final int MSG_NEXUS_START = 0x70;
 
     private int bluetoothEnabled = 0;
     private int zeroconfEnabled = 0;
+    private int nexusEnabled = 0;
 
     // Target we publish for clients to send messages to
     final Messenger messenger = new Messenger(new IncomingHandler());
@@ -190,6 +193,25 @@ public class NetworkService extends Service {
 
                     }
                     zeroconfEnabled = msg.arg1;
+                    break;
+                case MSG_NEXUS_START:
+                    if (msg.arg1 != nexusEnabled) {
+                        if ((msg.arg1 == 1) && (nexusServiceThread == null)) {
+                            Bundle b = msg.getData();
+                            String key = b.getString("key");
+                            String secret = b.getString("secret");
+                            String token = b.getString("token");
+                            String token_secret = b.getString("token_secret");
+                            nexusServiceThread = new NexusServiceThread(getApplicationContext(), clients, key, secret, token, token_secret);
+                            nexusServiceThread.setScanFrequency(msg.arg2);
+                            log.info("Starting our nexus service thread...");
+                            nexusServiceThread.start();
+                        }
+
+                        nexusEnabled = msg.arg1;
+                    }
+
+
                     break;
                 case MainActivity.MSG_NEW_MESSAGE_CREATED:
                     if (bluetoothServiceThread != null) {
