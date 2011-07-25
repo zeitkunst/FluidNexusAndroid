@@ -220,18 +220,9 @@ public class NexusServiceThread extends ServiceThread {
                             File file = new File(attachment_path);
                             ContentBody cbFile = new FileBody(file);
                             entity.addPart("message_attachment", cbFile);
+
                             // add the original filename to the message
                             message.put("message_attachment_original_filename", c.getString(c.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME)));
-
-                            //FileInputStream fin = new FileInputStream(file);
-                            //BufferedInputStream bin = new BufferedInputStream(fin);
-                            //int length = (int) file.length();
-    
-                            // TODO
-                            // Is there a better way of doing this, other than reading everything in at once?
-                            //byte[] data = new byte[length];
-                            //bin.read(data, 0, length);
-                            //String dataBase64 = Base64.encodeBytes(data);
                         }
 
                         String serializedMessage = message.toString();
@@ -241,9 +232,6 @@ public class NexusServiceThread extends ServiceThread {
                         HttpPost message_request = new HttpPost(NEXUS_MESSAGE_URL);
                         message_request.setEntity(entity);
 
-                        //List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
-                        //nameValuePairs.add(new BasicNameValuePair("message", serializedMessage));
-                        //message_request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
                         client = new DefaultHttpClient();
                         client.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
 
