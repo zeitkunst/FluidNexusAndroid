@@ -311,9 +311,10 @@ public class MainActivity extends ListActivity {
                 public void onClick(DialogInterface dialog, int id) {
                     Cursor localCursor = messagesProviderHelper.returnItemByID(currentRowID);
                     String attachmentPath = localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_PATH));
+                    boolean mine = localCursor.getInt(localCursor.getColumnIndex(MessagesProvider.KEY_MINE)) > 0;
                     localCursor.close();
                     
-                    if (!(attachmentPath.equals(""))) {
+                    if ((!(attachmentPath.equals(""))) && (!mine)) {
                         File f = new File(attachmentPath);
                         f.delete();
                     }
