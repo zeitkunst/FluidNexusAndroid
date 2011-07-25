@@ -15,7 +15,7 @@
     <item android:id="@+id/menu_view_public"
         android:title="@string/menu_view_public"
         android:icon="@drawable/menu_public"
-        android:alphabeticShortcut="p" />
+        android:alphabeticShortcut="u" />
     <item android:id="@+id/menu_view_blacklist"
         android:title="@string/menu_view_blacklist"
         android:icon="@drawable/menu_blacklist"
@@ -24,6 +24,9 @@
         android:title="@string/menu_preferences"
         android:icon="@drawable/menu_preferences"
         android:alphabeticShortcut="p" />
+    <item android:id="@+id/menu_request_authorization"
+        android:title="@string/menu_request_authorization"
+        android:alphabeticShortcut="r" />
     <item android:id="@+id/menu_help"
         android:title="@string/menu_help"
         android:icon="@drawable/menu_help"

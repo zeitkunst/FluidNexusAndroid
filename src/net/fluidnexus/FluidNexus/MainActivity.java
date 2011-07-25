@@ -37,6 +37,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -66,6 +67,27 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.TreeSet;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.client.HttpClient;
+import org.apache.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
+
+import oauth.signpost.OAuth;
+import oauth.signpost.OAuthConsumer;
+import oauth.signpost.OAuthProvider;
+import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
+import oauth.signpost.commonshttp.CommonsHttpOAuthProvider;
+import oauth.signpost.exception.OAuthCommunicationException;
+import oauth.signpost.exception.OAuthExpectationFailedException;
+import oauth.signpost.exception.OAuthMessageSignerException;
+import oauth.signpost.exception.OAuthNotAuthorizedException;
+import oauth.signpost.http.HttpParameters;
 
 import net.fluidnexus.FluidNexus.provider.MessagesProvider;
 import net.fluidnexus.FluidNexus.provider.MessagesProviderHelper;
@@ -109,6 +131,7 @@ public class MainActivity extends ListActivity {
     private static final int DIALOG_REALLY_DELETE = 0;
     private static final int DIALOG_REALLY_BLACKLIST = 1;
     private static final int DIALOG_REALLY_UNBLACKLIST = 2;
+    private static final int DIALOG_NO_KEY = 3;
 
     private static final int MENU_ADD_ID = Menu.FIRST;
     private static final int MENU_VIEW_ID = Menu.FIRST + 1;
@@ -133,6 +156,15 @@ public class MainActivity extends ListActivity {
     private boolean enableBluetoothServicePref = true;
 
     private File attachmentsDir = null;
+
+    // oauth constants
+    private static final String API_BASE = "http://192.168.1.36:6543/api/01/";
+    private static final String REQUEST_URL = API_BASE + "request_token/android";
+    private static final String ACCESS_URL = API_BASE + "access_token";
+    private static final String AUTH_URL = API_BASE + "authorize_token/android";
+    private static final String CALLBACK_URL = "fluidnexus://access_token";
+    private static CommonsHttpOAuthConsumer consumer = null;
+    private static CommonsHttpOAuthProvider provider = new CommonsHttpOAuthProvider(REQUEST_URL, ACCESS_URL, AUTH_URL);
 
     /**
      * Our handler for incoming messages
@@ -241,6 +273,9 @@ public class MainActivity extends ListActivity {
             case DIALOG_REALLY_UNBLACKLIST:
                 dialog = reallyUnblacklistDialog();
                 break;
+            case DIALOG_NO_KEY:
+                dialog = noKeyDialog();
+                break;
             default:
                 dialog = null;
         }
@@ -333,6 +368,20 @@ public class MainActivity extends ListActivity {
         return builder.create();
     }
 
+    /**
+     * Method to create our lack of nexus key or secret dialog
+     */
+    private AlertDialog noKeyDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.no_key_dialog)
+            .setCancelable(false)
+            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                }
+            });
+        return builder.create();
+    }
+
 
     @Override 
     public void onStart() {
@@ -370,6 +419,23 @@ public class MainActivity extends ListActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        Uri uri = this.getIntent().getData();
+
+        if (uri != null && uri.toString().startsWith(CALLBACK_URL)) {
+            String token = uri.getQueryParameter("oauth_token");
+            String token_secret = uri.getQueryParameter("oauth_token_secret");
+
+            prefsEditor = prefs.edit();
+            if ((token != null) && (token_secret != null)) {
+                prefsEditor.putString("nexusTokenPref", token);
+                prefsEditor.putString("nexusTokenSecretPref", token_secret);
+                prefsEditor.commit();
+                Toast.makeText(this, R.string.toast_tokens_updated, Toast.LENGTH_LONG).show();
+            } else {
+                log.error("Unable to parse token or token_secret from the uri: " + uri);
+            }
+        }
     }
 
     @Override
@@ -486,6 +552,7 @@ public class MainActivity extends ListActivity {
         i.putExtra(MessagesProvider.KEY_CONTENT, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_CONTENT)));
         i.putExtra(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME)));
         i.putExtra(MessagesProvider.KEY_ATTACHMENT_PATH, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_PATH)));
+        i.putExtra(MessagesProvider.KEY_PUBLIC, localCursor.getInt(localCursor.getColumnIndex(MessagesProvider.KEY_PUBLIC)) > 0);
 
         localCursor.close();
         startActivityForResult(i, ACTIVITY_EDIT_MESSAGE);
@@ -595,7 +662,49 @@ public class MainActivity extends ListActivity {
                 tv.setText(R.string.message_list_header_text_blacklist);
 
                 return true;
+            case R.id.menu_request_authorization:
+                String key = prefs.getString("nexusKeyPref", "");
+                String secret = prefs.getString("nexusSecretPref", "");
 
+                if (key.equals("")) {
+                    showDialog(DIALOG_NO_KEY);
+                    return true;
+                } else {
+
+                    consumer = new CommonsHttpOAuthConsumer(key, secret);
+                    HttpParameters p = new HttpParameters();
+                    TreeSet<String> s = new TreeSet<String>();
+                    s.add(CALLBACK_URL);
+                    p.put("oauth_callback", s); 
+                    //consumer.setAdditionalParameters(p);
+
+                    try {
+                        //HttpPost request = new HttpPost(REQUEST_URL);
+                        //consumer.sign(request);
+                        //HttpClient httpClient = new DefaultHttpClient();
+                        //HttpResponse response = httpClient.execute(request);
+                        //log.debug(EntityUtils.toString(response.getEntity()));
+                        
+                        provider.setOAuth10a(true);
+                        String authURL = provider.retrieveRequestToken(consumer, CALLBACK_URL);
+                        log.debug("URL: " + authURL);
+
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(authURL)));
+                    } catch (OAuthMessageSignerException e) {
+                        log.debug("OAuthMessageSignerException: " + e);
+                    } catch (OAuthExpectationFailedException e) {
+                        log.debug("OAuthExpectationFailedException: " + e);
+                    } catch (OAuthCommunicationException e) {
+                        log.debug("OAuthCommunicationException: " + e);
+                    } catch (OAuthNotAuthorizedException e) {
+                        log.debug("OAuthNotAuthorizedException: " + e);
+                    } 
+                    /*catch (IOException e) {
+                        log.debug("Some sort of error trying to parse result" + e);
+                    }*/
+
+                    return true;
+                }
             case R.id.menu_preferences:
                 editPreferences();
                 return true;

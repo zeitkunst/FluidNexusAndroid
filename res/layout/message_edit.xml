@@ -41,6 +41,11 @@ android:layout_below="@+id/message_text"
 android:layout_alignParentLeft="true"
 >
 </EditText>
+<CheckBox android:id="@+id/public_checkbox"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/message_edit"
+    android:text="@string/public_label"/>
 <TextView
 android:id="@+id/attachment_text"
 android:layout_width="fill_parent"
@@ -48,7 +53,7 @@ android:layout_height="wrap_content"
 android:text="@string/attachment_add_label"
 android:textStyle="bold"
 android:layout_alignParentLeft="true"
-android:layout_below="@+id/message_edit"
+android:layout_below="@+id/public_checkbox"
 >
 </TextView>
 

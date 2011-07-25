@@ -29,10 +29,12 @@
     <string name="menu_unblacklist">Unblacklist Message</string>
     <string name="menu_edit">Edit Message</string>
     <string name="menu_preferences">Preferences</string>
+    <string name="menu_request_authorization">Request Nexus Authorization</string>
     <string name="menu_help">Help + About</string>
     <string name="really_delete_dialog">Are you sure you want to delete this message?</string>
     <string name="really_blacklist_dialog">Are you sure you want to blacklist this message?</string>
     <string name="really_unblacklist_dialog">Are you sure you want to remove this message from the blacklist?</string>
+    <string name="no_key_dialog">No Nexus Key or Nexus Secret exists.  These are necessary in order to request authorization.  Please visit http://fluidnexus.net and create an account (or login to an existing one) and request a Nexus Key and Secret.  If you already have a Key and Secret, please enter them into the Preferences.</string>
     <string name="really_save_dialog">Do you want to save this message?</string>
     <string name="same_dialog">The message you are trying to save already exists in the database; please change the title and/or the content.</string>
     <string name="view_message_back">Back</string>
@@ -41,6 +43,7 @@
     <string name="open_attachment_button_text">Open</string>
     <string name="title_edit_label">Title:</string>
     <string name="message_edit_label">Message:</string>
+    <string name="public_label">Public (push to nexus)?</string>
     <string name="attachment_add_label">Attachment:</string>
     <string name="add_attachment_prompt">Attachment Type</string>
     <string name="add_attachment_button">Add Attachment...</string>
@@ -96,7 +99,13 @@
     <string name="preferences_nexus_secret">Nexus Secret</string>
     <string name="preferences_nexus_secret_summary">The secret provided by to you on the Fluid Nexus website for posting to the Nexus</string>
     <string name="preferences_nexus_secret_title">Nexus Secret</string>
-
+    <string name="preferences_nexus_token">Nexus Token </string>
+    <string name="preferences_nexus_token_summary">The token provided by to you on the Fluid Nexus website for posting to the Nexus.  This should not need to be changed, but is rather added automatically upon pressing "Request authorization token" in the main menu.</string>
+    <string name="preferences_nexus_token_title">Nexus Token</string>
+    <string name="preferences_nexus_token_secret">Nexus Token Secret</string>
+    <string name="preferences_nexus_token_secret_summary">The token secret provided by to you on the Fluid Nexus website for posting to the Nexus.  This should not need to be changed, but is rather added automatically upon pressing "Request authorization token" in the main menu.</string>
+    <string name="preferences_nexus_token_secret_title">Nexus Token Secret</string>
+    <string name="toast_tokens_updated">Tokens updated; application is now authorized to post to the Nexus.</string>
 
     <string name="help_help_text">There are two types of messages in Fluid Nexus.  The first, \"outgoing\", are messages you have created and that are designed to be the first ones sent to other nearby phones.  These are indicated by the icon with the arrow pointing  left, outside of the device.  The second are messages that you have received from other phones; these are indicated by the icon without the arrow.  Your phone will try and send these messages after it has sent all of the messages marked as outgoing.\n
 \n

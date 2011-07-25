@@ -264,7 +264,8 @@ public class MessagesProviderHelper {
         }
         c.close();
 
-        return cr.update(uri, cv, null, null);
+        int result = cr.update(uri, cv, null, null);
+        return 1; 
 
     }
 

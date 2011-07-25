@@ -60,6 +60,7 @@ public class EditMessage extends Activity {
     private static Logger log = Logger.getLogger("FluidNexus"); 
     private EditText titleEditText;
     private EditText messageEditText;
+    private CheckBox checkbox;
     private long id = -1;
 
     // Activity result codes
@@ -82,6 +83,8 @@ public class EditMessage extends Activity {
     String originalMessage = null;
     String originalAttachmentPath = null;
     String originalAttachmentOriginalFilename = null;
+    Boolean originalPublic = null;
+    private boolean publicMessage = false;
 
     @Override
     protected void onCreate(Bundle icicle) {
@@ -97,6 +100,7 @@ public class EditMessage extends Activity {
         titleEditText = (EditText) findViewById(R.id.title_edit);
         messageEditText = (EditText) findViewById(R.id.message_edit);
 
+        checkbox = (CheckBox) findViewById(R.id.public_checkbox);
         Button addAttachmentButton = (Button) findViewById(R.id.add_attachment_button);
         Button removeAttachmentButton = (Button) findViewById(R.id.remove_attachment_button);
         attachmentLabel = (TextView) findViewById(R.id.attachment_label);
@@ -114,6 +118,7 @@ public class EditMessage extends Activity {
             originalAttachmentPath = extras.getString(MessagesProvider.KEY_ATTACHMENT_PATH); 
             originalAttachmentOriginalFilename = extras.getString(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME); 
             originalType = extras.getInt(MessagesProvider.KEY_TYPE); 
+            originalPublic = extras.getBoolean(MessagesProvider.KEY_PUBLIC); 
             attachmentType = originalType;
             
             if (originalTitle != null) {
@@ -133,7 +138,11 @@ public class EditMessage extends Activity {
                     originalAttachmentPath = null;
                 }
             }
-            
+
+            if (originalPublic != null) {
+                checkbox.setChecked(originalPublic);
+            }
+
             attachmentSpinner.setSelection(originalType);
 
         } else {
@@ -191,6 +200,16 @@ public class EditMessage extends Activity {
                 attachmentLabel.setVisibility(View.GONE);
                 attachmentUri = null; 
                 attachmentPath = "";
+            }
+        });
+
+        checkbox.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                if (checkbox.isChecked()) {
+                    publicMessage = true;
+                } else {
+                    publicMessage = false;
+                }
             }
         });
     }
@@ -272,6 +291,7 @@ public class EditMessage extends Activity {
         values.put(MessagesProvider.KEY_TITLE, title);
         values.put(MessagesProvider.KEY_CONTENT, message);
         values.put(MessagesProvider.KEY_MESSAGE_HASH, MessagesProviderHelper.makeSHA256(title + message));
+        values.put(MessagesProvider.KEY_PUBLIC, publicMessage);
 
         if (attachmentPath != null) {
             if (attachmentPath.equals("")) {
@@ -295,6 +315,7 @@ public class EditMessage extends Activity {
     private boolean checkIfTextChanged() {
         String title = titleEditText.getText().toString();
         String message = messageEditText.getText().toString();
+        boolean checked = checkbox.isChecked();
 
         if (!(title.equals(originalTitle))) {
             return true;
@@ -305,6 +326,10 @@ public class EditMessage extends Activity {
         }
 
         if (attachmentPath != originalAttachmentPath) {
+            return true;
+        }
+
+        if (checked != originalPublic) {
             return true;
         }
 

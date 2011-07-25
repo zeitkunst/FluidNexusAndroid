@@ -38,6 +38,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -66,6 +67,7 @@ public class AddOutgoing extends Activity {
     private Uri attachmentUri = null;
     private String attachmentPath = null;
     private TextView attachmentLabel = null;
+    private boolean publicMessage = false;
 
     @Override
     protected void onCreate(Bundle icicle) {
@@ -84,6 +86,7 @@ public class AddOutgoing extends Activity {
         attachmentLabel = (TextView) findViewById(R.id.attachment_label);
         attachmentLabel.setVisibility(View.GONE);
 
+        CheckBox checkbox = (CheckBox) findViewById(R.id.public_checkbox);
         Spinner attachmentSpinner = (Spinner) findViewById(R.id.add_attachment_spinner);
         ArrayAdapter adapter = ArrayAdapter.createFromResource(this, R.array.add_attachment_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -138,6 +141,16 @@ public class AddOutgoing extends Activity {
                 attachmentLabel.setVisibility(View.GONE);
                 attachmentUri = null;
                 attachmentPath = null;
+            }
+        });
+
+        checkbox.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                if (((CheckBox) view).isChecked()) {
+                    publicMessage = true;
+                } else {
+                    publicMessage = false;
+                }
             }
         });
        
@@ -267,11 +280,21 @@ public class AddOutgoing extends Activity {
         }
         c.close();
 
+        // TODO
+        // use defined TTL            
         if (attachmentPath == null) {
-            messagesProviderHelper.add_new(0, title, message, false, 0);
+            if (publicMessage) {
+                messagesProviderHelper.add_new(0, title, message, publicMessage, 30);
+            } else {
+                messagesProviderHelper.add_new(0, title, message, publicMessage, 0);
+            }
         } else {
             File file = new File(attachmentPath);
-            messagesProviderHelper.add_new(attachmentType, title, message, attachmentPath, file.getName(), false, 0);
+            if (publicMessage) {
+                messagesProviderHelper.add_new(attachmentType, title, message, attachmentPath, file.getName(), publicMessage, 30);
+            } else {
+                messagesProviderHelper.add_new(attachmentType, title, message, attachmentPath, file.getName(), publicMessage, 0);
+            }
         }
 
         return 1;

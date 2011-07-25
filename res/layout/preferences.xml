@@ -52,6 +52,7 @@
             android:summary="@string/preferences_nexus_key_summary"
             android:defaultValue=""
             android:maxLength="20"
+            android:numeric="decimal"
             android:title="@string/preferences_nexus_key_title"
             android:key="nexusKeyPref" />
         <EditTextPreference
@@ -59,8 +60,25 @@
             android:summary="@string/preferences_nexus_secret_summary"
             android:defaultValue=""
             android:maxLength="20"
+            android:numeric="decimal"
             android:title="@string/preferences_nexus_secret_title"
             android:key="nexusSecretPref" />
+        <EditTextPreference
+            android:name="@string/preferences_nexus_token"
+            android:summary="@string/preferences_nexus_token_summary"
+            android:defaultValue=""
+            android:maxLength="20"
+            android:numeric="decimal"
+            android:title="@string/preferences_nexus_token_title"
+            android:key="nexusTokenPref" />
+        <EditTextPreference
+            android:name="@string/preferences_nexus_token_secret"
+            android:summary="@string/preferences_nexus_token_secret_summary"
+            android:defaultValue=""
+            android:maxLength="20"
+            android:numeric="decimal"
+            android:title="@string/preferences_nexus_token_secret_title"
+            android:key="nexusTokenSecretPref" />
 
     </PreferenceCategory>
 
