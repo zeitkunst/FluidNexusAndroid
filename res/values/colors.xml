@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="white">#ffffffff</color>
+    <color name="black">#ff000000</color>
+    <color name="fluid_nexus_red">#ff84302d</color>
+    <color name="light_grey">#ffeeeeee</color>
+    <color name="text_color">#ff222222</color>
+</resources>

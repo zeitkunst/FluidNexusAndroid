@@ -122,7 +122,11 @@ public class MainActivity extends ListActivity {
     private static final int REQUEST_ENABLE_BT = 6;
     private static final int ACTIVITY_EDIT_MESSAGE = 7;
 
-    private static int VIEW_MODE = 0;
+    private static final int VIEW_ALL = 0;
+    private static final int VIEW_PUBLIC = 1;
+    private static final int VIEW_OUTGOING = 2;
+    private static final int VIEW_BLACKLIST = 3;
+    private static int VIEW_MODE = VIEW_ALL;
 
     private static final int MESSAGE_VIEW_LENGTH = 300;
 
@@ -486,7 +490,7 @@ public class MainActivity extends ListActivity {
         menu.setHeaderTitle(localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_TITLE)));
         int mine = localCursor.getInt(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_MINE));
 
-        if (VIEW_MODE == 2) {
+        if (VIEW_MODE == VIEW_BLACKLIST) {
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.message_list_context_unblacklist, menu);
         } else {
@@ -644,7 +648,7 @@ public class MainActivity extends ListActivity {
                 addOutgoingMessage();
                 return true;
             case R.id.menu_view_all:
-                VIEW_MODE = 0;
+                VIEW_MODE = VIEW_ALL;
                 fillListView(VIEW_MODE);
 
                 // Update our header text view
@@ -653,7 +657,7 @@ public class MainActivity extends ListActivity {
 
                 return true;
             case R.id.menu_view_public:
-                VIEW_MODE = 1;
+                VIEW_MODE = VIEW_PUBLIC;
                 fillListView(VIEW_MODE);
 
                 // Update our header text view
@@ -663,7 +667,7 @@ public class MainActivity extends ListActivity {
                 return true;
 
             case R.id.menu_view_outgoing:
-                VIEW_MODE = 2;
+                VIEW_MODE = VIEW_OUTGOING;
                 fillListView(VIEW_MODE);
 
                 // Update our header text view
@@ -672,7 +676,7 @@ public class MainActivity extends ListActivity {
 
                 return true;
             case R.id.menu_view_blacklist:
-                VIEW_MODE = 3;
+                VIEW_MODE = VIEW_BLACKLIST;
                 fillListView(VIEW_MODE);
 
                 // Update our header text view
@@ -852,14 +856,14 @@ public class MainActivity extends ListActivity {
                         if (publicMessage) {
                             iv.setImageResource(R.drawable.menu_public_other);
                         } else {
-                            iv.setImageResource(R.drawable.menu_all_list_icon);
+                            iv.setImageResource(R.drawable.menu_all);
                         }
                     } else if (mine == 1) {
                         if (publicMessage) {
 
                             iv.setImageResource(R.drawable.menu_public);
                         } else {
-                            iv.setImageResource(R.drawable.menu_view_list_icon);
+                            iv.setImageResource(R.drawable.menu_outgoing);
                         }
                     }
 

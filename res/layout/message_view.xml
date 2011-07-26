@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
 android:id="@+id/widget33"
+android:padding="10.0dp"
 android:layout_width="fill_parent"
 android:layout_height="fill_parent"
+android:background="@drawable/message_list_item_gradient"
 xmlns:android="http://schemas.android.com/apk/res/android"
 >
 <RelativeLayout
@@ -12,33 +14,32 @@ android:layout_height="wrap_content"
 android:layout_marginBottom="26sp"
 xmlns:android="http://schemas.android.com/apk/res/android"
 >
-
-<TextView
-android:id="@+id/view_message_title"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:text="TextView"
-android:textStyle="bold"
-android:textSize="16sp"
-android:layout_alignParentLeft="true"
->
-</TextView>
-<ImageView
-    android:id="@+id/view_message_attachment_icon"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:scaleType="center"
-android:layout_below="@+id/view_message_title"
-    android:src="@drawable/attachment_icon" />
-<Button
-android:id="@+id/view_message_attachment"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:text="View Attachment"
-android:layout_below="@+id/view_message_title"
-android:layout_toRightOf="@+id/view_message_attachment_icon"
->
-</Button>
+    <TextView
+        android:id="@+id/view_message_title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:textColor="@color/text_color"
+        android:layout_alignParentLeft="true" >
+    </TextView>
+    <ImageView
+        android:id="@+id/view_message_attachment_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleType="center"
+        android:layout_marginTop="14dp"
+        android:layout_below="@+id/view_message_title"
+        android:src="@drawable/attachment_icon" />
+    <Button
+        android:id="@+id/view_message_attachment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="View Attachment"
+        android:layout_below="@+id/view_message_title"
+        android:layout_marginTop="14dp"
+        android:layout_toRightOf="@+id/view_message_attachment_icon" />
 </RelativeLayout>
 <ScrollView
 android:id="@+id/widget28"
@@ -51,6 +52,7 @@ android:fadingEdgeLength="18sp"
 >
 <TextView
 android:id="@+id/view_message_data"
+android:textColor="@color/text_color"
 android:layout_width="fill_parent"
 android:layout_height="wrap_content"
 android:text="TextView"

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="add_attachment_array">
+        <item>None</item>
+        <item>Audio</item>
+        <item>Image</item>
+        <item>Video</item>
+    </string-array>
+</resources>

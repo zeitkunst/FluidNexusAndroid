@@ -10,7 +10,7 @@
         android:alphabeticShortcut="v" />
     <item android:id="@+id/menu_view_outgoing"
         android:title="@string/menu_view_outgoing"
-        android:icon="@drawable/menu_view"
+        android:icon="@drawable/menu_outgoing"
         android:alphabeticShortcut="o" />
     <item android:id="@+id/menu_view_public"
         android:title="@string/menu_view_public"
