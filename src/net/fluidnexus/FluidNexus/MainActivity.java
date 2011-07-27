@@ -215,7 +215,6 @@ public class MainActivity extends ListActivity {
                 msg.arg1 = (prefs.getBoolean("enableNexusServicePref", false)) ? 1 : 0;
                 // TODO
                 // Make this configurable?
-                //msg.arg2 = Integer.parseInt(prefs.getString("zeroconfScanFrequency", "120"));
                 msg.arg2 = 120;
                 Bundle bundle = new Bundle();
                 bundle.putString("key", prefs.getString("nexusKeyPref", ""));

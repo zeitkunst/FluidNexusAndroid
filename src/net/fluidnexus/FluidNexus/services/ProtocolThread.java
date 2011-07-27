@@ -505,8 +505,6 @@ public class ProtocolThread extends Thread {
             log.error("close() of ConnectedThread socket failed: " + e);
         }
 
-        // TODO
-        // seems like this could potentially be a race condition...
         log.info("Closing the socket and ending the thread");
         Message msg = threadHandler.obtainMessage(CONNECT_THREAD_FINISHED);
         Bundle bundle = new Bundle();

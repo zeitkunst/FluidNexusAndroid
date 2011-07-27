@@ -145,8 +145,6 @@ public class NexusServiceThread extends ServiceThread {
         token = gtoken;
         token_secret = gtoken_secret;
         
-        // TODO
-        // deal with what happens if wifi isn't enabled
         setName("NexusServiceThread");
         wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 

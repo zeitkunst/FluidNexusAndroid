@@ -154,8 +154,6 @@ public class ZeroconfClientThread extends ProtocolThread {
             log.error("close() of ZeroconfClientThread socket failed: " + e);
         }
 
-        // TODO
-        // seems like this could potentially be a race condition...
         log.info("Closing the socket and ending the thread");
         Message msg = threadHandler.obtainMessage(ProtocolThread.CONNECT_THREAD_FINISHED);
         Bundle bundle = new Bundle();
@@ -165,8 +163,6 @@ public class ZeroconfClientThread extends ProtocolThread {
         setConnectedState(STATE_QUIT);
     }
 
-    // TODO
-    // Change to pass a function to a method in the superclass that would call our own cleanupConnection
     @Override
     public void run() {
         log.info("Begin Zeroconf client thread");

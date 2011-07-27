@@ -66,8 +66,6 @@ import net.fluidnexus.FluidNexus.Logger;
 
 /**
  * Thread that actually sends data to a connected device
- * TODO
- * probably need to move some of the socket creation bits to another part of the class
  */
 public class ZeroconfServerThread extends ProtocolThread {
     private static Logger log = Logger.getLogger("FluidNexus"); 

@@ -30,11 +30,6 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.ScrollView;
 
-/**
- * TODO
- * Rework how we handle the help functionality
- * The layout thing is a mess right now, but we need to rethink it anyway
- */
 public class Help extends Activity {
 
     private static Logger log = Logger.getLogger("FluidNexus"); 

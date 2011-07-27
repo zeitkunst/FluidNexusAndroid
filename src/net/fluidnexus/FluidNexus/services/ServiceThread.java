@@ -184,8 +184,6 @@ public class ServiceThread extends Thread {
 
     /**
      * Update the data based on items from the database
-     * TODO
-     * Probably shouldn't do this atomically like this...
      */
     public void updateData() {
         dataCursor = messagesProviderHelper.outgoing();
