@@ -87,7 +87,6 @@ import oauth.signpost.http.HttpParameters;
 
 import net.fluidnexus.FluidNexus.provider.MessagesProvider;
 import net.fluidnexus.FluidNexus.provider.MessagesProviderHelper;
-import net.fluidnexus.FluidNexus.Base64;
 import net.fluidnexus.FluidNexus.Logger;
 
 /**

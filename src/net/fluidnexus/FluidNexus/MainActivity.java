@@ -198,21 +198,21 @@ public class MainActivity extends ListActivity {
 
                 // Send bluetooth enabled bit on start
                 msg = Message.obtain(null, NetworkService.MSG_BLUETOOTH_ENABLED);
-                msg.arg1 = (prefs.getBoolean("enableBluetoothServicePref", false))? 1 : 0;
+                msg.arg1 = (prefs.getBoolean("enableBluetoothServicePref", true))? 1 : 0;
                 msg.arg2 = Integer.parseInt(prefs.getString("bluetoothScanFrequency", "120"));
                 msg.replyTo = messenger;
                 networkService.send(msg);
 
                 // Send zeroconf enabled bit on start
                 msg = Message.obtain(null, NetworkService.MSG_ZEROCONF_ENABLED);
-                msg.arg1 = (prefs.getBoolean("enableZeroconfServicePref", false)) ? 1 : 0;
+                msg.arg1 = (prefs.getBoolean("enableZeroconfServicePref", true)) ? 1 : 0;
                 msg.arg2 = Integer.parseInt(prefs.getString("zeroconfScanFrequency", "120"));
                 msg.replyTo = messenger;
                 networkService.send(msg);
 
                 // Send bit for starting nexus service
                 msg = Message.obtain(null, NetworkService.MSG_NEXUS_START);
-                msg.arg1 = (prefs.getBoolean("enableNexusServicePref", false)) ? 1 : 0;
+                msg.arg1 = (prefs.getBoolean("enableNexusServicePref", true)) ? 1 : 0;
                 // TODO
                 // Make this configurable?
                 msg.arg2 = 120;
@@ -613,7 +613,7 @@ public class MainActivity extends ListActivity {
                 } else if (key.equals("bluetoothScanFrequency")) {
                     try {
                         Message msg = Message.obtain(null, NetworkService.MSG_BLUETOOTH_SCAN_FREQUENCY);
-                        msg.arg1 = Integer.parseInt(prefs.getString("bluetoothScanFrequency", "5"));
+                        msg.arg1 = Integer.parseInt(prefs.getString("bluetoothScanFrequency", "120"));
                         msg.replyTo = messenger;
                         networkService.send(msg);
 
