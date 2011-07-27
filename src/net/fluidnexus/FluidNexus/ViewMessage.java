@@ -38,6 +38,7 @@ import net.fluidnexus.FluidNexus.provider.MessagesProvider;
 public class ViewMessage extends Activity {
 
     private static Logger log = Logger.getLogger("FluidNexus"); 
+    private ImageView typeImageView;
     private TextView titleTextView;
     private TextView messageTextView;
     private String attachment_path;
@@ -54,6 +55,7 @@ public class ViewMessage extends Activity {
         
         titleTextView = (TextView) findViewById(R.id.view_message_title);
         messageTextView = (TextView) findViewById(R.id.view_message_data);
+        typeImageView = (ImageView) findViewById(R.id.view_message_type);
         Button viewAttachmentButton = (Button) findViewById(R.id.view_message_attachment);
         ImageView attachmentIconView = (ImageView) findViewById(R.id.view_message_attachment_icon);
 
@@ -64,7 +66,26 @@ public class ViewMessage extends Activity {
             String message = extras.getString(MessagesProvider.KEY_CONTENT); 
             attachment_path = extras.getString(MessagesProvider.KEY_ATTACHMENT_PATH);
             attachment_original_filename = extras.getString(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME); 
-           
+            Boolean mine = extras.getBoolean(MessagesProvider.KEY_MINE); 
+            Boolean publicMessage = extras.getBoolean(MessagesProvider.KEY_PUBLIC); 
+
+            if (mine != null) {
+                if (mine == false) {
+                    if (publicMessage) {
+                        typeImageView.setImageResource(R.drawable.menu_public_other);
+                    } else {
+                        typeImageView.setImageResource(R.drawable.menu_all);
+                    }
+                } else if (mine == true) {
+                    if (publicMessage) {
+
+                        typeImageView.setImageResource(R.drawable.menu_public);
+                    } else {
+                        typeImageView.setImageResource(R.drawable.menu_outgoing);
+                    }
+                }
+            }
+
             if (title != null) {
                 titleTextView.setText(title);
             }

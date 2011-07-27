@@ -11,7 +11,7 @@
     <string name="settings_title">Settings (Fluid Nexus)</string>
     <string name="message_view_title">View Message (Fluid Nexus)</string>
     <string name="help_title">Help + About (Fluid Nexus)</string>
-    <string name="message_add_outgoing_title">Add Outgoing Message (Fluid Nexus)</string>
+    <string name="message_add_outgoing_title">New Message (Fluid Nexus)</string>
     <string name="message_edit_title">Edit Message (Fluid Nexus)</string>
     <string name="message_view_outgoing_title">View Outgoing Messages (Fluid Nexus)</string>
     <string name="message_list_header_text_all">ALL MESSAGES</string>
@@ -19,7 +19,7 @@
     <string name="message_list_header_text_outgoing">OUTGOING MESSAGES</string>
     <string name="message_list_header_text_blacklist">BLACKLISTED MESSAGES</string>
     <string name="menu_message_list_context_title">Context menu</string>
-    <string name="menu_add_message">Add Outgoing</string>
+    <string name="menu_add_message">New Message</string>
     <string name="menu_view_all">View All</string>
     <string name="menu_view_public">View Public</string>
     <string name="menu_view_outgoing">View Outgoing</string>
@@ -114,7 +114,7 @@
 \n
 VIEWING A MESSAGE: Simply click/tap/hit enter on a message to open a window that allows you to see the entirety of the message.\n
 DELETING A MESSAGE: Once you have selected a message using the keyboard or direction pad, open the menu and select \"Delete message\" to remove it from the database and advertisements.\n
-ADDING A MESSAGE: Open the menu and select \"Add Outgoing\".  Enter your message, select save, and it will be queued for for sending, as well as appearing in your message list.\n
+ADDING A MESSAGE: Open the menu and select \"New Message\".  Enter your message, select save, and it will be queued for for sending, as well as appearing in your message list.\n
 VIEW ALL MESSAGES: The default opening view of Fluid Nexus, this shows all of the messages on your device.  You can also return to this view by opening the menu and selecting \"View All\".\n
 VIEW OUTGOING: This shows you only the messages you have created and that are thus marked as \"outgoing\".  You can select this by opening the menu and selecting \"View Outgoing\".\n
 \n

@@ -752,6 +752,8 @@ public class MainActivity extends ListActivity {
         i.putExtra(MessagesProvider.KEY_TITLE, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_TITLE)));
         i.putExtra(MessagesProvider.KEY_CONTENT, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_CONTENT)));
         i.putExtra(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME)));
+        i.putExtra(MessagesProvider.KEY_MINE, localCursor.getInt(localCursor.getColumnIndex(MessagesProvider.KEY_MINE)) > 0);
+        i.putExtra(MessagesProvider.KEY_PUBLIC, localCursor.getInt(localCursor.getColumnIndex(MessagesProvider.KEY_PUBLIC)) > 0);
         i.putExtra(MessagesProvider.KEY_ATTACHMENT_PATH, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_PATH)));
         c.close();
         startActivityForResult(i, ACTIVITY_VIEW_MESSAGE);

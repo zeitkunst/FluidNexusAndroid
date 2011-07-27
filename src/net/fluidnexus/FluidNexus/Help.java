@@ -23,6 +23,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
@@ -45,33 +47,12 @@ public class Help extends Activity {
         setContentView(R.layout.help);
         setTitle(R.string.help_title);
         Bundle extras = getIntent().getExtras();
-        
-        //Button okButton = (Button) findViewById(R.id.help_return_button);
-        //Button conceptButton = (Button) findViewById(R.id.help_concept_button);
-        //Button helpButton = (Button) findViewById(R.id.help_help_button);
-        tv = (TextView) findViewById(R.id.help_text);
-        ScrollView sv = (ScrollView) findViewById(R.id.help_scroll_view);
 
-        /*
-        okButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                Bundle bundle = new Bundle();
-                setResult(RESULT_OK);
-                finish();
-            }
-        });
+        // From http://stackoverflow.com/questions/4371058/help-activity-in-android-app        
+        WebView browser = (WebView) findViewById(R.id.help_webview);
+        WebSettings settings = browser.getSettings();
+        settings.setJavaScriptEnabled(true);
+        browser.loadUrl("file:///android_asset/manual.html");
 
-        helpButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                tv.setText(R.string.help_help_text);
-            }
-        });
-
-        conceptButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                tv.setText(R.string.help_concept_text);
-            }
-        });
-        */
     }
 }

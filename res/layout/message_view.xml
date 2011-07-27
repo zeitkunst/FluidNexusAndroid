@@ -14,6 +14,15 @@ android:layout_height="wrap_content"
 android:layout_marginBottom="26sp"
 xmlns:android="http://schemas.android.com/apk/res/android"
 >
+    <ImageView
+        android:id="@+id/view_message_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleType="center"
+        android:layout_marginTop="14dp"
+        android:layout_alignParentLeft="true"
+        android:src="@drawable/attachment_icon" />
+
     <TextView
         android:id="@+id/view_message_title"
         android:layout_width="fill_parent"
@@ -21,15 +30,16 @@ xmlns:android="http://schemas.android.com/apk/res/android"
         android:text="TextView"
         android:textStyle="bold"
         android:textSize="16sp"
+        android:layout_marginTop="14dp"
         android:textColor="@color/text_color"
-        android:layout_alignParentLeft="true" >
+        android:layout_toRightOf="@+id/view_message_type" >
     </TextView>
     <ImageView
         android:id="@+id/view_message_attachment_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:scaleType="center"
-        android:layout_marginTop="14dp"
+        android:layout_marginTop="40dp"
         android:layout_below="@+id/view_message_title"
         android:src="@drawable/attachment_icon" />
     <Button
@@ -38,7 +48,7 @@ xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_height="wrap_content"
         android:text="View Attachment"
         android:layout_below="@+id/view_message_title"
-        android:layout_marginTop="14dp"
+        android:layout_marginTop="40dp"
         android:layout_toRightOf="@+id/view_message_attachment_icon" />
 </RelativeLayout>
 <ScrollView

@@ -31,11 +31,9 @@ The jmdns library is licensed under Apache V2.0 or LGPL and is based on the modi
 
 = TODO =
 
-* Implement a "public" message type (with TTL) that would be sent to a central FN website for a public stream?
 * Implement wake locks so that the service can run even when the device is sleeping; create it so that we run an alarm, run the code, then "sleep" until the next alarm (thus getting rid of the thread sleep code).  Does this only happen when we're on battery power?
 * Fix cursor leak issue (even though I'm positive we close all cursors when we need to...)
 * Figure out good way to stop the threads safely
-* Implement zeroconf server and client functionality
 * Implement SQLCipher database encryption
 * Implement SSL/TLS over network modalities
 * Implement wifi ad-hoc networking

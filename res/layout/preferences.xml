@@ -5,6 +5,7 @@
         <CheckBoxPreference
             android:title="@string/preferences_show_messages"
             android:defaultValue="true"
+            android:enabled="false"
             android:summary="@string/preferences_show_messages_summary"
             android:key="showMessagesPref" />
     </PreferenceCategory>
