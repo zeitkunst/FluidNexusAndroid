@@ -17,7 +17,7 @@
  */
 
 
-package net.fluidnexus.FluidNexus.services;
+package net.fluidnexus.FluidNexusAndroid.services;
 
 import java.lang.reflect.Method;
 import java.io.BufferedInputStream;
@@ -69,11 +69,11 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
 
-import net.fluidnexus.FluidNexus.provider.MessagesProvider;
-import net.fluidnexus.FluidNexus.provider.MessagesProviderHelper;
-import net.fluidnexus.FluidNexus.Logger;
-import net.fluidnexus.FluidNexus.MainActivity;
-import net.fluidnexus.FluidNexus.R;
+import net.fluidnexus.FluidNexusAndroid.provider.MessagesProvider;
+import net.fluidnexus.FluidNexusAndroid.provider.MessagesProviderHelper;
+import net.fluidnexus.FluidNexusAndroid.Logger;
+import net.fluidnexus.FluidNexusAndroid.MainActivity;
+import net.fluidnexus.FluidNexusAndroid.R;
 
 /**
  * This is a base class that all of our network modality-specific threads subclass

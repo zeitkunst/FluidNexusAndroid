@@ -17,7 +17,7 @@
  */
 
 
-package net.fluidnexus.FluidNexus.services;
+package net.fluidnexus.FluidNexusAndroid.services;
 
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
@@ -34,7 +34,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 import java.util.ArrayList;
@@ -59,25 +60,24 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
 
-import net.fluidnexus.FluidNexus.provider.MessagesProvider;
-import net.fluidnexus.FluidNexus.provider.MessagesProviderHelper;
-import net.fluidnexus.FluidNexus.Logger;
+import net.fluidnexus.FluidNexusAndroid.provider.MessagesProvider;
+import net.fluidnexus.FluidNexusAndroid.provider.MessagesProviderHelper;
+import net.fluidnexus.FluidNexusAndroid.Logger;
 
 
 /**
  * Thread that actually sends data to a connected device
  */
-public class ZeroconfServerThread extends ProtocolThread {
+public class ZeroconfClientThread extends ProtocolThread {
     private static Logger log = Logger.getLogger("FluidNexus"); 
 
-    //private DataInputStream inputStream = null;
-    //private DataOutputStream outputStream = null;
+    public Socket socket = null;
+    private String host = null;
+    private int port = 0;
 
     private ArrayList<String> hashList = new ArrayList<String>();
 
     private char connectedState = 0x00;
-
-    private ServerSocket serverSocket;
 
     private final char STATE_START = 0x00;
     private final char STATE_WRITE_HELO = 0x10;
@@ -104,46 +104,26 @@ public class ZeroconfServerThread extends ProtocolThread {
     // will likely always be only a single client, but what the hey
     ArrayList<Messenger> clients = new ArrayList<Messenger>();
 
-    // Our zeroconf type
-    private static final String zeroconfType = "_fluidnexus._tcp.local.";
-    
-    // jmdns infos
-    private JmDNS jmdns = null;
-    private ServiceInfo serviceInfo;
-    private MulticastLock lock = null;
-    private WifiManager wifiManager = null;
 
-    private static final int ZEROCONF_PORT = 17894;
-
-    public ZeroconfServerThread(Context ctx, Handler givenHandler, ArrayList<Messenger> givenClients) {
+    public ZeroconfClientThread(Context ctx, Handler givenHandler, ArrayList<Messenger> givenClients, String givenHost, int givenPort) {
 
         super(ctx, givenHandler, givenClients);
-        setName("ZeroconfServerThread");
-        wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        lock = wifiManager.createMulticastLock("ZeroconfServerLock");
-        lock.setReferenceCounted(true);
-
+        setName("ZeroconfClientThread");
+        
+        host = givenHost;
+        port = givenPort;
 
         try {
-            serverSocket = new ServerSocket(ZEROCONF_PORT);
+            socket = new Socket(host, port);
+        } catch (UnknownHostException e) {
+            log.error("Unknown host.");
+            cleanupConnection();
         } catch (IOException e) {
-            log.error("Unable to create new server socket.");
+            log.error("Unable to create new socket.");
             cleanupConnection();
         }
 
-    }
-
-    /**
-     * Do the client accept work
-     */
-    private void doClientAccept() {
-
-        try {
-            socket = serverSocket.accept();
-        } catch (IOException e) {
-            log.debug("Accept failed");
-            cleanupConnection();
-        }
+        setConnectedState(STATE_START);
 
         DataInputStream tmpIn = null;
         DataOutputStream tmpOut = null;
@@ -158,23 +138,8 @@ public class ZeroconfServerThread extends ProtocolThread {
 
         setInputStream(tmpIn);
         setOutputStream(tmpOut);
-    }
 
-    /**
-     * Advertise our service
-     */
-    public void advertiseService() {
-        lock.acquire();
-        log.debug("Advertising our service");
-        serviceInfo = ServiceInfo.create(zeroconfType, "Fluid Nexus", 0, "Fluid Nexus Zeroconf server for android");
-        try {
-            jmdns = JmDNS.create();
-            jmdns.registerService(serviceInfo);
-        } catch (IOException e) {
-            log.error("Unable to register zeroconf service.");
-            e.printStackTrace();
-        }
-        lock.release();
+        setConnectedState(STATE_WRITE_HELO);
     }
 
 
@@ -185,24 +150,28 @@ public class ZeroconfServerThread extends ProtocolThread {
     public void cleanupConnection() {
         try {
             socket.close();
-            serverSocket.close();
         } catch (IOException e) {
-            log.error("close() of ZeroconfServerThread socket failed: " + e);
+            log.error("close() of ZeroconfClientThread socket failed: " + e);
         }
 
+        log.info("Closing the socket and ending the thread");
+        Message msg = threadHandler.obtainMessage(ProtocolThread.CONNECT_THREAD_FINISHED);
+        Bundle bundle = new Bundle();
+        bundle.putString("host", host);
+        msg.setData(bundle);
+        threadHandler.sendMessage(msg);
         setConnectedState(STATE_QUIT);
     }
 
     @Override
     public void run() {
-
-        log.info("Begin Zeroconf server thread");
+        log.info("Begin Zeroconf client thread");
         
         char command = 0x00;            
         while (super.getConnectedState() != STATE_QUIT) {
             switch(super.getConnectedState()) {
-                case STATE_START:
-                    doClientAccept();
+                case STATE_WRITE_HELO:
+                    writeCommand(HELO);
                     super.setConnectedState(STATE_READ_HELO);
                     break;
                 case STATE_READ_HELO:
@@ -211,32 +180,7 @@ public class ZeroconfServerThread extends ProtocolThread {
                         log.error("Received unexpected command: " + command);
                         cleanupConnection();
                     } else {
-                        super.setConnectedState(STATE_WRITE_HELO);
-                    }
-                    break;
-                case STATE_WRITE_HELO:
-                    writeCommand(HELO);
-                    super.setConnectedState(STATE_READ_HASHES);
-                    break;
-                case STATE_READ_HASHES:
-                    command = readCommand();
-                    if (command != HASHES) {
-                        log.error("Received unexpected command: " + command);
-                        cleanupConnection();
-                    } else {
-                        readHashes();
-                    }
-                    break;
-                case STATE_WRITE_MESSAGES:
-                    writeMessages();
-                    break;
-                case STATE_READ_SWITCH:
-                    command = readCommand();
-                    if (command != SWITCH) {
-                        log.error("Received unexpected command: " + command);
-                        cleanupConnection();
-                    } else {
-                        super.setConnectedState(STATE_WRITE_DONE);
+                        super.setConnectedState(STATE_WRITE_HASHES);
                     }
                     break;
                 case STATE_WRITE_HASHES:
@@ -250,9 +194,36 @@ public class ZeroconfServerThread extends ProtocolThread {
                     } else {
                         readMessages();
                     }
+
                     break;
                 case STATE_WRITE_SWITCH:
                     writeCommand(SWITCH);
+                    super.setConnectedState(STATE_READ_HASHES);
+                    break;
+                case STATE_READ_HASHES:
+                    command = readCommand();
+                    if (command != HASHES) {
+                        log.error("Received unexpected command: " + command);
+                        cleanupConnection();
+                    } else {
+                        readHashes();
+                    }
+
+                    break;
+                case STATE_WRITE_MESSAGES:
+                    writeMessages();
+                    break;
+                case STATE_READ_SWITCH:
+                    command = readCommand();
+                    if (command != SWITCH) {
+                        log.error("Received unexpected command: " + command);
+                        cleanupConnection();
+                    } else {
+                        super.setConnectedState(STATE_WRITE_DONE);
+                    }
+                    break;
+                case STATE_WRITE_DONE:
+                    writeCommand(DONE);
                     super.setConnectedState(STATE_READ_DONE);
                     break;
                 case STATE_READ_DONE:
@@ -261,13 +232,9 @@ public class ZeroconfServerThread extends ProtocolThread {
                         log.error("Received unexpected command: " + command);
                         cleanupConnection();
                     } else {
-                        super.setConnectedState(STATE_WRITE_DONE);
+                        super.setConnectedState(STATE_QUIT);
                     }
 
-                    break;
-                case STATE_WRITE_DONE:
-                    writeCommand(DONE);
-                    super.setConnectedState(STATE_QUIT);
                     break;
                 default:
                     cleanupConnection();

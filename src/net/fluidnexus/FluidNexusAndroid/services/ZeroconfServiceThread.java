@@ -16,7 +16,7 @@
  *
  */
 
-package net.fluidnexus.FluidNexus.services;
+package net.fluidnexus.FluidNexusAndroid.services;
 
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceEvent;
@@ -55,9 +55,9 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
 
-import net.fluidnexus.FluidNexus.provider.MessagesProvider;
-import net.fluidnexus.FluidNexus.provider.MessagesProviderHelper;
-import net.fluidnexus.FluidNexus.Logger;
+import net.fluidnexus.FluidNexusAndroid.provider.MessagesProvider;
+import net.fluidnexus.FluidNexusAndroid.provider.MessagesProviderHelper;
+import net.fluidnexus.FluidNexusAndroid.Logger;
 
 /**
  * This thread runs all of the device/service discovery and starts threads for socket communication
@@ -141,7 +141,9 @@ public class ZeroconfServiceThread extends ServiceThread {
         updateData();
 
 
-
+        // TODO
+        // Disabling server thread for now until we can figure out the lack of resolution issue
+        /*
         if (serverThread == null) {
 
             serverThread = new ZeroconfServerThread(ctx, threadHandler, clients);
@@ -149,6 +151,7 @@ public class ZeroconfServiceThread extends ServiceThread {
             serverThread.setData(currentData);
             serverThread.start();
         }
+        */
 
         setServiceState(STATE_NONE);
     }

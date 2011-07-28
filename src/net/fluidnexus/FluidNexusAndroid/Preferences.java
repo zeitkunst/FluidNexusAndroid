@@ -17,7 +17,7 @@
  */
 
 
-package net.fluidnexus.FluidNexus;
+package net.fluidnexus.FluidNexusAndroid;
 
 import android.app.Activity;
 import android.content.SharedPreferences;

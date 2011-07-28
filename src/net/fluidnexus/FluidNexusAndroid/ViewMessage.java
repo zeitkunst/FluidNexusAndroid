@@ -17,7 +17,7 @@
  */
 
 
-package net.fluidnexus.FluidNexus;
+package net.fluidnexus.FluidNexusAndroid;
 
 import android.app.Activity;
 import android.content.Context;
@@ -33,7 +33,7 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import net.fluidnexus.FluidNexus.provider.MessagesProvider;
+import net.fluidnexus.FluidNexusAndroid.provider.MessagesProvider;
 
 public class ViewMessage extends Activity {
 

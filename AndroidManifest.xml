@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="net.fluidnexus.FluidNexus"
-    android:versionCode="1"
-    android:versionName="0.2.0">
+    package="net.fluidnexus.FluidNexusAndroid"
+    android:versionCode="2"
+    android:versionName="0.2.1">
     <uses-sdk android:minSdkVersion="5" android:targetSdkVersion="7"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE"></uses-permission>
     <uses-permission android:name="android.permission.BLUETOOTH"></uses-permission>
@@ -13,22 +13,22 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"></uses-permission>
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>
     <uses-permission android:name="android.permission.VIBRATE"></uses-permission>
-    <uses-permission android:name="net.fluidnexus.FluidNexus.permission.NETWORK_SERVICE"></uses-permission>
+    <uses-permission android:name="net.fluidnexus.FluidNexusAndroid.permission.NETWORK_SERVICE"></uses-permission>
 
     <uses-feature android:name="android.hardware.bluetooth" android:required="false"/>
     <uses-feature android:name="android.hardware.wifi" android:required="false"/>
 
-    <permission android:name="net.fluidnexus.FluidNexus.permission.NETWORK_SERVICE"
+    <permission android:name="net.fluidnexus.FluidNexusAndroid.permission.NETWORK_SERVICE"
         android:protectionLevel="dangerous"
         android:label="@string/network_perm_label"
         android:description="@string/network_perm_desc" />
 
-    <permission android:name="net.fluidnexus.FluidNexus.permission.READ_ONLY"
+    <permission android:name="net.fluidnexus.FluidNexusAndroid.permission.READ_ONLY"
         android:protectionLevel="dangerous"
         android:label="@string/ro_perm_label"
         android:description="@string/ro_perm_desc" />
 
-    <permission android:name="net.fluidnexus.FluidNexus.permission.WRITE_ONLY"
+    <permission android:name="net.fluidnexus.FluidNexusAndroid.permission.WRITE_ONLY"
         android:protectionLevel="dangerous"
         android:label="@string/wo_perm_label"
         android:description="@string/wo_perm_desc" />
@@ -60,17 +60,17 @@
         <activity android:name=".EditMessage"></activity>
         <service android:name=".services.NetworkService"
             android:process=":remote"
-            android:permission="net.fluidnexus.FluidNexus.permission.NETWORK_SERVICE">
+            android:permission="net.fluidnexus.FluidNexusAndroid.permission.NETWORK_SERVICE">
             <intent-filter>
-                <action android:name="net.fluidnexus.FluidNexus.services.NetworkService" />
+                <action android:name="net.fluidnexus.FluidNexusAndroid.services.NetworkService" />
             </intent-filter>
         </service>
         <provider
-            android:authorities="net.fluidnexus.FluidNexus.provider.MessagesProvider"
+            android:authorities="net.fluidnexus.FluidNexusAndroid.provider.MessagesProvider"
             android:multiprocess="true"
-            android:readPermission="net.fluidnexus.FluidNexus.permission.READ_ONLY"
-            android:writePermission="net.fluidnexus.FluidNexus.permission.WRITE_ONLY"
-            android:name="net.fluidnexus.FluidNexus.provider.MessagesProvider" />
+            android:readPermission="net.fluidnexus.FluidNexusAndroid.permission.READ_ONLY"
+            android:writePermission="net.fluidnexus.FluidNexusAndroid.permission.WRITE_ONLY"
+            android:name="net.fluidnexus.FluidNexusAndroid.provider.MessagesProvider" />
 
     </application>
 </manifest> 

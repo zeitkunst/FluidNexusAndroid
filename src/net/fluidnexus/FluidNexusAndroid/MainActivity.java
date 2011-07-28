@@ -17,7 +17,7 @@
  */
 
 
-package net.fluidnexus.FluidNexus;
+package net.fluidnexus.FluidNexusAndroid;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -89,9 +89,9 @@ import oauth.signpost.exception.OAuthMessageSignerException;
 import oauth.signpost.exception.OAuthNotAuthorizedException;
 import oauth.signpost.http.HttpParameters;
 
-import net.fluidnexus.FluidNexus.provider.MessagesProvider;
-import net.fluidnexus.FluidNexus.provider.MessagesProviderHelper;
-import net.fluidnexus.FluidNexus.services.NetworkService;
+import net.fluidnexus.FluidNexusAndroid.provider.MessagesProvider;
+import net.fluidnexus.FluidNexusAndroid.provider.MessagesProviderHelper;
+import net.fluidnexus.FluidNexusAndroid.services.NetworkService;
 /*
  * TODO
  * * deal with new binding to the service when clicking on the notification; this shouldn't happen

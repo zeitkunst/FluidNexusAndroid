@@ -16,7 +16,7 @@
  *
  */
 
-package net.fluidnexus.FluidNexus.provider;
+package net.fluidnexus.FluidNexusAndroid.provider;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.MessageDigest;
@@ -28,7 +28,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
-import net.fluidnexus.FluidNexus.Logger;
+import net.fluidnexus.FluidNexusAndroid.Logger;
 
 public class MessagesProviderHelper {
 

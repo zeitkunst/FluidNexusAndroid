@@ -16,7 +16,7 @@
  *
  */
 
-package net.fluidnexus.FluidNexus.services;
+package net.fluidnexus.FluidNexusAndroid.services;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -85,9 +85,9 @@ import oauth.signpost.exception.OAuthMessageSignerException;
 import oauth.signpost.exception.OAuthNotAuthorizedException;
 import oauth.signpost.http.HttpParameters;
 
-import net.fluidnexus.FluidNexus.provider.MessagesProvider;
-import net.fluidnexus.FluidNexus.provider.MessagesProviderHelper;
-import net.fluidnexus.FluidNexus.Logger;
+import net.fluidnexus.FluidNexusAndroid.provider.MessagesProvider;
+import net.fluidnexus.FluidNexusAndroid.provider.MessagesProviderHelper;
+import net.fluidnexus.FluidNexusAndroid.Logger;
 
 /**
  * This thread runs all of the device/service discovery and starts threads for socket communication

@@ -17,10 +17,8 @@
  */
 
 
-package net.fluidnexus.FluidNexus.services;
+package net.fluidnexus.FluidNexusAndroid.services;
 
-import javax.jmdns.JmDNS;
-import javax.jmdns.ServiceInfo;
 
 import java.lang.reflect.Method;
 import java.io.BufferedInputStream;
@@ -34,8 +32,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.Socket;
-import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 import java.util.ArrayList;
@@ -48,10 +44,11 @@ import java.util.Vector;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothServerSocket;
+import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.database.Cursor;
-import android.net.wifi.WifiManager;
-import android.net.wifi.WifiManager.MulticastLock;
 import android.os.Environment;
 import android.os.Bundle;
 import android.os.Handler;
@@ -60,22 +57,24 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
 
-import net.fluidnexus.FluidNexus.provider.MessagesProvider;
-import net.fluidnexus.FluidNexus.provider.MessagesProviderHelper;
-import net.fluidnexus.FluidNexus.Logger;
-
+import net.fluidnexus.FluidNexusAndroid.provider.MessagesProvider;
+import net.fluidnexus.FluidNexusAndroid.provider.MessagesProviderHelper;
+import net.fluidnexus.FluidNexusAndroid.Logger;
 
 /**
  * Thread that actually sends data to a connected device
  */
-public class ZeroconfClientThread extends ProtocolThread {
+public class BluetoothClientThread extends ProtocolThread {
     private static Logger log = Logger.getLogger("FluidNexus"); 
+    private final BluetoothSocket socket;
+    private final BluetoothDevice device;
 
-    public Socket socket = null;
-    private String host = null;
-    private int port = 0;
+    //private DataInputStream inputStream = null;
+    //private DataOutputStream outputStream = null;
 
     private ArrayList<String> hashList = new ArrayList<String>();
+
+    private final Handler threadHandler;
 
     private char connectedState = 0x00;
 
@@ -104,26 +103,43 @@ public class ZeroconfClientThread extends ProtocolThread {
     // will likely always be only a single client, but what the hey
     ArrayList<Messenger> clients = new ArrayList<Messenger>();
 
-
-    public ZeroconfClientThread(Context ctx, Handler givenHandler, ArrayList<Messenger> givenClients, String givenHost, int givenPort) {
-
+    public BluetoothClientThread(Context ctx, BluetoothDevice remoteDevice, Handler givenHandler, ArrayList<Messenger> givenClients) {
         super(ctx, givenHandler, givenClients);
-        setName("ZeroconfClientThread");
-        
-        host = givenHost;
-        port = givenPort;
+        setName("ConnectThread: " + remoteDevice.getAddress());
+        device = remoteDevice;
+        threadHandler = givenHandler;
 
+        BluetoothSocket tmp = null;
+        
+        clients = givenClients;
+
+        context = ctx;
+
+        setConnectedState(STATE_START);
+        // Get our socket to the remove device
         try {
-            socket = new Socket(host, port);
-        } catch (UnknownHostException e) {
-            log.error("Unknown host.");
-            cleanupConnection();
+            tmp = device.createRfcommSocketToServiceRecord(FluidNexusUUID);
         } catch (IOException e) {
-            log.error("Unable to create new socket.");
+            log.error("create() failed: " + e);
             cleanupConnection();
         }
 
-        setConnectedState(STATE_START);
+        // Save our socket
+        socket = tmp;
+
+        // Try to connect
+        try {
+            socket.connect();
+        } catch (IOException e) {
+            // Try to close the socket
+            try {
+                socket.close();
+            } catch (IOException e2) {
+                log.error("unable to close() socket during connection failure: " + e2);
+            }
+            cleanupConnection();
+        }
+
 
         DataInputStream tmpIn = null;
         DataOutputStream tmpOut = null;
@@ -135,6 +151,9 @@ public class ZeroconfClientThread extends ProtocolThread {
             log.error("Temp stream sockets not created");
             cleanupConnection();
         }
+
+        //inputStream = tmpIn;
+        //outputStream = tmpOut;
 
         setInputStream(tmpIn);
         setOutputStream(tmpOut);
@@ -151,31 +170,34 @@ public class ZeroconfClientThread extends ProtocolThread {
         try {
             socket.close();
         } catch (IOException e) {
-            log.error("close() of ZeroconfClientThread socket failed: " + e);
+            log.error("close() of ConnectedThread socket failed: " + e);
         }
 
         log.info("Closing the socket and ending the thread");
         Message msg = threadHandler.obtainMessage(ProtocolThread.CONNECT_THREAD_FINISHED);
         Bundle bundle = new Bundle();
-        bundle.putString("host", host);
+        bundle.putString("address", device.getAddress());
         msg.setData(bundle);
         threadHandler.sendMessage(msg);
         setConnectedState(STATE_QUIT);
     }
 
+    /**
+     * Our thread's run method
+     */
     @Override
     public void run() {
-        log.info("Begin Zeroconf client thread");
+        log.info("Begin BluetoothClientThread");
         
         char command = 0x00;            
         while (super.getConnectedState() != STATE_QUIT) {
             switch(super.getConnectedState()) {
                 case STATE_WRITE_HELO:
-                    writeCommand(HELO);
+                    super.writeCommand(HELO);
                     super.setConnectedState(STATE_READ_HELO);
                     break;
                 case STATE_READ_HELO:
-                    command = readCommand();
+                    command = super.readCommand();
                     if (command != HELO) {
                         log.error("Received unexpected command: " + command);
                         cleanupConnection();
@@ -184,37 +206,37 @@ public class ZeroconfClientThread extends ProtocolThread {
                     }
                     break;
                 case STATE_WRITE_HASHES:
-                    writeHashes();
+                    super.writeHashes();
                     break;
                 case STATE_READ_MESSAGES:
-                    command = readCommand();
+                    command = super.readCommand();
                     if (command != MESSAGES) {
                         log.error("Received unexpected command: " + command);
                         cleanupConnection();
                     } else {
-                        readMessages();
+                        super.readMessages();
                     }
 
                     break;
                 case STATE_WRITE_SWITCH:
-                    writeCommand(SWITCH);
+                    super.writeCommand(SWITCH);
                     super.setConnectedState(STATE_READ_HASHES);
                     break;
                 case STATE_READ_HASHES:
-                    command = readCommand();
+                    command = super.readCommand();
                     if (command != HASHES) {
                         log.error("Received unexpected command: " + command);
                         cleanupConnection();
                     } else {
-                        readHashes();
+                        super.readHashes();
                     }
 
                     break;
                 case STATE_WRITE_MESSAGES:
-                    writeMessages();
+                    super.writeMessages();
                     break;
                 case STATE_READ_SWITCH:
-                    command = readCommand();
+                    command = super.readCommand();
                     if (command != SWITCH) {
                         log.error("Received unexpected command: " + command);
                         cleanupConnection();
@@ -223,11 +245,11 @@ public class ZeroconfClientThread extends ProtocolThread {
                     }
                     break;
                 case STATE_WRITE_DONE:
-                    writeCommand(DONE);
+                    super.writeCommand(DONE);
                     super.setConnectedState(STATE_READ_DONE);
                     break;
                 case STATE_READ_DONE:
-                    command = readCommand();
+                    command = super.readCommand();
                     if (command != DONE) {
                         log.error("Received unexpected command: " + command);
                         cleanupConnection();
@@ -244,5 +266,8 @@ public class ZeroconfClientThread extends ProtocolThread {
 
         // We're done here
         cleanupConnection();
+
     }
+
 }
+

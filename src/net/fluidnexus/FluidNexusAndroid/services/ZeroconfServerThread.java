@@ -17,8 +17,10 @@
  */
 
 
-package net.fluidnexus.FluidNexus.services;
+package net.fluidnexus.FluidNexusAndroid.services;
 
+import javax.jmdns.JmDNS;
+import javax.jmdns.ServiceInfo;
 
 import java.lang.reflect.Method;
 import java.io.BufferedInputStream;
@@ -32,6 +34,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.ServerSocket;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 import java.util.ArrayList;
@@ -44,11 +47,10 @@ import java.util.Vector;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothServerSocket;
-import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.wifi.WifiManager;
+import android.net.wifi.WifiManager.MulticastLock;
 import android.os.Environment;
 import android.os.Bundle;
 import android.os.Handler;
@@ -57,26 +59,25 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
 
-import net.fluidnexus.FluidNexus.provider.MessagesProvider;
-import net.fluidnexus.FluidNexus.provider.MessagesProviderHelper;
-import net.fluidnexus.FluidNexus.Logger;
+import net.fluidnexus.FluidNexusAndroid.provider.MessagesProvider;
+import net.fluidnexus.FluidNexusAndroid.provider.MessagesProviderHelper;
+import net.fluidnexus.FluidNexusAndroid.Logger;
+
 
 /**
  * Thread that actually sends data to a connected device
  */
-public class BluetoothClientThread extends ProtocolThread {
+public class ZeroconfServerThread extends ProtocolThread {
     private static Logger log = Logger.getLogger("FluidNexus"); 
-    private final BluetoothSocket socket;
-    private final BluetoothDevice device;
 
     //private DataInputStream inputStream = null;
     //private DataOutputStream outputStream = null;
 
     private ArrayList<String> hashList = new ArrayList<String>();
 
-    private final Handler threadHandler;
-
     private char connectedState = 0x00;
+
+    private ServerSocket serverSocket;
 
     private final char STATE_START = 0x00;
     private final char STATE_WRITE_HELO = 0x10;
@@ -103,43 +104,46 @@ public class BluetoothClientThread extends ProtocolThread {
     // will likely always be only a single client, but what the hey
     ArrayList<Messenger> clients = new ArrayList<Messenger>();
 
-    public BluetoothClientThread(Context ctx, BluetoothDevice remoteDevice, Handler givenHandler, ArrayList<Messenger> givenClients) {
+    // Our zeroconf type
+    private static final String zeroconfType = "_fluidnexus._tcp.local.";
+    
+    // jmdns infos
+    private JmDNS jmdns = null;
+    private ServiceInfo serviceInfo;
+    private MulticastLock lock = null;
+    private WifiManager wifiManager = null;
+
+    private static final int ZEROCONF_PORT = 17894;
+
+    public ZeroconfServerThread(Context ctx, Handler givenHandler, ArrayList<Messenger> givenClients) {
+
         super(ctx, givenHandler, givenClients);
-        setName("ConnectThread: " + remoteDevice.getAddress());
-        device = remoteDevice;
-        threadHandler = givenHandler;
+        setName("ZeroconfServerThread");
+        wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        lock = wifiManager.createMulticastLock("ZeroconfServerLock");
+        lock.setReferenceCounted(true);
 
-        BluetoothSocket tmp = null;
-        
-        clients = givenClients;
 
-        context = ctx;
-
-        setConnectedState(STATE_START);
-        // Get our socket to the remove device
         try {
-            tmp = device.createRfcommSocketToServiceRecord(FluidNexusUUID);
+            serverSocket = new ServerSocket(ZEROCONF_PORT);
         } catch (IOException e) {
-            log.error("create() failed: " + e);
+            log.error("Unable to create new server socket.");
             cleanupConnection();
         }
 
-        // Save our socket
-        socket = tmp;
+    }
 
-        // Try to connect
+    /**
+     * Do the client accept work
+     */
+    private void doClientAccept() {
+
         try {
-            socket.connect();
+            socket = serverSocket.accept();
         } catch (IOException e) {
-            // Try to close the socket
-            try {
-                socket.close();
-            } catch (IOException e2) {
-                log.error("unable to close() socket during connection failure: " + e2);
-            }
+            log.debug("Accept failed");
             cleanupConnection();
         }
-
 
         DataInputStream tmpIn = null;
         DataOutputStream tmpOut = null;
@@ -152,13 +156,25 @@ public class BluetoothClientThread extends ProtocolThread {
             cleanupConnection();
         }
 
-        //inputStream = tmpIn;
-        //outputStream = tmpOut;
-
         setInputStream(tmpIn);
         setOutputStream(tmpOut);
+    }
 
-        setConnectedState(STATE_WRITE_HELO);
+    /**
+     * Advertise our service
+     */
+    public void advertiseService() {
+        lock.acquire();
+        log.debug("Advertising our service");
+        serviceInfo = ServiceInfo.create(zeroconfType, "Fluid Nexus", 0, "Fluid Nexus Zeroconf server for android");
+        try {
+            jmdns = JmDNS.create();
+            jmdns.registerService(serviceInfo);
+        } catch (IOException e) {
+            log.error("Unable to register zeroconf service.");
+            e.printStackTrace();
+        }
+        lock.release();
     }
 
 
@@ -169,74 +185,53 @@ public class BluetoothClientThread extends ProtocolThread {
     public void cleanupConnection() {
         try {
             socket.close();
+            serverSocket.close();
         } catch (IOException e) {
-            log.error("close() of ConnectedThread socket failed: " + e);
+            log.error("close() of ZeroconfServerThread socket failed: " + e);
         }
 
-        log.info("Closing the socket and ending the thread");
-        Message msg = threadHandler.obtainMessage(ProtocolThread.CONNECT_THREAD_FINISHED);
-        Bundle bundle = new Bundle();
-        bundle.putString("address", device.getAddress());
-        msg.setData(bundle);
-        threadHandler.sendMessage(msg);
         setConnectedState(STATE_QUIT);
     }
 
-    /**
-     * Our thread's run method
-     */
     @Override
     public void run() {
-        log.info("Begin BluetoothClientThread");
+
+        log.info("Begin Zeroconf server thread");
         
         char command = 0x00;            
         while (super.getConnectedState() != STATE_QUIT) {
             switch(super.getConnectedState()) {
-                case STATE_WRITE_HELO:
-                    super.writeCommand(HELO);
+                case STATE_START:
+                    doClientAccept();
                     super.setConnectedState(STATE_READ_HELO);
                     break;
                 case STATE_READ_HELO:
-                    command = super.readCommand();
+                    command = readCommand();
                     if (command != HELO) {
                         log.error("Received unexpected command: " + command);
                         cleanupConnection();
                     } else {
-                        super.setConnectedState(STATE_WRITE_HASHES);
+                        super.setConnectedState(STATE_WRITE_HELO);
                     }
                     break;
-                case STATE_WRITE_HASHES:
-                    super.writeHashes();
-                    break;
-                case STATE_READ_MESSAGES:
-                    command = super.readCommand();
-                    if (command != MESSAGES) {
-                        log.error("Received unexpected command: " + command);
-                        cleanupConnection();
-                    } else {
-                        super.readMessages();
-                    }
-
-                    break;
-                case STATE_WRITE_SWITCH:
-                    super.writeCommand(SWITCH);
+                case STATE_WRITE_HELO:
+                    writeCommand(HELO);
                     super.setConnectedState(STATE_READ_HASHES);
                     break;
                 case STATE_READ_HASHES:
-                    command = super.readCommand();
+                    command = readCommand();
                     if (command != HASHES) {
                         log.error("Received unexpected command: " + command);
                         cleanupConnection();
                     } else {
-                        super.readHashes();
+                        readHashes();
                     }
-
                     break;
                 case STATE_WRITE_MESSAGES:
-                    super.writeMessages();
+                    writeMessages();
                     break;
                 case STATE_READ_SWITCH:
-                    command = super.readCommand();
+                    command = readCommand();
                     if (command != SWITCH) {
                         log.error("Received unexpected command: " + command);
                         cleanupConnection();
@@ -244,19 +239,35 @@ public class BluetoothClientThread extends ProtocolThread {
                         super.setConnectedState(STATE_WRITE_DONE);
                     }
                     break;
-                case STATE_WRITE_DONE:
-                    super.writeCommand(DONE);
+                case STATE_WRITE_HASHES:
+                    writeHashes();
+                    break;
+                case STATE_READ_MESSAGES:
+                    command = readCommand();
+                    if (command != MESSAGES) {
+                        log.error("Received unexpected command: " + command);
+                        cleanupConnection();
+                    } else {
+                        readMessages();
+                    }
+                    break;
+                case STATE_WRITE_SWITCH:
+                    writeCommand(SWITCH);
                     super.setConnectedState(STATE_READ_DONE);
                     break;
                 case STATE_READ_DONE:
-                    command = super.readCommand();
+                    command = readCommand();
                     if (command != DONE) {
                         log.error("Received unexpected command: " + command);
                         cleanupConnection();
                     } else {
-                        super.setConnectedState(STATE_QUIT);
+                        super.setConnectedState(STATE_WRITE_DONE);
                     }
 
+                    break;
+                case STATE_WRITE_DONE:
+                    writeCommand(DONE);
+                    super.setConnectedState(STATE_QUIT);
                     break;
                 default:
                     cleanupConnection();
@@ -266,8 +277,5 @@ public class BluetoothClientThread extends ProtocolThread {
 
         // We're done here
         cleanupConnection();
-
     }
-
 }
-

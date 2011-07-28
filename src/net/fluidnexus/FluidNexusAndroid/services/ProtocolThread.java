@@ -17,7 +17,7 @@
  */
 
 
-package net.fluidnexus.FluidNexus.services;
+package net.fluidnexus.FluidNexusAndroid.services;
 
 import java.lang.reflect.Method;
 import java.io.BufferedInputStream;
@@ -56,10 +56,10 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
 
-import net.fluidnexus.FluidNexus.provider.MessagesProvider;
-import net.fluidnexus.FluidNexus.provider.MessagesProviderHelper;
-import net.fluidnexus.FluidNexus.Logger;
-import net.fluidnexus.FluidNexus.Protos;
+import net.fluidnexus.FluidNexusAndroid.provider.MessagesProvider;
+import net.fluidnexus.FluidNexusAndroid.provider.MessagesProviderHelper;
+import net.fluidnexus.FluidNexusAndroid.Logger;
+import net.fluidnexus.FluidNexusAndroid.Protos;
 
 public class ProtocolThread extends Thread {
     private static Logger log = Logger.getLogger("FluidNexus"); 

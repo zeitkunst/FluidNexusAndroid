@@ -17,7 +17,7 @@
  */
 
 
-package net.fluidnexus.FluidNexus;
+package net.fluidnexus.FluidNexusAndroid;
 
 import java.lang.CharSequence;
 
@@ -53,8 +53,9 @@ import android.widget.Toast;
 
 import java.io.File;
 
-import net.fluidnexus.FluidNexus.provider.MessagesProvider;
-import net.fluidnexus.FluidNexus.provider.MessagesProviderHelper;
+import net.fluidnexus.FluidNexusAndroid.provider.MessagesProvider;
+import net.fluidnexus.FluidNexusAndroid.provider.MessagesProviderHelper;
+
 public class EditMessage extends Activity {
 
     private MessagesProviderHelper messagesProviderHelper = null;

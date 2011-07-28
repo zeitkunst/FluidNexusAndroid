@@ -16,7 +16,7 @@
  *
  */
 
-package net.fluidnexus.FluidNexus.provider;
+package net.fluidnexus.FluidNexusAndroid.provider;
 
 import java.util.HashMap;
 
@@ -35,7 +35,7 @@ import android.database.sqlite.SQLiteQueryBuilder;
 //import info.guardianproject.database.sqlcipher.SQLiteQueryBuilder;
 import android.net.Uri;
 
-import net.fluidnexus.FluidNexus.Logger;
+import net.fluidnexus.FluidNexusAndroid.Logger;
 
 public class MessagesProvider extends ContentProvider {
     private static Logger log = Logger.getLogger("FluidNexus"); 
@@ -46,7 +46,7 @@ public class MessagesProvider extends ContentProvider {
     private static final String DATABASE_TABLE = "Messages";
     private static final int DATABASE_VERSION = 1;
 
-    private static final String AUTHORITY = "net.fluidnexus.FluidNexus.provider.MessagesProvider";
+    private static final String AUTHORITY = "net.fluidnexus.FluidNexusAndroid.provider.MessagesProvider";
 
     // URIs for our provider
     public static final String SCHEME = "content://";

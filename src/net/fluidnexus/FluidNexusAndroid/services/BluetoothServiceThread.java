@@ -16,7 +16,7 @@
  *
  */
 
-package net.fluidnexus.FluidNexus.services;
+package net.fluidnexus.FluidNexusAndroid.services;
 
 import java.lang.reflect.Method;
 import java.io.BufferedInputStream;
@@ -68,7 +68,7 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
 
-import net.fluidnexus.FluidNexus.Logger;
+import net.fluidnexus.FluidNexusAndroid.Logger;
 
 /**
  * This thread runs all of the device/service discovery and starts threads for socket communication
