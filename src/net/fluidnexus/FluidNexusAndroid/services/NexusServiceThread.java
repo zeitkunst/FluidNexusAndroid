@@ -118,7 +118,7 @@ public class NexusServiceThread extends ServiceThread {
 
     // API infos
 
-    private static final String API_BASE = "http://192.168.1.36:6543/api/01/";
+    private static final String API_BASE = "http://192.168.1.37:6543/api/01/";
     private static final String HASH_REQUEST_URL = API_BASE + "nexus/hashes/";
     private static final String NEXUS_NONCE_URL = API_BASE + "nexus/message/nonce.json";
     private static final String NEXUS_MESSAGE_URL = API_BASE + "nexus/message/update.json";

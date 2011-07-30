@@ -121,6 +121,7 @@ public class MainActivity extends ListActivity {
     private static final int ACTIVITY_HELP = 5;
     private static final int REQUEST_ENABLE_BT = 6;
     private static final int ACTIVITY_EDIT_MESSAGE = 7;
+    private static final int ACTIVITY_ABOUT = 8;
 
     private static final int VIEW_ALL = 0;
     private static final int VIEW_PUBLIC = 1;
@@ -642,6 +643,8 @@ public class MainActivity extends ListActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         TextView tv;
 
+        Intent i = null;
+
         switch (item.getItemId()) {
             case R.id.menu_add:
                 addOutgoingMessage();
@@ -730,10 +733,16 @@ public class MainActivity extends ListActivity {
                 editPreferences();
                 return true;
             case R.id.menu_help:
-                Intent i = new Intent(this, Help.class);
+                i = new Intent(this, Help.class);
                 /*startSubActivity(i, ACTIVITY_HELP);*/
                 startActivityForResult(i, ACTIVITY_HELP);
                 return true;
+            case R.id.menu_about:
+                i = new Intent(this, About.class);
+                /*startSubActivity(i, ACTIVITY_HELP);*/
+                startActivityForResult(i, ACTIVITY_ABOUT);
+                return true;
+
         }
 
         return super.onOptionsItemSelected(item);

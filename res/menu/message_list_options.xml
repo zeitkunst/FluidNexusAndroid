@@ -31,4 +31,9 @@
         android:title="@string/menu_help"
         android:icon="@drawable/menu_help"
         android:alphabeticShortcut="h" />
+    <item android:id="@+id/menu_about"
+        android:title="@string/menu_about"
+        android:icon="@drawable/menu_help"
+        android:alphabeticShortcut="b" />
+
 </menu>

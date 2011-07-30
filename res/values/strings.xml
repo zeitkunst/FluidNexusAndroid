@@ -10,7 +10,8 @@
     <string name="app_name">Fluid Nexus</string>
     <string name="settings_title">Settings (Fluid Nexus)</string>
     <string name="message_view_title">View Message (Fluid Nexus)</string>
-    <string name="help_title">Help + About (Fluid Nexus)</string>
+    <string name="help_title">Help (Fluid Nexus)</string>
+    <string name="about_title">About (Fluid Nexus)</string>
     <string name="message_add_outgoing_title">New Message (Fluid Nexus)</string>
     <string name="message_edit_title">Edit Message (Fluid Nexus)</string>
     <string name="message_view_outgoing_title">View Outgoing Messages (Fluid Nexus)</string>
@@ -30,7 +31,8 @@
     <string name="menu_edit">Edit Message</string>
     <string name="menu_preferences">Preferences</string>
     <string name="menu_request_authorization">Request Nexus Authorization</string>
-    <string name="menu_help">Help + About</string>
+    <string name="menu_help">Help</string>
+    <string name="menu_about">About</string>
     <string name="really_delete_dialog">Are you sure you want to delete this message?</string>
     <string name="really_blacklist_dialog">Are you sure you want to blacklist this message?</string>
     <string name="really_unblacklist_dialog">Are you sure you want to remove this message from the blacklist?</string>
@@ -54,7 +56,6 @@
     <string name="button_concept">Concept</string>
     <string name="button_return">Return</string>
     <string name="notification">Fluid Nexus Notification</string>
-    <string name="notification_bluetooth">Fluid Nexus Bluetooth Notification</string>
     <string name="notification_title_new_message">New Message</string>
     <string name="notification_fluid_nexus_device_found">Fluid Nexus device found</string>
     <string name="notification_fluid_nexus_discovery_complete">Device discovery complete</string>
@@ -75,6 +76,10 @@
     <string name="service_started">Fluid Nexus service started</string>
     <string name="service_stopped">Fluid Nexus service stopped</string>
     <string name="service_label">Fluid Nexus Network service</string>
+    <string name="notification_starting">Starting network services</string>
+    <string name="notification_bluetooth">Bluetooth</string>
+    <string name="notification_zeroconf">Zeroconf</string>
+    <string name="notification_nexus">Nexus</string>
     <string name="preferences">Fluid Nexus Preferences</string>
     <string name="preferences_category_interface">Interface</string>
     <string name="preferences_category_network">Network</string>
@@ -133,7 +138,7 @@ BLUETOOTH SIMULATION: For the purposes of this competition, I have simulated Blu
 \n
 MESSAGE FORWARDING: Right now we only implement broadcast-style forwarding; future versions will allow the creation of pre-defined groups for more limited distribution.  The forwarding algorithm works by reappropriating the advertisement of Bluetooth services to advertise hashes of already-received messages.  This is similar to what many insects do in the wild, by leaving traces of prior activity in an area, known as stigmergy.  Thus messages leave traces of where they\'ve been, via the advertisement of their hashes, thus greatly increasing the efficiency of this broadcast-style forwarding algorithm.  For more information, please see the PDF documentation available online ( http://fluidnexus.net/media/pdf/FluidNexusAndroid.pdf ).
     </string>
-
+    <string name="about_text">This is some about text, along with some credits.</string>
     <string name="ro_perm_label">read messages</string>
     <string name="ro_perm_desc">Allows applications to read messages from the Fluid Nexus content provider.</string>
     <string name="wo_perm_label">write messages</string>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+android:id="@+id/widget27"
+android:layout_width="fill_parent"
+android:layout_height="fill_parent"
+android:background="@drawable/message_list_item_gradient"
+xmlns:android="http://schemas.android.com/apk/res/android"
+>
+<RelativeLayout
+    android:id="@+id/top_relative_layout"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentTop="true" >
+    <RelativeLayout
+        android:orientation="vertical" 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp">
+            <TextView
+            android:id="@+id/about_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fluid Nexus"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_color"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            >
+            </TextView>
+            <TextView
+            android:id="@+id/about_website"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:autoLink="web"
+            android:text="http://fluidnexus.net"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:linksClickable="true"
+            android:layout_below="@+id/about_name"
+            android:layout_alignParentRight="true"
+            >
+            </TextView>
+            <TextView
+            android:id="@+id/about_version"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:autoLink="web"
+            android:text=""
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_color"
+            android:linksClickable="true"
+            android:layout_below="@+id/about_website"
+            android:layout_alignParentRight="true"
+            >
+            </TextView>
+        
+            <ImageView
+            android:id="@+id/help_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/fluid_nexus_help_icon"
+            android:adjustViewBounds="true"
+            android:maxHeight="75sp"
+            android:maxWidth="75sp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            />
+    </RelativeLayout>
+</RelativeLayout>
+
+<ScrollView
+    android:id="@+id/help_scroll_view"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/top_relative_layout"
+    android:scrollbars="vertical"
+    android:fadingEdgeLength="10sp"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:padding="5px"
+    android:orientation="vertical" >
+        <TextView
+        android:id="@+id/help_text"
+        android:autoLink="web"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:padding="5px"
+        android:text="@string/about_text"
+        android:linksClickable="true"
+        android:textSize="11sp"
+        android:textColor="@color/text_color"
+        android:scrollHorizontally="false"
+        >
+        </TextView>
+</ScrollView>
+</RelativeLayout>
+
+

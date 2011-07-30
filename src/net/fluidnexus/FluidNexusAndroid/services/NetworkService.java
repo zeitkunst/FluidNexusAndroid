@@ -113,6 +113,14 @@ public class NetworkService extends Service {
     private int zeroconfEnabled = 0;
     private int nexusEnabled = 0;
 
+    // masks for notification info
+    private static final int NONE_FLAG = 0;
+    private static final int BLUETOOTH_FLAG = 1<<0;
+    private static final int ZEROCONF_FLAG = 1<<1;
+    private static final int NEXUS_FLAG = 1<<2;
+    private int notificationFlags = 0;
+
+
     // Target we publish for clients to send messages to
     final Messenger messenger = new Messenger(new IncomingHandler());
 
@@ -124,7 +132,8 @@ public class NetworkService extends Service {
     private static final UUID FluidNexusUUID = UUID.fromString("bd547e68-952b-11e0-a6c7-0023148b3104");
 
 
-    private NotificationManager nm;
+    private NotificationManager nm = null;
+    private Notification notification = null;
     private int NOTIFICATION = R.string.service_started;
     
     // Timers
@@ -181,6 +190,8 @@ public class NetworkService extends Service {
                         */
                     }
                     bluetoothEnabled = msg.arg1;
+                    notificationFlags |= BLUETOOTH_FLAG;
+                    updateNotification();
                     break;
                 case MSG_ZEROCONF_ENABLED:
                     if (msg.arg1 != zeroconfEnabled) {
@@ -193,6 +204,8 @@ public class NetworkService extends Service {
 
                     }
                     zeroconfEnabled = msg.arg1;
+                    notificationFlags |= ZEROCONF_FLAG;
+                    updateNotification();
                     break;
                 case MSG_NEXUS_START:
                     if (msg.arg1 != nexusEnabled) {
@@ -209,6 +222,8 @@ public class NetworkService extends Service {
                         }
 
                         nexusEnabled = msg.arg1;
+                        notificationFlags |= NEXUS_FLAG;
+                        updateNotification();
                     }
 
 
@@ -283,19 +298,71 @@ public class NetworkService extends Service {
      * Show a notification while the service is running
      */
     private void showNotification() {
-        CharSequence text = getText(R.string.service_started);
+
+        //CharSequence text = getText(R.string.service_started);
 
         // Set icon, scrolling text, and timestamp
-        Notification notification = new Notification(R.drawable.fluid_nexus_icon, text, System.currentTimeMillis());
+        notification = new Notification(R.drawable.fluid_nexus_icon, getNotificationText(), System.currentTimeMillis());
         notification.flags |= Notification.FLAG_ONGOING_EVENT;
 
         // The PendingIntent to launch the activity of the user selects this notification
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0);
 
         // Set the info for the view that show in the notification panel
-        notification.setLatestEventInfo(this, getText(R.string.service_label), text, contentIntent);
+        notification.setLatestEventInfo(this, getText(R.string.service_label), getNotificationText(), contentIntent);
 
         nm.notify(NOTIFICATION, notification);
     }
 
+    /**
+     * Update the notification
+     */
+    private void updateNotification() {
+        log.debug("UPDATING NOTIFICATION");
+        // The PendingIntent to launch the activity of the user selects this notification
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0);
+
+        // Set the info for the view that show in the notification panel
+        notification.setLatestEventInfo(this, getText(R.string.service_label), getNotificationText(), contentIntent);
+
+        nm.notify(NOTIFICATION, notification);
+
+    }
+
+    /**
+     * Get the current notification text
+     * @return notificationText the text for the notification
+     */
+    private String getNotificationText() {
+        String notificationText = "";
+
+        if (0 != (notificationFlags & BLUETOOTH_FLAG)) {
+            notificationText = getText(R.string.notification_bluetooth).toString();
+        }
+
+        if (0 != (notificationFlags & ZEROCONF_FLAG)) {
+            if (notificationText.length() > 0) {
+                notificationText = notificationText + ", " + getText(R.string.notification_zeroconf).toString();
+            } else {
+                notificationText = (String) getText(R.string.notification_zeroconf).toString();
+
+            }
+        }
+
+        if (0 != (notificationFlags & NEXUS_FLAG)) {
+            if (notificationText.length() > 0) {
+                notificationText = notificationText + ", " + getText(R.string.notification_nexus).toString();
+            } else {
+                notificationText = (String) getText(R.string.notification_nexus).toString();
+
+            }
+        }
+
+        if (notificationText.length() == 0) {
+            notificationText = getText(R.string.notification_starting).toString();
+        }
+
+        return notificationText;
+
+    }
 }
