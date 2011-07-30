@@ -108,6 +108,9 @@ public class BluetoothServiceThread extends ServiceThread {
     // UUID
     private static final UUID FluidNexusUUID = UUID.fromString("bd547e68-952b-11e0-a6c7-0023148b3104");
 
+    // Threads
+    private BluetoothServerThread serverThread = null;
+
     /**
      * BroadcastReceiver for the bluetooth discovery responses
      */
@@ -177,10 +180,20 @@ public class BluetoothServiceThread extends ServiceThread {
         btFoundFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         context.registerReceiver(btDiscoveryReceiver, btFoundFilter);
 
-        setName("BluetoothServiceThread-Paired+Discovery");
+        setName("BluetoothServiceThread");
 
         updateHashes();
         updateData();
+
+        // Start the server thread
+
+        if (serverThread == null) {
+
+            serverThread = new BluetoothServerThread(ctx, threadHandler, clients);
+            serverThread.setHashes(currentHashes);
+            serverThread.setData(currentData);
+            serverThread.start();
+        }
     }
 
     /**

@@ -19,9 +19,6 @@
 
 package net.fluidnexus.FluidNexusAndroid.services;
 
-import javax.jmdns.JmDNS;
-import javax.jmdns.ServiceInfo;
-
 import java.lang.reflect.Method;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -47,6 +44,9 @@ import java.util.Vector;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothServerSocket;
+import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.wifi.WifiManager;
@@ -67,7 +67,7 @@ import net.fluidnexus.FluidNexusAndroid.Logger;
 /**
  * Thread that actually sends data to a connected device
  */
-public class ZeroconfServerThread extends ProtocolThread {
+public class BluetoothServerThread extends ProtocolThread {
     private static Logger log = Logger.getLogger("FluidNexus"); 
 
     //private DataInputStream inputStream = null;
@@ -77,26 +77,9 @@ public class ZeroconfServerThread extends ProtocolThread {
 
     private char connectedState = 0x00;
 
-    private ServerSocket serverSocket;
-
-    private final char STATE_START = 0x00;
-    private final char STATE_WRITE_HELO = 0x10;
-    private final char STATE_READ_HELO = 0x20;        
-    private final char STATE_WRITE_HASHES = 0x30;
-    private final char STATE_READ_MESSAGES = 0x40;
-    private final char STATE_WRITE_SWITCH = 0x50;
-    private final char STATE_READ_HASHES = 0x60;
-    private final char STATE_WRITE_MESSAGES = 0x70;
-    private final char STATE_READ_SWITCH = 0x80;
-    private final char STATE_WRITE_DONE = 0x90;
-    private final char STATE_READ_DONE = 0xA0;
-    private final char STATE_QUIT = 0xF0;
-
-    private final char HELO = 0x10;
-    private final char HASHES = 0x20;
-    private final char MESSAGES = 0x30;
-    private final char SWITCH = 0x80;
-    private final char DONE = 0xF0;
+    private BluetoothServerSocket serverSocket = null;
+    private BluetoothSocket socket = null;
+    private BluetoothAdapter bluetoothAdapter;
 
     private HashSet<String> hashesToSend = new HashSet<String>();
 
@@ -104,32 +87,12 @@ public class ZeroconfServerThread extends ProtocolThread {
     // will likely always be only a single client, but what the hey
     ArrayList<Messenger> clients = new ArrayList<Messenger>();
 
-    // Our zeroconf type
-    private static final String zeroconfType = "_fluidnexus._tcp.local.";
-    
-    // jmdns infos
-    private JmDNS jmdns = null;
-    private ServiceInfo serviceInfo;
-    private MulticastLock lock = null;
-    private WifiManager wifiManager = null;
-
-    private static final int ZEROCONF_PORT = 17894;
-
-    public ZeroconfServerThread(Context ctx, Handler givenHandler, ArrayList<Messenger> givenClients) {
+    public BluetoothServerThread(Context ctx, Handler givenHandler, ArrayList<Messenger> givenClients) {
 
         super(ctx, givenHandler, givenClients);
-        setName("ZeroconfServerThread");
-        wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        lock = wifiManager.createMulticastLock("ZeroconfServerLock");
-        lock.setReferenceCounted(true);
+        setName("BluetoothServerThread");
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-
-        try {
-            serverSocket = new ServerSocket(ZEROCONF_PORT);
-        } catch (IOException e) {
-            log.error("Unable to create new server socket.");
-            cleanupConnection();
-        }
 
     }
 
@@ -137,6 +100,12 @@ public class ZeroconfServerThread extends ProtocolThread {
      * Do the client accept work
      */
     private void doClientAccept() {
+        try {
+            serverSocket = bluetoothAdapter.listenUsingRfcommWithServiceRecord("Fluid Nexus", FluidNexusUUID);;
+        } catch (IOException e) {
+            log.error("Unable to create new server socket: " + e);
+            cleanupConnection();
+        }
 
         try {
             socket = serverSocket.accept();
@@ -161,33 +130,15 @@ public class ZeroconfServerThread extends ProtocolThread {
     }
 
     /**
-     * Advertise our service
-     */
-    public void advertiseService() {
-        lock.acquire();
-        log.debug("Advertising our service");
-        serviceInfo = ServiceInfo.create(zeroconfType, "Fluid Nexus", 0, "Fluid Nexus Zeroconf server for android");
-        try {
-            jmdns = JmDNS.create();
-            jmdns.registerService(serviceInfo);
-        } catch (IOException e) {
-            log.error("Unable to register zeroconf service.");
-            e.printStackTrace();
-        }
-        lock.release();
-    }
-
-
-    /**
      * Cleanup the connection and exit out of main loop
      */
     @Override
     public void cleanupConnection() {
         try {
-            socket.close();
             serverSocket.close();
+            socket.close();
         } catch (IOException e) {
-            log.error("close() of ZeroconfServerThread socket failed: " + e);
+            log.error("close() of BluetoothServerThread socket failed: " + e);
         }
 
         setConnectedState(STATE_QUIT);
@@ -196,10 +147,11 @@ public class ZeroconfServerThread extends ProtocolThread {
     @Override
     public void run() {
 
-        log.info("Begin Zeroconf server thread");
+        log.info("Begin Bluetooth server thread");
         
         char command = 0x00;            
-        while (super.getConnectedState() != STATE_QUIT) {
+        boolean done = false;
+        while (!done) {
             switch(super.getConnectedState()) {
                 case STATE_START:
                     doClientAccept();
@@ -267,9 +219,13 @@ public class ZeroconfServerThread extends ProtocolThread {
                     break;
                 case STATE_WRITE_DONE:
                     writeCommand(DONE);
-                    super.setConnectedState(STATE_QUIT);
+                    cleanupConnection();
+                    break;
+                case STATE_QUIT:
+                    super.setConnectedState(STATE_START);
                     break;
                 default:
+                    done = true;
                     cleanupConnection();
                     break;
             }            

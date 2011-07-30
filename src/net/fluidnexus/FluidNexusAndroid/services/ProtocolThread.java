@@ -79,24 +79,26 @@ public class ProtocolThread extends Thread {
 
     private char connectedState = 0x00;
 
-    private final char STATE_START = 0x00;
-    private final char STATE_WRITE_HELO = 0x10;
-    private final char STATE_READ_HELO = 0x20;        
-    private final char STATE_WRITE_HASHES = 0x30;
-    private final char STATE_READ_MESSAGES = 0x40;
-    private final char STATE_WRITE_SWITCH = 0x50;
-    private final char STATE_READ_HASHES = 0x60;
-    private final char STATE_WRITE_MESSAGES = 0x70;
-    private final char STATE_READ_SWITCH = 0x80;
-    private final char STATE_WRITE_DONE = 0x90;
-    private final char STATE_READ_DONE = 0xA0;
-    private final char STATE_QUIT = 0xF0;
+    public final char STATE_START = 0x00;
+    public final char STATE_WRITE_HELO = 0x10;
+    public final char STATE_READ_HELO = 0x20;        
+    public final char STATE_WRITE_HASHES = 0x30;
+    public final char STATE_READ_MESSAGES = 0x40;
+    public final char STATE_WRITE_SWITCH = 0x50;
+    public final char STATE_READ_HASHES = 0x60;
+    public final char STATE_WRITE_MESSAGES = 0x70;
+    public final char STATE_READ_SWITCH = 0x80;
+    public final char STATE_WRITE_DONE = 0x90;
+    public final char STATE_READ_DONE = 0xA0;
+    public final char STATE_QUIT = 0xF0;
 
-    private final char HELO = 0x10;
-    private final char HASHES = 0x20;
-    private final char MESSAGES = 0x30;
-    private final char SWITCH = 0x80;
-    private final char DONE = 0xF0;
+    public final char HELO = 0x10;
+    public final char HASHES = 0x20;
+    public final char MESSAGES = 0x30;
+    public final char SWITCH = 0x80;
+    public final char DONE = 0xF0;
+
+    public final HashMap<Integer, String> stateMapping = new HashMap<Integer, String>();
 
     private HashSet<String> hashesToSend = new HashSet<String>();
 
@@ -131,8 +133,27 @@ public class ProtocolThread extends Thread {
 
         //updateHashes();
         //updateData();
-
+        
+        setStateMapping();
         setConnectedState(STATE_START);
+    }
+
+    /**
+     * Setup our state mapping for easy log viewing
+     */
+    public void setStateMapping() {
+        stateMapping.put(0x00, "STATE_START");
+        stateMapping.put(0x10, "STATE_WRITE_HELO");
+        stateMapping.put(0x20, "STATE_READ_HELO");
+        stateMapping.put(0x30, "STATE_WRITE_MESSAGES");
+        stateMapping.put(0x40, "STATE_READ_MESSAGES");
+        stateMapping.put(0x50, "STATE_WRITE_SWITCH");
+        stateMapping.put(0x60, "STATE_READ_HASHES");
+        stateMapping.put(0x70, "STATE_WRITE_MESSAGES");
+        stateMapping.put(0x80, "STATE_READ_SWITCH");
+        stateMapping.put(0x90, "STATE_WRITE_DONE");
+        stateMapping.put(0xA0, "STATE_READ_DONE");
+        stateMapping.put(0xF0, "STATE_QUIT");
     }
 
     /**
@@ -256,8 +277,10 @@ public class ProtocolThread extends Thread {
     public synchronized void setConnectedState(char newState) {
         int iNew = (int) newState;
         int iConnected = (int) connectedState;
-        String tmpNewState = Integer.toString(iNew);
-        String tmpConnectedState = Integer.toString(iConnected);
+        //String tmpNewState = Integer.toString(iNew);
+        String tmpNewState = stateMapping.get(iNew);
+        //String tmpConnectedState = Integer.toString(iConnected);
+        String tmpConnectedState = stateMapping.get(iConnected);
         log.debug("Changing connected thread state from " + tmpConnectedState + " to " + tmpNewState);
         connectedState = newState;
     }
