@@ -44,7 +44,7 @@ public class About extends Activity {
 
         super.onCreate(icicle);
         setContentView(R.layout.about);
-        setTitle(R.string.help_title);
+        setTitle(R.string.about_title);
         Bundle extras = getIntent().getExtras();
         
         tv = (TextView) findViewById(R.id.about_version);

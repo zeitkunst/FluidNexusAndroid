@@ -88,6 +88,8 @@
     <string name="preferences_category_nexus">Nexus</string>
     <string name="preferences_show_messages">Show messages?</string>
     <string name="preferences_show_messages_summary">Whether or not to show messages in the interface.</string>
+    <string name="preferences_vibrate">Vibrate on new messages?</string>
+    <string name="preferences_vibrate_summary">Whether or not to vibrate when new messages arrive.</string>
     <string name="preferences_enable_bluetooth_service">Bluetooth Service</string>
     <string name="preferences_enable_bluetooth_service_summary">Whether or not the bluetooth service is enabled.  This service will run even when the application has ended.</string>
     <string name="preferences_enable_zeroconf_service">Zeroconf Service</string>

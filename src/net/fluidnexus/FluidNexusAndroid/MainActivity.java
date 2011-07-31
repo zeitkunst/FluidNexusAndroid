@@ -45,6 +45,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -159,6 +160,9 @@ public class MainActivity extends ListActivity {
 
     private BluetoothAdapter bluetoothAdapter = null;
     private boolean enableBluetoothServicePref = true;
+    private boolean vibratePref = false;
+
+    private Vibrator vibrator = null;
 
     private File attachmentsDir = null;
 
@@ -180,6 +184,11 @@ public class MainActivity extends ListActivity {
             switch (msg.what) {
                 case NetworkService.MSG_NEW_MESSAGE_RECEIVED:
                     Toast.makeText(getApplicationContext(), R.string.toast_new_message_received, Toast.LENGTH_LONG).show();
+
+                    if (vibratePref) {
+                        ((Vibrator) getSystemService(getApplicationContext().VIBRATOR_SERVICE)).vibrate(500);
+                    }
+
                     fillListView(VIEW_MODE);
                     break;
                 default:
@@ -254,12 +263,6 @@ public class MainActivity extends ListActivity {
         setContentView(R.layout.message_list);
         registerForContextMenu(getListView());
 
-        /*      
-        // Regiser my receiver to NEW_MESSAGE action
-        iFilter = new IntentFilter(getText(R.string.intent_new_message).toString());
-        iReceiver = new NewMessageIntentReceiver();
-        registerReceiver(iReceiver, iFilter);
-        */
 
         // setup bluetooth adapter
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -411,8 +414,9 @@ public class MainActivity extends ListActivity {
 
         fillListView(VIEW_MODE);
 
-        setupPreferences();
+        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
+        setupPreferences();
 
         if (bluetoothAdapter != null) {
             if (!bluetoothAdapter.isEnabled()) {
@@ -594,7 +598,8 @@ public class MainActivity extends ListActivity {
             fillListView(VIEW_MODE);
         }
         
-        showMessages = prefs.getBoolean("ShowMessages", true);
+        showMessages = prefs.getBoolean("showMessagesPref", true);
+        vibratePref = prefs.getBoolean("vibratePref", false);
 
         // Setup a listener for when preferences change
         preferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
@@ -621,8 +626,10 @@ public class MainActivity extends ListActivity {
                     } catch (RemoteException e) {
                         log.error("Unable to send scan frequency message: " + e);
                     }
-                } else if (key.equals("showMessages")) {
-                    showMessages = prefs.getBoolean("showMessages", true);
+                } else if (key.equals("vibratePref")) {
+                    vibratePref = prefs.getBoolean("vibratePref", false);
+                } else if (key.equals("showMessagesPref")) {
+                    showMessages = prefs.getBoolean("showMessagesPref", true);
                     fillListView(VIEW_MODE);
                 }
 

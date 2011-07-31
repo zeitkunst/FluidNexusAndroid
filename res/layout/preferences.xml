@@ -8,6 +8,12 @@
             android:enabled="false"
             android:summary="@string/preferences_show_messages_summary"
             android:key="showMessagesPref" />
+        <CheckBoxPreference
+            android:title="@string/preferences_vibrate"
+            android:defaultValue="true"
+            android:summary="@string/preferences_vibrate_summary"
+            android:key="vibratePref" />
+
     </PreferenceCategory>
     <PreferenceCategory
         android:title="@string/preferences_category_network">

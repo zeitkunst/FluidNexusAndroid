@@ -318,7 +318,6 @@ public class NetworkService extends Service {
      * Update the notification
      */
     private void updateNotification() {
-        log.debug("UPDATING NOTIFICATION");
         // The PendingIntent to launch the activity of the user selects this notification
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0);
 
