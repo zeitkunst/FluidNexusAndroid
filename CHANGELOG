@@ -1,0 +1,11 @@
+CHANGELOG
+=========
+
+v0.2.2
+------
+
+* Enabled bluetooth server for accepting bluetooth connections
+* Added option for phone to vibrate on message receipt
+* Added "About" activity
+
+    
