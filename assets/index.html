@@ -8,308 +8,64 @@
 <style type="text/css">
 
 /*
-:Author: David Goodger (goodger@python.org)
-:Id: $Id: html4css1.css 7056 2011-06-17 10:50:48Z milde $
-:Copyright: This stylesheet has been placed in the public domain.
+_______________________________
+Desktop version layout - place your custom code here */
 
-Default cascading style sheet for the HTML output of Docutils.
-
-See http://docutils.sf.net/docs/howto/html-stylesheets.html for how to
-customize this style sheet.
-*/
-
-/* used to remove borders from tables and images */
-.borderless, table.borderless td, table.borderless th {
-  border: 0 }
-
-table.borderless td, table.borderless th {
-  /* Override padding for "table.docutils td" with "! important".
-     The right padding separates the table cells. */
-  padding: 0 0.5em 0 0 ! important }
-
-.first {
-  /* Override more specific margin styles with "! important". */
-  margin-top: 0 ! important }
-
-.last, .with-subtitle {
-  margin-bottom: 0 ! important }
-
-.hidden {
-  display: none }
-
-a.toc-backref {
-  text-decoration: none ;
-  color: black }
-
-blockquote.epigraph {
-  margin: 2em 5em ; }
-
-dl.docutils dd {
-  margin-bottom: 0.5em }
-
-object[type="image/svg+xml"], object[type="application/x-shockwave-flash"] {
-  overflow: hidden;
+body {
+    font-family: Verdana, sans-serif;
+    font-size: 1.1em;
+    background-color: #ddd;
 }
 
-/* Uncomment (and remove this text!) to get bold-faced definition list terms
-dl.docutils dt {
-  font-weight: bold }
-*/
-
-div.abstract {
-  margin: 2em 5em }
-
-div.abstract p.topic-title {
-  font-weight: bold ;
-  text-align: center }
-
-div.admonition, div.attention, div.caution, div.danger, div.error,
-div.hint, div.important, div.note, div.tip, div.warning {
-  margin: 2em ;
-  border: medium outset ;
-  padding: 1em }
-
-div.admonition p.admonition-title, div.hint p.admonition-title,
-div.important p.admonition-title, div.note p.admonition-title,
-div.tip p.admonition-title {
-  font-weight: bold ;
-  font-family: sans-serif }
-
-div.attention p.admonition-title, div.caution p.admonition-title,
-div.danger p.admonition-title, div.error p.admonition-title,
-div.warning p.admonition-title {
-  color: red ;
-  font-weight: bold ;
-  font-family: sans-serif }
-
-/* Uncomment (and remove this text!) to get reduced vertical space in
-   compound paragraphs.
-div.compound .compound-first, div.compound .compound-middle {
-  margin-bottom: 0.5em }
-
-div.compound .compound-last, div.compound .compound-middle {
-  margin-top: 0.5em }
-*/
-
-div.dedication {
-  margin: 2em 5em ;
-  text-align: center ;
-  font-style: italic }
-
-div.dedication p.topic-title {
-  font-weight: bold ;
-  font-style: normal }
-
-div.figure {
-  margin-left: 2em ;
-  margin-right: 2em }
-
-div.footer, div.header {
-  clear: both;
-  font-size: smaller }
-
-div.line-block {
-  display: block ;
-  margin-top: 1em ;
-  margin-bottom: 1em }
-
-div.line-block div.line-block {
-  margin-top: 0 ;
-  margin-bottom: 0 ;
-  margin-left: 1.5em }
-
-div.sidebar {
-  margin: 0 0 0.5em 1em ;
-  border: medium outset ;
-  padding: 1em ;
-  background-color: #ffffee ;
-  width: 40% ;
-  float: right ;
-  clear: right }
-
-div.sidebar p.rubric {
-  font-family: sans-serif ;
-  font-size: medium }
-
-div.system-messages {
-  margin: 5em }
-
-div.system-messages h1 {
-  color: red }
-
-div.system-message {
-  border: medium outset ;
-  padding: 1em }
-
-div.system-message p.system-message-title {
-  color: red ;
-  font-weight: bold }
-
-div.topic {
-  margin: 2em }
-
-h1.section-subtitle, h2.section-subtitle, h3.section-subtitle,
-h4.section-subtitle, h5.section-subtitle, h6.section-subtitle {
-  margin-top: 0.4em }
-
-h1.title {
-  text-align: center }
-
-h2.subtitle {
-  text-align: center }
-
-hr.docutils {
-  width: 75% }
-
-img.align-left, .figure.align-left, object.align-left {
-  clear: left ;
-  float: left ;
-  margin-right: 1em }
-
-img.align-right, .figure.align-right, object.align-right {
-  clear: right ;
-  float: right ;
-  margin-left: 1em }
-
-img.align-center, .figure.align-center, object.align-center {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
+h1, h2, h3 {
+    font-weight: normal;
+    font-family: Palatino, "Times New Roman", serif;
+    color: #84302d;
 }
 
-.align-left {
-  text-align: left }
+h1 {
+    font-size: 2em;
+}
 
-.align-center {
-  clear: both ;
-  text-align: center }
+h2 {
+    font-size: 1.5em;
+}
 
-.align-right {
-  text-align: right }
+h3 {
+    font-size: 1.3em;
+}
 
-/* reset inner alignment in figures */
-div.align-right {
-  text-align: inherit }
+img {
+    margin: 0em;
+    padding: 0em;
+}
 
-/* div.align-center * { */
-/*   text-align: left } */
+ol {
+    list-style-type: decimal;
+}
 
-ol.simple, ul.simple {
-  margin-bottom: 1em }
+code {
+    font-family: "Courier", "Courier New", monospace;
+}
 
-ol.arabic {
-  list-style: decimal }
+a {
+    color: #EB302D;
+    text-decoration: underline;
+}
 
-ol.loweralpha {
-  list-style: lower-alpha }
+a:visited {
+    color: #EB302D;
+    text-decoration: underline;
+}
 
-ol.upperalpha {
-  list-style: upper-alpha }
+a:hover {
+    color: #84302d;
+    text-decoration: none;
+}
 
-ol.lowerroman {
-  list-style: lower-roman }
-
-ol.upperroman {
-  list-style: upper-roman }
-
-p.attribution {
-  text-align: right ;
-  margin-left: 50% }
-
-p.caption {
-  font-style: italic }
-
-p.credits {
-  font-style: italic ;
-  font-size: smaller }
-
-p.label {
-  white-space: nowrap }
-
-p.rubric {
-  font-weight: bold ;
-  font-size: larger ;
-  color: maroon ;
-  text-align: center }
-
-p.sidebar-title {
-  font-family: sans-serif ;
-  font-weight: bold ;
-  font-size: larger }
-
-p.sidebar-subtitle {
-  font-family: sans-serif ;
-  font-weight: bold }
-
-p.topic-title {
-  font-weight: bold }
-
-pre.address {
-  margin-bottom: 0 ;
-  margin-top: 0 ;
-  font: inherit }
-
-pre.literal-block, pre.doctest-block, pre.math {
-  margin-left: 2em ;
-  margin-right: 2em }
-
-span.classifier {
-  font-family: sans-serif ;
-  font-style: oblique }
-
-span.classifier-delimiter {
-  font-family: sans-serif ;
-  font-weight: bold }
-
-span.interpreted {
-  font-family: sans-serif }
-
-span.option {
-  white-space: nowrap }
-
-span.pre {
-  white-space: pre }
-
-span.problematic {
-  color: red }
-
-span.section-subtitle {
-  /* font-size relative to parent (h1..h6 element) */
-  font-size: 80% }
-
-table.citation {
-  border-left: solid 1px gray;
-  margin-left: 1px }
-
-table.docinfo {
-  margin: 2em 4em }
-
-table.docutils {
-  margin-top: 0.5em ;
-  margin-bottom: 0.5em }
-
-table.footnote {
-  border-left: solid 1px black;
-  margin-left: 1px }
-
-table.docutils td, table.docutils th,
-table.docinfo td, table.docinfo th {
-  padding-left: 0.5em ;
-  padding-right: 0.5em ;
-  vertical-align: top }
-
-table.docutils th.field-name, table.docinfo th.docinfo-name {
-  font-weight: bold ;
-  text-align: left ;
-  white-space: nowrap ;
-  padding-left: 0 }
-
-h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
-h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
-  font-size: 100% }
-
-ul.auto-toc {
-  list-style-type: none }
+.caption {
+    font-style: italic;
+}
 
 </style>
 </head>
@@ -319,9 +75,6 @@ ul.auto-toc {
 
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 <!-- TODO -->
-<!--  -->
-<!-- - just a test -->
-<!-- - another test -->
 <div class="contents topic" id="contents">
 <p class="topic-title first">Contents</p>
 <ul class="auto-toc simple">
@@ -346,12 +99,17 @@ ul.auto-toc {
 <li><a class="reference internal" href="#using-fluid-nexus" id="id15">5&nbsp;&nbsp;&nbsp;Using Fluid Nexus</a><ul class="auto-toc">
 <li><a class="reference internal" href="#creating-a-new-message" id="id16">5.1&nbsp;&nbsp;&nbsp;Creating a new message</a></li>
 <li><a class="reference internal" href="#editing-messages" id="id17">5.2&nbsp;&nbsp;&nbsp;Editing Messages</a></li>
-<li><a class="reference internal" href="#preferences" id="id18">5.3&nbsp;&nbsp;&nbsp;Preferences</a></li>
+<li><a class="reference internal" href="#preferences" id="id18">5.3&nbsp;&nbsp;&nbsp;Preferences</a><ul class="auto-toc">
+<li><a class="reference internal" href="#network" id="id19">5.3.1&nbsp;&nbsp;&nbsp;Network</a></li>
+<li><a class="reference internal" href="#scan-frequency" id="id20">5.3.2&nbsp;&nbsp;&nbsp;Scan Frequency</a></li>
+<li><a class="reference internal" href="#nexus" id="id21">5.3.3&nbsp;&nbsp;&nbsp;Nexus</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#technical-information" id="id19">6&nbsp;&nbsp;&nbsp;Technical Information</a><ul class="auto-toc">
-<li><a class="reference internal" href="#protocol-buffer-implementation" id="id20">6.1&nbsp;&nbsp;&nbsp;Protocol Buffer implementation</a></li>
-<li><a class="reference internal" href="#network-modalities" id="id21">6.2&nbsp;&nbsp;&nbsp;Network Modalities</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#technical-information" id="id22">6&nbsp;&nbsp;&nbsp;Technical Information</a><ul class="auto-toc">
+<li><a class="reference internal" href="#protocol-buffer-implementation" id="id23">6.1&nbsp;&nbsp;&nbsp;Protocol Buffer implementation</a></li>
+<li><a class="reference internal" href="#network-modalities" id="id24">6.2&nbsp;&nbsp;&nbsp;Network Modalities</a></li>
 </ul>
 </li>
 </ul>
@@ -387,27 +145,27 @@ ul.auto-toc {
 <p>In this manual <strong>Android</strong> refers to the Android application, while <strong>Desktop</strong> refers to the application for Windows and Linux PCs.</p>
 <p>The following icons are used throughout the manual and in the applications themselves:</p>
 <dl class="docutils">
-<dt><img alt="Public messages created by you" src="file:///android_asset/images/menu_public.png" style="width: 48px;" /> Public messages created by you</dt>
+<dt><img alt="Public messages created by you" src="images/menu_public.png" style="width: 48px;" /> Public messages created by you</dt>
 <dd>Messages that you have marked as public and will be pushed by yourself or someone else to the Nexus</dd>
 </dl>
 <dl class="docutils">
-<dt><img alt="Public messages created by someone else" src="file:///android_asset/images/menu_public_other.png" style="width: 48px;" /> Public messages created by someone else</dt>
+<dt><img alt="Public messages created by someone else" src="images/menu_public_other.png" style="width: 48px;" /> Public messages created by someone else</dt>
 <dd>Messages that someone else has marked as public and will be pushed by yourself or someone else to the Nexus</dd>
 </dl>
 <dl class="docutils">
-<dt><img alt="Outgoing messages" src="file:///android_asset/images/menu_outgoing.png" style="width: 48px;" /> Outgoing messages</dt>
+<dt><img alt="Outgoing messages" src="images/menu_outgoing.png" style="width: 48px;" /> Outgoing messages</dt>
 <dd>Messages that you've created and that will be passed to other devices running Fluid Nexus</dd>
 </dl>
 <dl class="docutils">
-<dt><img alt="Other messages" src="file:///android_asset/images/menu_all.png" style="width: 48px;" /> Other messages</dt>
+<dt><img alt="Other messages" src="images/menu_all.png" style="width: 48px;" /> Other messages</dt>
 <dd>Messages that you've received from other users of Fluid Nexus</dd>
 </dl>
 <dl class="docutils">
-<dt><img alt="Blacklisted messages" src="file:///android_asset/images/menu_blacklist.png" style="width: 48px;" /> Blacklisted messages</dt>
+<dt><img alt="Blacklisted messages" src="images/menu_blacklist.png" style="width: 48px;" /> Blacklisted messages</dt>
 <dd>Messages that you've blacklisted (removed from view)</dd>
 </dl>
 <dl class="docutils">
-<dt><img alt="Attachment" src="file:///android_asset/images/attachment_icon.png" style="width: 48px;" /> Message attachment</dt>
+<dt><img alt="Attachment" src="images/attachment_icon.png" style="width: 48px;" /> Message attachment</dt>
 <dd>Indicates that the given message has an attachment of some sort (audio, image, video)</dd>
 </dl>
 </div>
@@ -437,65 +195,65 @@ ul.auto-toc {
 <h1><a class="toc-backref" href="#id15">5&nbsp;&nbsp;&nbsp;Using Fluid Nexus</a></h1>
 <p>The main interface provides a list of all of the messages that have been created or received, sorted from newest to oldest.</p>
 <div class="figure">
-<img alt="android main interface" src="file:///android_asset/images/android_main_interface.png" style="width: 400px;" />
+<img alt="android main interface" src="images/android_main_interface.png" style="width: 400px;" />
 <p class="caption">Main interface of the Android application.</p>
 </div>
 <div class="figure">
-<img alt="desktop main interface" src="file:///android_asset/images/desktop_main_interface.png" style="width: 400px;" />
+<img alt="desktop main interface" src="images/desktop_main_interface.png" style="width: 400px;" />
 <p class="caption">Main interface of the Desktop application.</p>
 </div>
 <p>Due to the small screen size on Android, you must tap on a message to view it in its entirety:</p>
 <div class="figure">
-<img alt="android view message" src="file:///android_asset/images/android_view_message.png" style="width: 400px;" />
+<img alt="android view message" src="images/android_view_message.png" style="width: 400px;" />
 <p class="caption">Viewing a message (Android)</p>
 </div>
 <p>If there is an attachment, a button will appear that will allow you to open it.</p>
 <div class="figure">
-<img alt="android view message attachment" src="file:///android_asset/images/android_view_message_attachment.png" style="width: 400px;" />
+<img alt="android view message attachment" src="images/android_view_message_attachment.png" style="width: 400px;" />
 <p class="caption">Viewing a message with an attachment (Android)</p>
 </div>
 <p>On the desktop version, all of the message is displayed in the main window.  If there is an attachment, an icon will be displayed with a blue clickable link to open it.</p>
 <div class="figure">
-<img alt="desktop main interface" src="file:///android_asset/images/desktop_main_interface.png" style="width: 400px;" />
+<img alt="desktop main interface" src="images/desktop_main_interface.png" style="width: 400px;" />
 <p class="caption">Attachments can be opened on the desktop by clicking the blue underlined link.</p>
 </div>
 <p>You can further sort messages by their message type via the application menu (Android) or the &quot;View&quot; menu/toolbar buttons (Desktop).  This allows you to view all messages (the default), messages to be sent to the Nexus, only those you have created and are thus &quot;outgoing&quot;, and blacklisted messages.</p>
 <div class="figure">
-<img alt="android menu" src="file:///android_asset/images/android_menu.png" style="width: 400px;" />
+<img alt="android menu" src="images/android_menu.png" style="width: 400px;" />
 <p class="caption">Android menu</p>
 </div>
 <div class="figure">
-<img alt="desktop view message types" src="file:///android_asset/images/desktop_view_message_type.png" style="width: 400px;" />
+<img alt="desktop view message types" src="images/desktop_view_message_type.png" style="width: 400px;" />
 <p class="caption">Options for viewing different message types on the desktop version.  On the toolbar, from left to right the options are: all, nexus messages, outgoing messages, and blacklisted messages.</p>
 </div>
 <div class="section" id="creating-a-new-message">
 <h2><a class="toc-backref" href="#id16">5.1&nbsp;&nbsp;&nbsp;Creating a new message</a></h2>
 <p>New messages can be created by selecting the &quot;New Message&quot; menu item on Android or by clicking the &quot;New Message&quot; button on the Desktop toolbar (also available under the &quot;File&quot; menu).  This will open up a new message window.</p>
 <div class="figure">
-<img alt="android new message" src="file:///android_asset/images/android_new_message.png" style="width: 400px;" />
+<img alt="android new message" src="images/android_new_message.png" style="width: 400px;" />
 <p class="caption">Android new message window</p>
 </div>
 <div class="figure">
-<img alt="Desktop new message window" src="file:///android_asset/images/desktop_new_message.png" style="width: 400px;" />
+<img alt="Desktop new message window" src="images/desktop_new_message.png" style="width: 400px;" />
 <p class="caption">Desktop new message window</p>
 </div>
 <p>Fill out the desired title and message.  Messages can be marked as potentially being sent to the Nexus by checking &quot;Public (push to Nexus?)&quot;.  Attachments can be added as well.  In the Desktop application simply press &quot;Choose File...&quot; to open up a file dialog and select the desired attachment.  On Android, select the type of attachment (audio, image, video) and then tap &quot;Add Attachment...&quot; to open up the native file choosing application.</p>
 <div class="figure">
-<img alt="android new message attachment type" src="file:///android_asset/images/android_new_message_attachment_type.png" style="width: 400px;" />
+<img alt="android new message attachment type" src="images/android_new_message_attachment_type.png" style="width: 400px;" />
 <p class="caption">Selecting an attachment type on Android</p>
 </div>
 <p>Once complete, you can remove an attachment if desired by tapping &quot;Remove Attachment...&quot; on Android or clicking &quot;Remove File&quot; on the Desktop.</p>
 <div class="figure">
-<img alt="android new message complete" src="file:///android_asset/images/android_new_message_complete.png" style="width: 400px;" />
+<img alt="android new message complete" src="images/android_new_message_complete.png" style="width: 400px;" />
 <p class="caption">Completed new message window on Android</p>
 </div>
 <div class="figure">
-<img alt="desktop new message complete" src="file:///android_asset/images/desktop_new_message_complete.png" style="width: 400px;" />
+<img alt="desktop new message complete" src="images/desktop_new_message_complete.png" style="width: 400px;" />
 <p class="caption">Completed new message window on the Desktop</p>
 </div>
 <p>To save, simply tap the &quot;Back&quot; button on Android, where you will be presented a confirmation dialog, or click &quot;Save&quot; on the Desktop.</p>
 <div class="figure">
-<img alt="android new message save" src="file:///android_asset/images/android_new_message_save.png" style="width: 400px;" />
+<img alt="android new message save" src="images/android_new_message_save.png" style="width: 400px;" />
 <p class="caption">Save new message dialog on Android</p>
 </div>
 </div>
@@ -503,30 +261,32 @@ ul.auto-toc {
 <h2><a class="toc-backref" href="#id17">5.2&nbsp;&nbsp;&nbsp;Editing Messages</a></h2>
 <p>Messages you create can be edited or deleted, while messages you receive can be deleted or blacklisted.  On Android, to edit or delete a message you have created, long tap the desired message in the main window to open up a context menu.</p>
 <div class="figure">
-<img alt="android outgoing context menu" src="file:///android_asset/images/android_context_menu_outgoing.png" style="width: 400px;" />
+<img alt="android outgoing context menu" src="images/android_context_menu_outgoing.png" style="width: 400px;" />
 <p class="caption">Android outgoing context menu</p>
 </div>
-<p>On the Desktop, click the <img alt="Edit message" src="file:///android_asset/images/menu_edit.png" style="width: 32px;" /> edit message icon or the <img alt="Delete message" src="file:///android_asset/images/menu_delete.png" style="width: 32px;" /> delete message icon to do the same.</p>
+<p>On the Desktop, click the <img alt="Edit message" src="images/menu_edit.png" style="width: 32px;" /> edit message icon or the <img alt="Delete message" src="images/menu_delete.png" style="width: 32px;" /> delete message icon to do the same.</p>
 <p>For messages you have received you either blacklist or delete the message; long tap on Android the desired message to bring up the menu.</p>
 <div class="figure">
-<img alt="android other context menu" src="file:///android_asset/images/android_context_menu_other.png" style="width: 400px;" />
+<img alt="android other context menu" src="images/android_context_menu_other.png" style="width: 400px;" />
 <p class="caption">Android received message context menu</p>
 </div>
-<p>On the Desktop, click the <img alt="Blacklist message" src="file:///android_asset/images/menu_blacklist_desktop.png" style="width: 32px;" /> blacklist message icon or the <img alt="Delete message" src="file:///android_asset/images/menu_delete.png" style="width: 32px;" /> delete message icon to do the same.</p>
+<p>On the Desktop, click the <img alt="Blacklist message" src="images/menu_blacklist_desktop.png" style="width: 32px;" /> blacklist message icon or the <img alt="Delete message" src="images/menu_delete.png" style="width: 32px;" /> delete message icon to do the same.</p>
 <p>Once a message is on the blacklist you can only view it by selecting the &quot;Blacklist&quot; view.  Once there you can remove it by, on Android, long tapping on the desired message and selecting &quot;Unblacklist Message&quot;.</p>
 <div class="figure">
-<img alt="android blacklist context menu" src="file:///android_asset/images/android_context_menu_unblacklist.png" style="width: 400px;" />
+<img alt="android blacklist context menu" src="images/android_context_menu_unblacklist.png" style="width: 400px;" />
 <p class="caption">Android blacklisted message context menu</p>
 </div>
 <div class="figure">
-<img alt="desktop blacklist" src="file:///android_asset/images/desktop_blacklist.png" style="width: 400px;" />
+<img alt="desktop blacklist" src="images/desktop_blacklist.png" style="width: 400px;" />
 <p class="caption">Desktop blacklist view</p>
 </div>
-<p>On the desktop, click the <img alt="Unblacklist message" src="file:///android_asset/images/menu_unblacklist.png" style="width: 32px;" /> unblacklist message icon.</p>
+<p>On the desktop, click the <img alt="Unblacklist message" src="images/menu_unblacklist.png" style="width: 32px;" /> unblacklist message icon.</p>
 </div>
 <div class="section" id="preferences">
 <h2><a class="toc-backref" href="#id18">5.3&nbsp;&nbsp;&nbsp;Preferences</a></h2>
 <p>Both the Android and the Desktop applications have preferences that allow you to control how the applications behave.</p>
+<div class="section" id="network">
+<h3><a class="toc-backref" href="#id19">5.3.1&nbsp;&nbsp;&nbsp;Network</a></h3>
 <p>The &quot;Network&quot; section provides checkboxes to enable or disable particular network modalities.  Fluid Nexus is opportunistic and tries to use whatever modality is available to spread messages.  Multiple modalities can run in parallel without problems.  At the moment we have implemented three modalities:</p>
 <ul class="simple">
 <li><a class="reference external" href="https://secure.wikimedia.org/wikipedia/en/wiki/Bluetooth">Bluetooth</a>: connects to nearby devices running Fluid Nexus.  On Android, attempts to connect to paired Bluetooth devices only.</li>
@@ -534,48 +294,55 @@ ul.auto-toc {
 <li>Nexus: tries to connect to the Internet to push messages marked as public to the Nexus.</li>
 </ul>
 <div class="figure">
-<img alt="android preferences" src="file:///android_asset/images/android_preferences.png" style="width: 400px;" />
+<img alt="android preferences" src="images/android_preferences.png" style="width: 400px;" />
 <p class="caption">Android preferences screen</p>
 </div>
 <div class="figure">
-<img alt="desktop preferences" src="file:///android_asset/images/desktop_preferences.png" style="width: 400px;" />
+<img alt="desktop preferences" src="images/desktop_preferences.png" style="width: 400px;" />
 <p class="caption">Desktop preferences screen</p>
 </div>
 <p>Ad-Hoc Wifi is still under development.</p>
+</div>
+<div class="section" id="scan-frequency">
+<h3><a class="toc-backref" href="#id20">5.3.2&nbsp;&nbsp;&nbsp;Scan Frequency</a></h3>
 <p>For each of the network modalities (with the exception of &quot;Nexus&quot;) you also have the possibility of setting the &quot;Scan Frequency&quot;; this is the amount of time between successive scans for nearby devices.  Lower values mean more frequent scans.  On Android, low values for the <a class="reference external" href="https://secure.wikimedia.org/wikipedia/en/wiki/Bluetooth">Bluetooth</a> Scan Frequency will <em>severely</em> impact battery life.</p>
 <div class="figure">
-<img alt="android bluetooth scan frequency" src="file:///android_asset/images/android_preferences_bluetooth_scan_frequency.png" style="width: 400px;" />
+<img alt="android bluetooth scan frequency" src="images/android_preferences_bluetooth_scan_frequency.png" style="width: 400px;" />
 <p class="caption">Android bluetooth scan frequency</p>
 </div>
 <div class="figure">
-<img alt="desktop bluetooth scan frequency" src="file:///android_asset/images/desktop_preferences_bluetooth_scan_frequency.png" style="width: 400px;" />
+<img alt="desktop bluetooth scan frequency" src="images/desktop_preferences_bluetooth_scan_frequency.png" style="width: 400px;" />
 <p class="caption">Desktop bluetooth scan frequency</p>
 </div>
+</div>
+<div class="section" id="nexus">
+<h3><a class="toc-backref" href="#id21">5.3.3&nbsp;&nbsp;&nbsp;Nexus</a></h3>
 <p>Finally, the &quot;Nexus&quot; section allows you to set your key and secret for posting to the Nexus.  To set this up, first register for an account at <a class="reference external" href="http://fluidnexus.net">http://fluidnexus.net</a> (by either creating a new account there or by logging in using your Google Account).  Then, on your user page click &quot;Request  a key and secret&quot;.  Enter these 20-digit numbers into the corresponding boxes in your Android or Desktop application.</p>
 <div class="figure">
-<img alt="android nexus preferences" src="file:///android_asset/images/android_preferences_nexus.png" style="width: 400px;" />
+<img alt="android nexus preferences" src="images/android_preferences_nexus.png" style="width: 400px;" />
 <p class="caption">Android Nexus Preferences</p>
 </div>
 <div class="figure">
-<img alt="android nexus preferences key" src="file:///android_asset/images/android_preferences_nexus_key.png" style="width: 400px;" />
+<img alt="android nexus preferences key" src="images/android_preferences_nexus_key.png" style="width: 400px;" />
 <p class="caption">Entering a Nexus key on Android</p>
 </div>
 <div class="figure">
-<img alt="desktop nexus preferences" src="file:///android_asset/images/desktop_preferences_nexus.png" style="width: 400px;" />
+<img alt="desktop nexus preferences" src="images/desktop_preferences_nexus.png" style="width: 400px;" />
 <p class="caption">Desktop Nexus Preferences</p>
 </div>
 <p>Then, request authorization from within the application.  On Android, open the menu and select &quot;Request Nexus Authorization&quot;; on the Desktop click the &quot;Request Nexus Authorization&quot; button.</p>
 <div class="figure">
-<img alt="android menu extension" src="file:///android_asset/images/android_menu_more.png" style="width: 400px;" />
+<img alt="android menu extension" src="images/android_menu_more.png" style="width: 400px;" />
 <p class="caption">Android menu showing &quot;Request Nexus Authorization&quot; option</p>
 </div>
 <p>You will be forwarded to the Fluid Nexus website; you must be logged in in order to proceed.  Once you have granted authorization to the application (Android or Desktop) to post to the Nexus, you need to setup the Token and Token Secret.  On Android, these are filled in automatically for you; on the Desktop, you need to copy and paste these values from the website into the corresponding boxes.</p>
 </div>
 </div>
+</div>
 <div class="section" id="technical-information">
-<h1><a class="toc-backref" href="#id19">6&nbsp;&nbsp;&nbsp;Technical Information</a></h1>
+<h1><a class="toc-backref" href="#id22">6&nbsp;&nbsp;&nbsp;Technical Information</a></h1>
 <div class="section" id="protocol-buffer-implementation">
-<h2><a class="toc-backref" href="#id20">6.1&nbsp;&nbsp;&nbsp;Protocol Buffer implementation</a></h2>
+<h2><a class="toc-backref" href="#id23">6.1&nbsp;&nbsp;&nbsp;Protocol Buffer implementation</a></h2>
 <p>Fluid Nexus uses protocol buffers to share data.  The following documents our message format:</p>
 <pre class="literal-block">
 message FluidNexusHashes {
@@ -613,7 +380,7 @@ message FluidNexusMessages {
 <p>The application uses a SHA1 hash of the message title and message content to determine whether or not the message needs to be exchanged.  These hashes are first exchanged between devices to determine what needs to be sent.  Thus Fluid Nexus uses a type of <a class="reference external" href="https://secure.wikimedia.org/wikipedia/en/wiki/Distributed_hash_table">distributed hash table</a> with the goal of replicating the entire table amongst all devices.</p>
 </div>
 <div class="section" id="network-modalities">
-<h2><a class="toc-backref" href="#id21">6.2&nbsp;&nbsp;&nbsp;Network Modalities</a></h2>
+<h2><a class="toc-backref" href="#id24">6.2&nbsp;&nbsp;&nbsp;Network Modalities</a></h2>
 <p>Fluid Nexus currently works using <a class="reference external" href="https://secure.wikimedia.org/wikipedia/en/wiki/Bluetooth">Bluetooth</a> and <a class="reference external" href="http://fluidnexus.net/favicon.ico">Zeroconf</a> service discovery, with Ad-Hoc Wifi to be developed.  Android requires Bluetooth devices to be paired before any data sharing can occur.  On the Desktop, sharing between <em>discoverable</em> Linux devices does not require pairing beforehand.  (Windows is to be determined.)  Zeroconf does not require any pairing and thus messages will be shared between any device running Fluid Nexus and discoverable using Zeroconf service discovery.</p>
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 <!-- FOOTER -->
@@ -624,7 +391,7 @@ message FluidNexusMessages {
 <div class="footer">
 <hr class="footer" />
 Document generated from <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> plaintext markup source
-on 2011-07-26 at 21:40:07.
+on 2011-07-31 at 21:06:09.
 </div>
 </body>
 </html>

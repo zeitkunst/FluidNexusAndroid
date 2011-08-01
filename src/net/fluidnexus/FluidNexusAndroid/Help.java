@@ -47,7 +47,7 @@ public class Help extends Activity {
         WebView browser = (WebView) findViewById(R.id.help_webview);
         WebSettings settings = browser.getSettings();
         settings.setJavaScriptEnabled(true);
-        browser.loadUrl("file:///android_asset/manual.html");
+        browser.loadUrl("file:///android_asset/index.html");
 
     }
 }
