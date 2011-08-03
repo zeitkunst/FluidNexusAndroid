@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="show_messages_check">Show messages?</string>
-    <string name="simulate_bluetooth_check">Simulate Bluetooth?</string>
     <string name="view_message_title_string">Title:</string>
     <string name="view_message_data_string">Message:</string>
     <string name="language_text">Language:</string>
@@ -61,8 +60,6 @@
     <string name="notification_fluid_nexus_discovery_complete">Device discovery complete</string>
     <string name="notification_fluid_nexus_services_complete">Services discovery complete</string>
     <string name="notification_fluid_nexus_send_outgoing_complete">Sending outgoing message</string>
-    <string name="toast_bluetooth_settings_changed">Bluetooth simulator       settings changed; please restart the emulator and Fluid Nexus.  If using the bridge, be sure it is running before you start Fluid Nexus in the emulator.</string>
-    <string name="toast_bluetooth_server_simulator_complete">This is the end of the Bluetooth server (receive) simulator.  If you want to see the messages being added again, please restart the emulator.</string>
     <string name="toast_new_message_received">New message received.</string>
     <string name="toast_message_deleted">Message deleted.</string>
     <string name="toast_message_blacklisted">Message blacklisted.</string>

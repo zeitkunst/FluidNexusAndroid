@@ -274,6 +274,7 @@ public class AddOutgoing extends Activity {
         
         String message_hash = MessagesProviderHelper.makeSHA256(title + message);
         Cursor c = messagesProviderHelper.returnItemBasedOnHash(message_hash);
+
         if (c.getCount() != 0) {
             c.close();
             return 0;

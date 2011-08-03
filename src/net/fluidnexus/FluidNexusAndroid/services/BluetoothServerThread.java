@@ -76,10 +76,11 @@ public class BluetoothServerThread extends ProtocolThread {
     private ArrayList<String> hashList = new ArrayList<String>();
 
     private char connectedState = 0x00;
+    private static final char STATE_WAIT_SERVER = 0xb0;
 
     private BluetoothServerSocket serverSocket = null;
     private BluetoothSocket socket = null;
-    private BluetoothAdapter bluetoothAdapter;
+    private BluetoothAdapter bluetoothAdapter = null;
 
     private HashSet<String> hashesToSend = new HashSet<String>();
 
@@ -93,40 +94,58 @@ public class BluetoothServerThread extends ProtocolThread {
         setName("BluetoothServerThread");
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-
     }
 
     /**
      * Do the client accept work
      */
     private void doClientAccept() {
+        // Check for bluetooth adapter
+        if (bluetoothAdapter == null) {
+            super.setConnectedState(STATE_WAIT_SERVER);
+        } else {
+    
+            try {
+                serverSocket = bluetoothAdapter.listenUsingRfcommWithServiceRecord("Fluid Nexus", FluidNexusUUID);;
+            } catch (IOException e) {
+                log.error("Unable to create new server socket: " + e);
+                cleanupConnection();
+            }
+    
+            try {
+                socket = serverSocket.accept();
+            } catch (IOException e) {
+                log.debug("Accept failed");
+                cleanupConnection();
+            }
+    
+            DataInputStream tmpIn = null;
+            DataOutputStream tmpOut = null;
+    
+            try {
+                tmpIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+                tmpOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+            } catch (IOException e) {
+                log.error("Temp stream sockets not created");
+                cleanupConnection();
+            }
+    
+            setInputStream(tmpIn);
+            setOutputStream(tmpOut);
+            super.setConnectedState(STATE_READ_HELO);
+        }
+    }
+
+
+    private void waitServer() {
         try {
-            serverSocket = bluetoothAdapter.listenUsingRfcommWithServiceRecord("Fluid Nexus", FluidNexusUUID);;
-        } catch (IOException e) {
-            log.error("Unable to create new server socket: " + e);
-            cleanupConnection();
+            log.debug("Service thread sleeping for " + "300" + " seconds...");
+            this.sleep(300 * 1000);
+        } catch (InterruptedException e) {
+            log.error("Thread sleeping interrupted: " + e);
         }
 
-        try {
-            socket = serverSocket.accept();
-        } catch (IOException e) {
-            log.debug("Accept failed");
-            cleanupConnection();
-        }
-
-        DataInputStream tmpIn = null;
-        DataOutputStream tmpOut = null;
-
-        try {
-            tmpIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-            tmpOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-        } catch (IOException e) {
-            log.error("Temp stream sockets not created");
-            cleanupConnection();
-        }
-
-        setInputStream(tmpIn);
-        setOutputStream(tmpOut);
+        super.setConnectedState(STATE_START);
     }
 
     /**
@@ -155,7 +174,6 @@ public class BluetoothServerThread extends ProtocolThread {
             switch(super.getConnectedState()) {
                 case STATE_START:
                     doClientAccept();
-                    super.setConnectedState(STATE_READ_HELO);
                     break;
                 case STATE_READ_HELO:
                     command = readCommand();
@@ -223,6 +241,9 @@ public class BluetoothServerThread extends ProtocolThread {
                     break;
                 case STATE_QUIT:
                     super.setConnectedState(STATE_START);
+                    break;
+                case STATE_WAIT_SERVER:
+                    waitServer();
                     break;
                 default:
                     done = true;

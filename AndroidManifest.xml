@@ -14,22 +14,24 @@
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>
     <uses-permission android:name="android.permission.VIBRATE"></uses-permission>
     <uses-permission android:name="net.fluidnexus.FluidNexusAndroid.permission.NETWORK_SERVICE"></uses-permission>
+    <uses-permission android:name="net.fluidnexus.FluidNexusAndroid.permission.READ_ONLY"></uses-permission>
+    <uses-permission android:name="net.fluidnexus.FluidNexusAndroid.permission.WRITE_ONLY"></uses-permission>
 
     <uses-feature android:name="android.hardware.bluetooth" android:required="false"/>
     <uses-feature android:name="android.hardware.wifi" android:required="false"/>
 
     <permission android:name="net.fluidnexus.FluidNexusAndroid.permission.NETWORK_SERVICE"
-        android:protectionLevel="dangerous"
+        android:protectionLevel="signature"
         android:label="@string/network_perm_label"
         android:description="@string/network_perm_desc" />
 
     <permission android:name="net.fluidnexus.FluidNexusAndroid.permission.READ_ONLY"
-        android:protectionLevel="dangerous"
+        android:protectionLevel="signature"
         android:label="@string/ro_perm_label"
         android:description="@string/ro_perm_desc" />
 
     <permission android:name="net.fluidnexus.FluidNexusAndroid.permission.WRITE_ONLY"
-        android:protectionLevel="dangerous"
+        android:protectionLevel="signature"
         android:label="@string/wo_perm_label"
         android:description="@string/wo_perm_desc" />
 
