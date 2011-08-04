@@ -23,7 +23,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
@@ -53,6 +55,8 @@ public class About extends Activity {
         } catch (NameNotFoundException e) {
             log.error("Package name not found: " + e);
         }
-
+        
+        tv = (TextView) findViewById(R.id.about_text);
+        tv.setText(Html.fromHtml(getString(R.string.about_text)));
     }
 }

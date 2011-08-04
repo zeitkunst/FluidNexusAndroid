@@ -154,8 +154,15 @@ public class BluetoothServerThread extends ProtocolThread {
     @Override
     public void cleanupConnection() {
         try {
-            serverSocket.close();
-            socket.close();
+
+            if (serverSocket != null) {
+                serverSocket.close();
+            }
+
+            if (socket != null) {
+                socket.close();
+            }
+
         } catch (IOException e) {
             log.error("close() of BluetoothServerThread socket failed: " + e);
         }
