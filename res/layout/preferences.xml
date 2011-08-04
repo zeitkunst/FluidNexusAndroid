@@ -41,6 +41,12 @@
 
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/preferences_category_bluetooth">
+        <CheckBoxPreference
+            android:title="@string/preferences_bluetooth_bonded_only_flag"
+            android:defaultValue="false"
+            android:summary="@string/preferences_bluetooth_bonded_only_flag_summary"
+            android:key="bluetoothBondedOnlyFlag" />
+
         <ListPreference 
             android:title="@string/preferences_bluetooth_scan_frequency"
             android:summary="@string/preferences_bluetooth_scan_frequency_summary"

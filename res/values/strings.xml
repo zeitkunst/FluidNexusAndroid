@@ -85,7 +85,7 @@
     <string name="preferences_category_nexus">Nexus</string>
     <string name="preferences_show_messages">Show messages?</string>
     <string name="preferences_show_messages_summary">Whether or not to show messages in the interface.</string>
-    <string name="preferences_vibrate">Vibrate on new messages?</string>
+    <string name="preferences_vibrate">Vibrate?</string>
     <string name="preferences_vibrate_summary">Whether or not to vibrate when new messages arrive.</string>
     <string name="preferences_enable_bluetooth_service">Bluetooth Service</string>
     <string name="preferences_enable_bluetooth_service_summary">Whether or not the bluetooth service is enabled.  This service will run even when the application has ended.</string>
@@ -94,7 +94,9 @@
     <string name="preferences_enable_adhocwifi_service">Ad-Hoc Wifi Service</string>
     <string name="preferences_enable_adhocwifi_service_summary">Whether or not the Ad-Hoc Wifi service is enabled.  This service will run even when the application has ended.  This feature is under development.</string>
     <string name="preferences_enable_nexus_service">Nexus Service</string>
-    <string name="preferences_enable_nexus_service_summary">Whether or not the application tries to post public messages to the Nexus.  This feature requires some sort of access to the internet over Wifi, but will still run without problems if Wifi is not enabled</string>
+    <string name="preferences_enable_nexus_service_summary">Whether to post public messages to the Nexus.  This feature requires some sort of access to the internet over Wifi, but will still run without problems if Wifi is not enabled</string>
+    <string name="preferences_bluetooth_bonded_only_flag">Bonded only?</string>
+    <string name="preferences_bluetooth_bonded_only_flag_summary">If checked, will not do device discovery and will only connected to previously bonded devices.</string>
 
     <string name="preferences_bluetooth_scan_frequency">Scan Frequency</string>
     <string name="preferences_bluetooth_scan_frequency_summary">How often to scan for other devices.  Shorter durations will severely impact battery life.</string>
@@ -107,10 +109,10 @@
     <string name="preferences_nexus_secret_summary">The secret provided by to you on the Fluid Nexus website for posting to the Nexus</string>
     <string name="preferences_nexus_secret_title">Nexus Secret</string>
     <string name="preferences_nexus_token">Nexus Token </string>
-    <string name="preferences_nexus_token_summary">The token provided by to you on the Fluid Nexus website for posting to the Nexus.  This should not need to be changed, but is rather added automatically upon pressing "Request authorization token" in the main menu.</string>
+    <string name="preferences_nexus_token_summary">The token provided by to you on the Fluid Nexus website for posting to the Nexus.  This is added automatically upon pressing "Request authorization token" in the main menu.</string>
     <string name="preferences_nexus_token_title">Nexus Token</string>
     <string name="preferences_nexus_token_secret">Nexus Token Secret</string>
-    <string name="preferences_nexus_token_secret_summary">The token secret provided by to you on the Fluid Nexus website for posting to the Nexus.  This should not need to be changed, but is rather added automatically upon pressing "Request authorization token" in the main menu.</string>
+    <string name="preferences_nexus_token_secret_summary">The token secret provided by to you on the Fluid Nexus website for posting to the Nexus.  This is added automatically upon pressing "Request authorization token" in the main menu.</string>
     <string name="preferences_nexus_token_secret_title">Nexus Token Secret</string>
     <string name="toast_tokens_updated">Tokens updated; application is now authorized to post to the Nexus.</string>
 

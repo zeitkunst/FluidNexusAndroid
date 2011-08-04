@@ -212,6 +212,12 @@ public class MainActivity extends ListActivity {
                 msg.arg2 = Integer.parseInt(prefs.getString("bluetoothScanFrequency", "120"));
                 msg.replyTo = messenger;
                 networkService.send(msg);
+                
+                // Send bonded only flag
+                msg = Message.obtain(null, NetworkService.MSG_BLUETOOTH_BONDED_ONLY_FLAG);
+                msg.arg1 = (prefs.getBoolean("bluetoothBondedOnlyFlag", false))? 1 : 0;
+                msg.replyTo = messenger;
+                networkService.send(msg);
 
                 // Send zeroconf enabled bit on start
                 msg = Message.obtain(null, NetworkService.MSG_ZEROCONF_ENABLED);
@@ -625,6 +631,15 @@ public class MainActivity extends ListActivity {
 
                     } catch (RemoteException e) {
                         log.error("Unable to send scan frequency message: " + e);
+                    }
+                } else if (key.equals("bluetoothBondedOnlyFlag")) {
+                    try {
+                        Message msg = Message.obtain(null, NetworkService.MSG_BLUETOOTH_BONDED_ONLY_FLAG);
+                        msg.arg1 = (prefs.getBoolean("bluetoothBondedOnlyFlag", false) ? 1:0);
+                        msg.replyTo = messenger;
+                        networkService.send(msg);
+                    } catch (RemoteException e) {
+                        log.error("Unable to send bonded only flag message: " + e);
                     }
                 } else if (key.equals("vibratePref")) {
                     vibratePref = prefs.getBoolean("vibratePref", false);

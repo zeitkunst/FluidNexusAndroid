@@ -104,6 +104,7 @@ public class NetworkService extends Service {
     public static final int MSG_UNREGISTER_CLIENT = 0x11;
     public static final int MSG_NEW_MESSAGE_RECEIVED = 0x20;
     public static final int MSG_BLUETOOTH_SCAN_FREQUENCY = 0x30;
+    public static final int MSG_BLUETOOTH_BONDED_ONLY_FLAG = 0x31;
     public static final int MSG_ZEROCONF_SCAN_FREQUENCY = 0x40;
     public static final int MSG_BLUETOOTH_ENABLED = 0x50;
     public static final int MSG_ZEROCONF_ENABLED = 0x60;
@@ -192,6 +193,13 @@ public class NetworkService extends Service {
                     bluetoothEnabled = msg.arg1;
                     notificationFlags |= BLUETOOTH_FLAG;
                     updateNotification();
+                    break;
+                case MSG_BLUETOOTH_BONDED_ONLY_FLAG:
+                    log.debug("Changing bluetooth bonded only flag to: " + msg.arg1);
+                    if (bluetoothServiceThread != null) {
+                        bluetoothServiceThread.setBondedOnly(msg.arg1 != 0);
+                    }
+
                     break;
                 case MSG_ZEROCONF_ENABLED:
                     if (msg.arg1 != zeroconfEnabled) {

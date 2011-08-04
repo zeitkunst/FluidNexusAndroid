@@ -94,6 +94,9 @@ public class BluetoothServiceThread extends ServiceThread {
     // State of the system
     private int state;
 
+    // whether to look for bonded devices only
+    private boolean bondedOnly = false;
+
     // Potential states
     public static final int STATE_NONE = 0;       // we're doing nothing
     public static final int STATE_DISCOVERY = 1; // we're discovering things
@@ -209,6 +212,13 @@ public class BluetoothServiceThread extends ServiceThread {
     }
 
     /**
+     * set whether or not we do bonded only
+     */
+    public void setBondedOnly(boolean flag) {
+        bondedOnly = flag;
+    }
+
+    /**
      * Handler that receives information from the threads
      */
     public final Handler threadHandler = new Handler() {
@@ -318,10 +328,15 @@ public class BluetoothServiceThread extends ServiceThread {
     private void doStateNone() {
         // If we're at the beginning state, then start the discovery process
 
-        try {
-            doDiscovery();
-        } catch (Exception e) {
-            log.error("some sort of exception: " + e);
+        if (bondedOnly) {
+            addPairedDevices();
+            setServiceState(STATE_DISCOVERY_FINISHED);
+        } else {
+            try {
+                doDiscovery();
+            } catch (Exception e) {
+                log.error("some sort of exception: " + e);
+            }
         }
     }
 
