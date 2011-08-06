@@ -38,6 +38,9 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -88,6 +91,7 @@ public class ZeroconfServiceThread extends ServiceThread {
 
     // Connected devices
     private HashSet<String> connectedDevices = new HashSet<String>();
+    private HashMap<String, DiscoveredDevice> discoveredDevices = new HashMap<String, DiscoveredDevice>();
 
     // jmdns infos
     private JmDNS jmdns = null;
@@ -100,6 +104,45 @@ public class ZeroconfServiceThread extends ServiceThread {
     private static final String zeroconfServiceName = "Fluid Nexus";
     private static final String zeroconfType = "_fluidnexus._tcp.local.";
     private static final int zeroconfPort = 17894;
+
+    /**
+     * Class for discovered devices
+     */
+    private class DiscoveredDevice {
+        public String name = null;
+        public String host = null;
+        public Integer port = null;
+
+        public DiscoveredDevice(String name, String host, Integer port) {
+            this.setName(name);
+            this.setHost(host);
+            this.setPort(port);
+        }
+
+        public void setName(String givenName) {
+            name = givenName;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setHost(String givenHost) {
+            host = givenHost;
+        }
+
+        public String getHost() {
+            return host;
+        }
+
+        public void setPort(Integer givenPort) {
+            port = givenPort;
+        }
+
+        public Integer getPort() {
+            return port;
+        }
+    }
 
     /**
      * Handler that receives information from the threads
@@ -149,7 +192,6 @@ public class ZeroconfServiceThread extends ServiceThread {
 
         // TODO
         // Disabling server thread for now until we can figure out the lack of resolution issue
-        /*
         if (serverThread == null) {
 
             serverThread = new ZeroconfServerThread(ctx, threadHandler, clients);
@@ -157,7 +199,6 @@ public class ZeroconfServiceThread extends ServiceThread {
             serverThread.setData(currentData);
             serverThread.start();
         }
-        */
 
         setServiceState(STATE_NONE);
     }
@@ -177,9 +218,26 @@ public class ZeroconfServiceThread extends ServiceThread {
                         log.debug("Service resolved: " + ev.getInfo().getQualifiedName() + " port: " + ev.getInfo().getPort() + "; additions: " + additions);
                         String host = additions;
                         int port = ev.getInfo().getPort();
+
+
                         // Connect to the device
                         if (!(ev.getInfo().getQualifiedName().equals(zeroconfServiceName + "." + zeroconfType))) {
-                            connect(host, port);
+                            DiscoveredDevice d = new DiscoveredDevice(ev.getName(), host, port);
+                            discoveredDevices.put(ev.getName(), d);
+
+                            //connect(host, port);
+                        }
+                    }
+
+                    if (!discoveredDevices.isEmpty()) {
+                        Iterator it = discoveredDevices.entrySet().iterator();
+
+                        while (it.hasNext()) {
+                            Map.Entry pairs = (Map.Entry) it.next();
+
+                            DiscoveredDevice d = (DiscoveredDevice) pairs.getValue();
+
+                            connect(d.getHost(), d.getPort());
                         }
                     }
                 }
@@ -187,6 +245,7 @@ public class ZeroconfServiceThread extends ServiceThread {
                 @Override
                 public void serviceRemoved(ServiceEvent ev) {
                     log.debug("Service removed: " + ev.getName());
+                    discoveredDevices.remove(ev.getName());
                 }
 
                 @Override
@@ -272,6 +331,9 @@ public class ZeroconfServiceThread extends ServiceThread {
      * Wait for devices to be found
      */
     private void waitForDevices() {
+        // This waits for 60s for service discovery and data transfer to take place
+        // TODO
+        // Should this value be smaller?
         try {
             log.debug("Zeroconf service waiting for service discovery...");
             this.sleep(60 * 1000);
