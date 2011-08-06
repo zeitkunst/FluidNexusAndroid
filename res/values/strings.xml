@@ -31,6 +31,7 @@
     <string name="menu_unblacklist">Unblacklist Message</string>
     <string name="menu_edit">Edit Message</string>
     <string name="menu_preferences">Preferences</string>
+    <string name="menu_discoverable">Make discoverable</string>
     <string name="menu_request_authorization">Request Nexus Authorization</string>
     <string name="menu_help">Help</string>
     <string name="menu_about">About</string>
@@ -66,6 +67,8 @@
     <string name="toast_message_deleted">Message deleted.</string>
     <string name="toast_message_blacklisted">Message blacklisted.</string>
     <string name="toast_message_unblacklisted">Message unblacklisted.</string>
+    <string name="toast_discoverable_ok">Device set to be discoverable for %d seconds.</string>
+    <string name="toast_discoverable_notok">Device not set to be discoverable</string>
     <string name="intent_new_message">net.fluidnexus.FluidNexusAndroid.NEW_MESSAGE</string>
     <string name="intent_discovery_started">net.fluidnexus.FluidNexusAndroid.DISCOVERY_STARTED</string>
     <string name="intent_device_found">net.fluidnexus.FluidNexusAndroid.REMOTE_DEVICE_FOUND</string>

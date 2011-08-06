@@ -1,9 +1,7 @@
 TODO
 ====
 
-* Figure out the funkiness wrt zeroconf
-
-* Add menu option to make discoverable
+* Figure out why we can't resolve a zeroconf service created on Android
 
 * Add error toast on problems with oauth
 

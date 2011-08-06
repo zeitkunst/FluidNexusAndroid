@@ -124,6 +124,7 @@ public class MainActivity extends ListActivity {
     private static final int REQUEST_ENABLE_BT = 6;
     private static final int ACTIVITY_EDIT_MESSAGE = 7;
     private static final int ACTIVITY_ABOUT = 8;
+    private static final int REQUEST_DISCOVERABLE_RESULT = 9;
 
     private static final int VIEW_ALL = 0;
     private static final int VIEW_PUBLIC = 1;
@@ -819,6 +820,14 @@ public class MainActivity extends ListActivity {
             case R.id.menu_preferences:
                 editPreferences();
                 return true;
+            case R.id.menu_discoverable:
+                if (bluetoothAdapter != null) {
+                    i = new Intent();
+                    i.setAction(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+                    i.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+                    startActivityForResult(i, REQUEST_DISCOVERABLE_RESULT);
+                }
+                return true;
             case R.id.menu_help:
                 i = new Intent(this, Help.class);
                 /*startSubActivity(i, ACTIVITY_HELP);*/
@@ -875,6 +884,16 @@ public class MainActivity extends ListActivity {
                 }
 
                 fillListView(VIEW_MODE);
+                break;
+            case(REQUEST_DISCOVERABLE_RESULT):
+                // Do something on request discoverable result
+                String s = "";
+                if (resultCode < 0) {
+                    s = getString(R.string.toast_discoverable_notok);
+                } else {
+                    s = getString(R.string.toast_discoverable_ok, resultCode);
+                }
+                Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
                 break;
             case(ACTIVITY_PREFERENCES):
                 break;

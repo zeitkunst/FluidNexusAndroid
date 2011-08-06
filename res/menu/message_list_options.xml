@@ -24,6 +24,9 @@
         android:title="@string/menu_preferences"
         android:icon="@drawable/menu_preferences"
         android:alphabeticShortcut="p" />
+    <item android:id="@+id/menu_discoverable"
+        android:title="@string/menu_discoverable"
+        android:alphabeticShortcut="d" />
     <item android:id="@+id/menu_request_authorization"
         android:title="@string/menu_request_authorization"
         android:alphabeticShortcut="r" />
