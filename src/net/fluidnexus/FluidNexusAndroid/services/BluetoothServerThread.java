@@ -115,7 +115,10 @@ public class BluetoothServerThread extends ProtocolThread {
             try {
                 socket = serverSocket.accept();
             } catch (IOException e) {
-                log.debug("Accept failed");
+                log.error("Bluetooth server socket accept failed: " + e);
+                cleanupConnection();
+            } catch (NullPointerException e) {
+                log.debug("Bluetooth server socket null pointer: " + e);
                 cleanupConnection();
             }
     
