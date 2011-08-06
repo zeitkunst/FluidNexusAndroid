@@ -141,6 +141,7 @@ public class ZeroconfServiceThread extends ServiceThread {
         wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         lock = wifiManager.createMulticastLock("ZeroconfServiceLock");
         lock.setReferenceCounted(true);
+        lock.acquire();
 
         updateHashes(sendBlacklist);
         updateData();
@@ -219,7 +220,6 @@ public class ZeroconfServiceThread extends ServiceThread {
      * Start the listeners for zeroconf services
      */
     public void doStateNone() {
-        lock.acquire();
         try {
             jmdns = JmDNS.create();
 
@@ -252,12 +252,14 @@ public class ZeroconfServiceThread extends ServiceThread {
         connectThread.start();
     }
 
+    /**
+     * Wait for next round of the service
+     */
     private void waitService() {
         jmdns.removeServiceListener(zeroconfType, serviceListener);
         serviceListener = null;
-        lock.release();
         try {
-            log.debug("Service thread sleeping for " + getScanFrequency() + " seconds...");
+            log.debug("Zeroconf service thread sleeping for " + getScanFrequency() + " seconds...");
             this.sleep(getScanFrequency() * 1000);
         } catch (InterruptedException e) {
             log.error("Thread sleeping interrupted: " + e);
@@ -265,6 +267,19 @@ public class ZeroconfServiceThread extends ServiceThread {
 
         setServiceState(STATE_NONE);
     }
+
+    /**
+     * Wait for devices to be found
+     */
+    private void waitForDevices() {
+        try {
+            log.debug("Zeroconf service waiting for service discovery...");
+            this.sleep(60 * 1000);
+        } catch (InterruptedException e) {
+            log.error("Thread sleeping interrupted: " + e);
+        }
+    }
+
 
     /**
      * Unregister our service on message to quit
@@ -304,6 +319,7 @@ public class ZeroconfServiceThread extends ServiceThread {
                     doStateNone();
                     break;
                 case STATE_WAIT_FOR_CONNECTIONS:
+                    waitForDevices();
                     if (connectedDevices.isEmpty()) {
                         setServiceState(STATE_SERVICE_WAIT);
                     }
