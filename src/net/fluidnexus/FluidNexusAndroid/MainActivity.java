@@ -47,6 +47,7 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.text.format.Time;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -157,6 +158,7 @@ public class MainActivity extends ListActivity {
     public static final int MSG_MESSAGE_DELETED = 0xF1;
 
     private boolean showMessages = true;
+    private boolean sendBlacklist = true;
 
     private BluetoothAdapter bluetoothAdapter = null;
     private boolean enableBluetoothServicePref = true;
@@ -206,6 +208,13 @@ public class MainActivity extends ListActivity {
                 networkService.send(msg);
                 log.debug("Connected to service");
 
+                // Send send_blacklist flag
+                // This needs to be sent before all others
+                msg = Message.obtain(null, NetworkService.MSG_SEND_BLACKLISTED);
+                msg.arg1 = (prefs.getBoolean("sendBlacklistPref", false))? 1 : 0;
+                msg.replyTo = messenger;
+                networkService.send(msg);
+
                 // Send bluetooth enabled bit on start
                 msg = Message.obtain(null, NetworkService.MSG_BLUETOOTH_ENABLED);
                 msg.arg1 = (prefs.getBoolean("enableBluetoothServicePref", true))? 1 : 0;
@@ -218,6 +227,8 @@ public class MainActivity extends ListActivity {
                 msg.arg1 = (prefs.getBoolean("bluetoothBondedOnlyFlag", false))? 1 : 0;
                 msg.replyTo = messenger;
                 networkService.send(msg);
+
+
 
                 // Send zeroconf enabled bit on start
                 msg = Message.obtain(null, NetworkService.MSG_ZEROCONF_ENABLED);
@@ -605,6 +616,7 @@ public class MainActivity extends ListActivity {
         }
         
         showMessages = prefs.getBoolean("showMessagesPref", true);
+        sendBlacklist = prefs.getBoolean("sendBlacklistPref", false);
         vibratePref = prefs.getBoolean("vibratePref", false);
 
         // Setup a listener for when preferences change
@@ -646,6 +658,17 @@ public class MainActivity extends ListActivity {
                 } else if (key.equals("showMessagesPref")) {
                     showMessages = prefs.getBoolean("showMessagesPref", true);
                     fillListView(VIEW_MODE);
+                } else if (key.equals("sendBlacklistPref")) {
+                    sendBlacklist = prefs.getBoolean("sendBlacklistPref", false);
+                    try {
+                        Message msg = Message.obtain(null, NetworkService.MSG_SEND_BLACKLISTED);
+                        msg.arg1 = (prefs.getBoolean("sendBlacklistPref", false) ? 1:0);
+                        msg.replyTo = messenger;
+                        networkService.send(msg);
+                    } catch (RemoteException e) {
+                        log.error("Unable to send bonded only flag message: " + e);
+                    }
+
                 }
 
             }
@@ -843,9 +866,9 @@ public class MainActivity extends ListActivity {
         TextView tv;
         tv = (TextView) findViewById(R.id.message_list_item);
         
-        String[] from = new String[] {MessagesProvider.KEY_TITLE, MessagesProvider.KEY_CONTENT, MessagesProvider.KEY_MINE, MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME};
+        String[] from = new String[] {MessagesProvider.KEY_TITLE, MessagesProvider.KEY_CONTENT, MessagesProvider.KEY_MINE, MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME, MessagesProvider.KEY_TIME, MessagesProvider.KEY_RECEIVED_TIME};
         String[] projection = new String[] {MessagesProvider._ID, MessagesProvider.KEY_TITLE, MessagesProvider.KEY_CONTENT, MessagesProvider.KEY_MINE, MessagesProvider.KEY_ATTACHMENT_PATH, MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME, MessagesProvider.KEY_PUBLIC};
-        int[] to = new int[] {R.id.message_list_item, R.id.message_list_data, R.id.message_list_item_icon, R.id.message_list_attachment};
+        int[] to = new int[] {R.id.message_list_item, R.id.message_list_data, R.id.message_list_item_icon, R.id.message_list_attachment, R.id.message_list_created_time, R.id.message_list_received_time};
         
         if (viewType == 0) {
             // Get the non-blacklisted messages
@@ -903,6 +926,35 @@ public class MainActivity extends ListActivity {
                     
                     return true;
                 }
+
+                if (i == cursor.getColumnIndex(MessagesProvider.KEY_TIME)) {
+                    Float s_float = cursor.getFloat(i);
+                    Long s = s_float.longValue() * 1000;
+                    Time t = new Time();
+                    t.set(s);
+
+                    TextView timeView = (TextView) view;
+
+                    String formattedTime = t.format(getString(R.string.message_list_created_time) + " %c");
+                    timeView.setText(formattedTime);
+
+                    return true;
+                }
+
+                if (i == cursor.getColumnIndex(MessagesProvider.KEY_RECEIVED_TIME)) {
+                    Float s_float = cursor.getFloat(i);
+                    Long s = s_float.longValue() * 1000;
+                    Time t = new Time();
+                    t.set(s);
+
+                    TextView timeView = (TextView) view;
+
+                    String formattedTime = t.format(getString(R.string.message_list_received_time) + " %c");
+                    timeView.setText(formattedTime);
+
+                    return true;
+                }
+
 
                 if (i == cursor.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME)) {
 

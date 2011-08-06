@@ -19,6 +19,8 @@
     <string name="message_list_header_text_outgoing">OUTGOING MESSAGES</string>
     <string name="message_list_header_text_blacklist">BLACKLISTED MESSAGES</string>
     <string name="menu_message_list_context_title">Context menu</string>
+    <string name="message_list_created_time">Created on </string>
+    <string name="message_list_received_time">Received on </string>
     <string name="menu_add_message">New Message</string>
     <string name="menu_view_all">View All</string>
     <string name="menu_view_public">View Public</string>
@@ -85,6 +87,8 @@
     <string name="preferences_category_nexus">Nexus</string>
     <string name="preferences_show_messages">Show messages?</string>
     <string name="preferences_show_messages_summary">Whether or not to show messages in the interface.</string>
+    <string name="preferences_send_blacklist">Send blacklist messages?</string>
+    <string name="preferences_send_blacklist_summary">Whether or not to spread messages you have blacklisted.</string>
     <string name="preferences_vibrate">Vibrate?</string>
     <string name="preferences_vibrate_summary">Whether or not to vibrate when new messages arrive.</string>
     <string name="preferences_enable_bluetooth_service">Bluetooth Service</string>

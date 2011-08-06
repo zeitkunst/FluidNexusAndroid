@@ -9,6 +9,11 @@
             android:summary="@string/preferences_show_messages_summary"
             android:key="showMessagesPref" />
         <CheckBoxPreference
+            android:title="@string/preferences_send_blacklist"
+            android:defaultValue="true"
+            android:summary="@string/preferences_send_blacklist_summary"
+            android:key="sendBlacklistPref" />
+        <CheckBoxPreference
             android:title="@string/preferences_vibrate"
             android:defaultValue="true"
             android:summary="@string/preferences_vibrate_summary"

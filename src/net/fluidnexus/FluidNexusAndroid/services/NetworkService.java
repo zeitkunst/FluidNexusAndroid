@@ -109,10 +109,12 @@ public class NetworkService extends Service {
     public static final int MSG_BLUETOOTH_ENABLED = 0x50;
     public static final int MSG_ZEROCONF_ENABLED = 0x60;
     public static final int MSG_NEXUS_START = 0x70;
+    public static final int MSG_SEND_BLACKLISTED = 0x80;
 
     private int bluetoothEnabled = 0;
     private int zeroconfEnabled = 0;
     private int nexusEnabled = 0;
+    private boolean sendBlacklist = false;
 
     // masks for notification info
     private static final int NONE_FLAG = 0;
@@ -201,10 +203,13 @@ public class NetworkService extends Service {
                     }
 
                     break;
+                case MSG_SEND_BLACKLISTED:
+                    sendBlacklist = (msg.arg1 != 0);
+                    break;
                 case MSG_ZEROCONF_ENABLED:
                     if (msg.arg1 != zeroconfEnabled) {
                         if ((msg.arg1 == 1) && (zeroconfServiceThread == null)) {
-                            zeroconfServiceThread = new ZeroconfServiceThread(getApplicationContext(), clients);
+                            zeroconfServiceThread = new ZeroconfServiceThread(getApplicationContext(), clients, sendBlacklist);
                             zeroconfServiceThread.setScanFrequency(msg.arg2);
                             log.info("Starting our zeroconf service thread...");
                             zeroconfServiceThread.start();

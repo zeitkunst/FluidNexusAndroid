@@ -104,14 +104,17 @@ public class ZeroconfClientThread extends ProtocolThread {
     // will likely always be only a single client, but what the hey
     ArrayList<Messenger> clients = new ArrayList<Messenger>();
 
+    // whether or not to send blacklisted messages
+    private boolean sendBlacklist = false;
 
-    public ZeroconfClientThread(Context ctx, Handler givenHandler, ArrayList<Messenger> givenClients, String givenHost, int givenPort) {
+    public ZeroconfClientThread(Context ctx, Handler givenHandler, ArrayList<Messenger> givenClients, String givenHost, int givenPort, boolean givenSendBlacklist) {
 
         super(ctx, givenHandler, givenClients);
         setName("ZeroconfClientThread");
         
         host = givenHost;
         port = givenPort;
+        sendBlacklist = givenSendBlacklist;
 
         try {
             socket = new Socket(host, port);

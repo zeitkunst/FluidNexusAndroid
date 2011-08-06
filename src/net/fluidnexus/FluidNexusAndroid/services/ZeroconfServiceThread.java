@@ -72,6 +72,9 @@ public class ZeroconfServiceThread extends ServiceThread {
     // State of the system
     private int state;
 
+    // whether to send blacklisted messages
+    private boolean sendBlacklist = false;
+
     // Potential states
     public static final int STATE_NONE = 0;       // we're doing nothing
     public static final int STATE_RESOLVING = 1; // we're resolving things
@@ -126,10 +129,12 @@ public class ZeroconfServiceThread extends ServiceThread {
     /**
      * Constructor for the thread that does zeroconf work
      */
-    public ZeroconfServiceThread(Context ctx, ArrayList<Messenger> givenClients) {
+    public ZeroconfServiceThread(Context ctx, ArrayList<Messenger> givenClients, boolean givenSendBlacklist) {
         
         super(ctx, givenClients);
         
+        sendBlacklist = givenSendBlacklist;
+
         // TODO
         // deal with what happens if wifi isn't enabled
         setName("ZeroconfServiceThread");
@@ -240,7 +245,7 @@ public class ZeroconfServiceThread extends ServiceThread {
     public synchronized void connect(String host, int port) {
         log.debug("Connecting to " + host + ":" + port);
 
-        ZeroconfClientThread connectThread = new ZeroconfClientThread(context, threadHandler, clients, host, port);
+        ZeroconfClientThread connectThread = new ZeroconfClientThread(context, threadHandler, clients, host, port, sendBlacklist);
         connectThread.setHashes(currentHashes);
         connectThread.setData(currentData);
         connectedDevices.add(host);            
