@@ -808,6 +808,8 @@ public class MainActivity extends ListActivity {
         i.putExtra(MessagesProvider.KEY_MINE, localCursor.getInt(localCursor.getColumnIndex(MessagesProvider.KEY_MINE)) > 0);
         i.putExtra(MessagesProvider.KEY_PUBLIC, localCursor.getInt(localCursor.getColumnIndex(MessagesProvider.KEY_PUBLIC)) > 0);
         i.putExtra(MessagesProvider.KEY_ATTACHMENT_PATH, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_PATH)));
+        i.putExtra(MessagesProvider.KEY_TIME, localCursor.getFloat(localCursor.getColumnIndex(MessagesProvider.KEY_TIME)));
+        i.putExtra(MessagesProvider.KEY_RECEIVED_TIME, localCursor.getFloat(localCursor.getColumnIndex(MessagesProvider.KEY_RECEIVED_TIME)));
         c.close();
         startActivityForResult(i, ACTIVITY_VIEW_MESSAGE);
         localCursor.close();

@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.format.Time;
 import android.view.View;
 import android.view.Window;
 import android.webkit.MimeTypeMap;
@@ -40,6 +41,8 @@ public class ViewMessage extends Activity {
     private static Logger log = Logger.getLogger("FluidNexus"); 
     private ImageView typeImageView;
     private TextView titleTextView;
+    private TextView createdTimeTextView;
+    private TextView receivedTimeTextView;
     private TextView messageTextView;
     private String attachment_path;
     private String attachment_original_filename;
@@ -54,6 +57,8 @@ public class ViewMessage extends Activity {
         Bundle extras = getIntent().getExtras();
         
         titleTextView = (TextView) findViewById(R.id.view_message_title);
+        createdTimeTextView = (TextView) findViewById(R.id.view_message_created_time);
+        receivedTimeTextView = (TextView) findViewById(R.id.view_message_received_time);
         messageTextView = (TextView) findViewById(R.id.view_message_data);
         typeImageView = (ImageView) findViewById(R.id.view_message_type);
         Button viewAttachmentButton = (Button) findViewById(R.id.view_message_attachment);
@@ -64,6 +69,8 @@ public class ViewMessage extends Activity {
         if (extras != null) {
             String title = extras.getString(MessagesProvider.KEY_TITLE);
             String message = extras.getString(MessagesProvider.KEY_CONTENT); 
+            Float createdTime = extras.getFloat(MessagesProvider.KEY_TIME);
+            Float receivedTime = extras.getFloat(MessagesProvider.KEY_RECEIVED_TIME);
             attachment_path = extras.getString(MessagesProvider.KEY_ATTACHMENT_PATH);
             attachment_original_filename = extras.getString(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME); 
             Boolean mine = extras.getBoolean(MessagesProvider.KEY_MINE); 
@@ -94,6 +101,25 @@ public class ViewMessage extends Activity {
                 messageTextView.setText(message);
 
             }
+
+            if (receivedTime != null) {
+                Long s = receivedTime.longValue() * 1000;
+                Time t = new Time();
+                t.set(s);
+
+                String formattedTime = t.format(getString(R.string.message_list_received_time) + " %c");
+                receivedTimeTextView.setText(formattedTime);
+            }
+
+            if (createdTime != null) {
+                Long s = createdTime.longValue() * 1000;
+                Time t = new Time();
+                t.set(s);
+
+                String formattedTime = t.format(getString(R.string.message_list_created_time) + " %c");
+                createdTimeTextView.setText(formattedTime);
+            }
+
 
             if (attachment_path.equals("")) {
                 viewAttachmentButton.setVisibility(View.GONE);

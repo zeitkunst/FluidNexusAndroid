@@ -34,20 +34,39 @@ xmlns:android="http://schemas.android.com/apk/res/android"
         android:textColor="@color/text_color"
         android:layout_toRightOf="@+id/view_message_type" >
     </TextView>
+
+    <TextView
+    android:id="@+id/view_message_received_time"
+    android:textColor="@color/text_color"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/view_message_title"
+    android:layout_toRightOf="@+id/view_message_type" >
+    </TextView>
+
+    <TextView
+    android:id="@+id/view_message_created_time"
+    android:textColor="@color/text_color"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/view_message_received_time"
+    android:layout_toRightOf="@+id/view_message_type" >
+    </TextView>
+
     <ImageView
         android:id="@+id/view_message_attachment_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:scaleType="center"
         android:layout_marginTop="40dp"
-        android:layout_below="@+id/view_message_title"
+        android:layout_below="@+id/view_message_created_time"
         android:src="@drawable/attachment_icon" />
     <Button
         android:id="@+id/view_message_attachment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="View Attachment"
-        android:layout_below="@+id/view_message_title"
+        android:layout_below="@+id/view_message_created_time"
         android:layout_marginTop="40dp"
         android:layout_toRightOf="@+id/view_message_attachment_icon" />
 </RelativeLayout>
