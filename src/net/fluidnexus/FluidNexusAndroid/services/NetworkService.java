@@ -177,7 +177,7 @@ public class NetworkService extends Service {
                     if (msg.arg1 != bluetoothEnabled) {
                         // If the received value is not what we currently have, then we need to start or stop the service
                         if ((msg.arg1 == 1) && (bluetoothServiceThread == null)) {
-                            bluetoothServiceThread = new BluetoothServiceThread(getApplicationContext(), clients);
+                            bluetoothServiceThread = new BluetoothServiceThread(getApplicationContext(), clients, sendBlacklist);
                             bluetoothServiceThread.setScanFrequency(msg.arg2);
                             log.info("Starting our bluetooth service thread for discovered and paired devices...");
                             bluetoothServiceThread.start();
@@ -243,12 +243,12 @@ public class NetworkService extends Service {
                     break;
                 case MainActivity.MSG_NEW_MESSAGE_CREATED:
                     if (bluetoothServiceThread != null) {
-                        bluetoothServiceThread.updateHashes();
+                        bluetoothServiceThread.updateHashes(sendBlacklist);
                         bluetoothServiceThread.updateData();
                     }
 
                     if (zeroconfServiceThread != null) {
-                        zeroconfServiceThread.updateHashes();
+                        zeroconfServiceThread.updateHashes(sendBlacklist);
                         zeroconfServiceThread.updateData();
                     }
 
@@ -257,12 +257,12 @@ public class NetworkService extends Service {
                 case MainActivity.MSG_MESSAGE_DELETED:
                     log.debug("MSG_MESSAGE_DELETED received");
                     if (bluetoothServiceThread != null) {
-                        bluetoothServiceThread.updateHashes();
+                        bluetoothServiceThread.updateHashes(sendBlacklist);
                         bluetoothServiceThread.updateData();
                     }
 
                     if (zeroconfServiceThread != null) {
-                        zeroconfServiceThread.updateHashes();
+                        zeroconfServiceThread.updateHashes(sendBlacklist);
                         zeroconfServiceThread.updateData();
                     }
 

@@ -5,4 +5,4 @@ TODO
 
 * Add error toast on problems with oauth
 
-* Add option to not pass along blacklisted messages
+* Restore listview position on return to app; for some reason this isn't working properly in the code I have now

@@ -97,6 +97,9 @@ public class BluetoothServiceThread extends ServiceThread {
     // whether to look for bonded devices only
     private boolean bondedOnly = false;
 
+    // whether or not to send blacklisted messages
+    private boolean sendBlacklist = false;
+
     // Potential states
     public static final int STATE_NONE = 0;       // we're doing nothing
     public static final int STATE_DISCOVERY = 1; // we're discovering things
@@ -172,9 +175,12 @@ public class BluetoothServiceThread extends ServiceThread {
     /**
      * Constructor for the thread that does discovery
      */
-    public BluetoothServiceThread(Context ctx, ArrayList<Messenger> givenClients) {
+    public BluetoothServiceThread(Context ctx, ArrayList<Messenger> givenClients, boolean givenSendBlacklist) {
         
         super(ctx, givenClients);        
+
+        sendBlacklist = givenSendBlacklist;
+
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         // Setup intent filters and receivers for discovery
@@ -185,8 +191,8 @@ public class BluetoothServiceThread extends ServiceThread {
 
         setName("BluetoothServiceThread");
 
-        updateHashes();
-        updateData();
+        updateHashes(sendBlacklist);
+        //updateData();
 
         // Start the server thread
 
@@ -238,7 +244,7 @@ public class BluetoothServiceThread extends ServiceThread {
                     }
                     break;
                 case UPDATE_HASHES:
-                    updateHashes();
+                    updateHashes(sendBlacklist);
                 case SCAN_FREQUENCY_CHANGED:
                     log.debug("Changing scan frequency to: " + msg.arg1);
                     setScanFrequency(msg.arg1);
@@ -377,7 +383,7 @@ public class BluetoothServiceThread extends ServiceThread {
         HashSet<BluetoothDevice> difference = new HashSet<BluetoothDevice>(fnDevicesBT);
         difference.removeAll(connectedDevices);
         
-        updateHashes();
+        updateHashes(sendBlacklist);
         updateData();
         for (BluetoothDevice currentDevice : difference) {
             log.debug("Trying to connect to " + currentDevice.getName() + " with address " + currentDevice.getAddress());

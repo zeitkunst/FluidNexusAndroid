@@ -455,14 +455,56 @@ public class MainActivity extends ListActivity {
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        ListView lv;
+        lv = (ListView) getListView();
+
+        int scrollPos = lv.getFirstVisiblePosition();
+        outState.putInt("position", scrollPos);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle inState) {
+        super.onRestoreInstanceState(inState);
+        ListView lv;
+        lv = (ListView) getListView();
+
+        int scrollPos = inState.getInt("position");
+        lv.setSelection(scrollPos);
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
+        
+        /*
+        ListView lv;
+        lv = (ListView) getListView();
+
+        int scroll = lv.getScrollY();
+        log.debug("ON PAUSE: " + scroll);
+        SharedPreferences p = getSharedPreferences("SCROLL", 0);
+        SharedPreferences.Editor e = p.edit();
+        e.putInt("ScrollValue", scroll);
+        e.commit();
+        */
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        
+        /*
+        SharedPreferences p = getSharedPreferences("SCROLL", 0);
+        int scroll = p.getInt("ScrollValue", 0);
+        log.debug("ON RESUME: " + scroll);
+        ListView lv;
+        lv = (ListView) getListView();
+        lv.scrollTo(0, scroll);
+        */
 
+        // Parse a URI result as sent from the browser on Nexus confirmation
         Uri uri = this.getIntent().getData();
 
         if (uri != null && uri.toString().startsWith(CALLBACK_URL)) {

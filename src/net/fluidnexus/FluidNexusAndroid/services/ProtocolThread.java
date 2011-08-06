@@ -188,10 +188,15 @@ public class ProtocolThread extends Thread {
     /**
      * Update the hashes in our HashSet based on items from the database
      */
-    public void updateHashes() {
+    public void updateHashes(boolean sendBlacklist) {
         //hashesCursor = dbAdapter.services();
         //hashesCursor.moveToFirst();
-        hashesCursor = messagesProviderHelper.hashes();
+
+        if (sendBlacklist) {
+            hashesCursor = messagesProviderHelper.hashes();
+        } else {
+            hashesCursor = messagesProviderHelper.hashesNoBlacklist();
+        }
 
         currentHashes = new HashSet<String>();
         currentHashes.clear();

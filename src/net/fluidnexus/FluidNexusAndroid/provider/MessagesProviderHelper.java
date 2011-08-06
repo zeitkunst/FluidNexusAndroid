@@ -117,6 +117,18 @@ public class MessagesProviderHelper {
     }
 
     /**
+     * Get our non-blacklist hashes 
+     */
+    public Cursor hashesNoBlacklist() {
+
+        Cursor c = cr.query(MessagesProvider.ALL_NOBLACKLIST_URI, MessagesProvider.HASHES_PROJECTION, null, null, null);
+        c.moveToFirst();
+        return c;
+
+    }
+
+
+    /**
      * Add a new message that doesn't have an attachment.
      * @param type Type of the message
      * @param title Title of the message

@@ -114,7 +114,7 @@ public class ZeroconfServiceThread extends ServiceThread {
                     connectedDevices.remove(doneAddress);
                     break;
                 case UPDATE_HASHES:
-                    updateHashes();
+                    updateHashes(sendBlacklist);
                 case SCAN_FREQUENCY_CHANGED:
                     log.debug("Changing scan frequency to: " + msg.arg1);
                     setScanFrequency(msg.arg1);
@@ -142,7 +142,7 @@ public class ZeroconfServiceThread extends ServiceThread {
         lock = wifiManager.createMulticastLock("ZeroconfServiceLock");
         lock.setReferenceCounted(true);
 
-        updateHashes();
+        updateHashes(sendBlacklist);
         updateData();
 
 
