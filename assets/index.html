@@ -98,17 +98,18 @@ a:hover {
 <li><a class="reference internal" href="#creating-a-new-message" id="id17">5.1&nbsp;&nbsp;&nbsp;Creating a new message</a></li>
 <li><a class="reference internal" href="#editing-messages" id="id18">5.2&nbsp;&nbsp;&nbsp;Editing Messages</a></li>
 <li><a class="reference internal" href="#preferences" id="id19">5.3&nbsp;&nbsp;&nbsp;Preferences</a><ul class="auto-toc">
-<li><a class="reference internal" href="#network" id="id20">5.3.1&nbsp;&nbsp;&nbsp;Network</a></li>
-<li><a class="reference internal" href="#id2" id="id21">5.3.2&nbsp;&nbsp;&nbsp;Bluetooth</a></li>
-<li><a class="reference internal" href="#scan-frequency" id="id22">5.3.3&nbsp;&nbsp;&nbsp;Scan Frequency</a></li>
-<li><a class="reference internal" href="#id3" id="id23">5.3.4&nbsp;&nbsp;&nbsp;Nexus</a></li>
+<li><a class="reference internal" href="#general" id="id20">5.3.1&nbsp;&nbsp;&nbsp;General</a></li>
+<li><a class="reference internal" href="#network" id="id21">5.3.2&nbsp;&nbsp;&nbsp;Network</a></li>
+<li><a class="reference internal" href="#id2" id="id22">5.3.3&nbsp;&nbsp;&nbsp;Bluetooth</a></li>
+<li><a class="reference internal" href="#scan-frequency" id="id23">5.3.4&nbsp;&nbsp;&nbsp;Scan Frequency</a></li>
+<li><a class="reference internal" href="#id3" id="id24">5.3.5&nbsp;&nbsp;&nbsp;Nexus</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#technical-information" id="id24">6&nbsp;&nbsp;&nbsp;Technical Information</a><ul class="auto-toc">
-<li><a class="reference internal" href="#protocol-buffer-implementation" id="id25">6.1&nbsp;&nbsp;&nbsp;Protocol Buffer implementation</a></li>
-<li><a class="reference internal" href="#network-modalities" id="id26">6.2&nbsp;&nbsp;&nbsp;Network Modalities</a></li>
+<li><a class="reference internal" href="#technical-information" id="id25">6&nbsp;&nbsp;&nbsp;Technical Information</a><ul class="auto-toc">
+<li><a class="reference internal" href="#protocol-buffer-implementation" id="id26">6.1&nbsp;&nbsp;&nbsp;Protocol Buffer implementation</a></li>
+<li><a class="reference internal" href="#network-modalities" id="id27">6.2&nbsp;&nbsp;&nbsp;Network Modalities</a></li>
 </ul>
 </li>
 </ul>
@@ -279,8 +280,13 @@ a:hover {
 <div class="section" id="preferences">
 <h2><a class="toc-backref" href="#id19">5.3&nbsp;&nbsp;&nbsp;Preferences</a></h2>
 <p>Both the Android and the Desktop applications have preferences that allow you to control how the applications behave.</p>
+<div class="section" id="general">
+<h3><a class="toc-backref" href="#id20">5.3.1&nbsp;&nbsp;&nbsp;General</a></h3>
+<p>On both Android and the Desktop is an option whether or not to pass along messages you have blacklisted.  If checked, blacklisted messages will be sent.</p>
+<p>On Android you additionally have an option to vibrate when new messages arrive.</p>
+</div>
 <div class="section" id="network">
-<h3><a class="toc-backref" href="#id20">5.3.1&nbsp;&nbsp;&nbsp;Network</a></h3>
+<h3><a class="toc-backref" href="#id21">5.3.2&nbsp;&nbsp;&nbsp;Network</a></h3>
 <p>The &quot;Network&quot; section provides checkboxes to enable or disable particular network modalities.  Fluid Nexus is opportunistic and tries to use whatever modality is available to spread messages.  Multiple modalities can run in parallel without problems.  At the moment we have implemented three modalities:</p>
 <ul class="simple">
 <li><a class="reference external" href="https://secure.wikimedia.org/wikipedia/en/wiki/Bluetooth">Bluetooth</a>: connects to nearby devices running Fluid Nexus.  On Android, attempts to connect to paired Bluetooth devices only.</li>
@@ -298,11 +304,11 @@ a:hover {
 <p>Ad-Hoc Wifi is still under development.</p>
 </div>
 <div class="section" id="id2">
-<h3><a class="toc-backref" href="#id21">5.3.2&nbsp;&nbsp;&nbsp;Bluetooth</a></h3>
+<h3><a class="toc-backref" href="#id22">5.3.3&nbsp;&nbsp;&nbsp;Bluetooth</a></h3>
 <p>For the Android version you have the additional option to only connect to previously paired or &quot;bonded&quot; devices.  This will skip the device discovery step.  While saving battery life, connecting to bonded devices also adds a small layer of security by only sharing data between devices that you already know about.</p>
 </div>
 <div class="section" id="scan-frequency">
-<h3><a class="toc-backref" href="#id22">5.3.3&nbsp;&nbsp;&nbsp;Scan Frequency</a></h3>
+<h3><a class="toc-backref" href="#id23">5.3.4&nbsp;&nbsp;&nbsp;Scan Frequency</a></h3>
 <p>For each of the network modalities (with the exception of &quot;Nexus&quot;) you also have the possibility of setting the &quot;Scan Frequency&quot;; this is the amount of time between successive scans for nearby devices.  Lower values mean more frequent scans.  On Android, low values for the <a class="reference external" href="https://secure.wikimedia.org/wikipedia/en/wiki/Bluetooth">Bluetooth</a> Scan Frequency will <em>severely</em> impact battery life.</p>
 <div class="figure">
 <img alt="android bluetooth scan frequency" src="images/android_preferences_bluetooth_scan_frequency.png" style="width: 400px;" />
@@ -314,7 +320,7 @@ a:hover {
 </div>
 </div>
 <div class="section" id="id3">
-<h3><a class="toc-backref" href="#id23">5.3.4&nbsp;&nbsp;&nbsp;Nexus</a></h3>
+<h3><a class="toc-backref" href="#id24">5.3.5&nbsp;&nbsp;&nbsp;Nexus</a></h3>
 <p>Finally, the &quot;Nexus&quot; section allows you to set your key and secret for posting to the Nexus.  To set this up, first register for an account at <a class="reference external" href="http://fluidnexus.net">http://fluidnexus.net</a> (by either creating a new account there or by logging in using your Google Account).  Then, on your user page click &quot;Request  a key and secret&quot;.  Enter these 20-digit numbers into the corresponding boxes in your Android or Desktop application.</p>
 <div class="figure">
 <img alt="android nexus preferences" src="images/android_preferences_nexus.png" style="width: 400px;" />
@@ -338,9 +344,9 @@ a:hover {
 </div>
 </div>
 <div class="section" id="technical-information">
-<h1><a class="toc-backref" href="#id24">6&nbsp;&nbsp;&nbsp;Technical Information</a></h1>
+<h1><a class="toc-backref" href="#id25">6&nbsp;&nbsp;&nbsp;Technical Information</a></h1>
 <div class="section" id="protocol-buffer-implementation">
-<h2><a class="toc-backref" href="#id25">6.1&nbsp;&nbsp;&nbsp;Protocol Buffer implementation</a></h2>
+<h2><a class="toc-backref" href="#id26">6.1&nbsp;&nbsp;&nbsp;Protocol Buffer implementation</a></h2>
 <p>Fluid Nexus uses protocol buffers to share data.  The following documents our message format:</p>
 <pre class="literal-block">
 message FluidNexusHashes {
@@ -378,7 +384,7 @@ message FluidNexusMessages {
 <p>The application uses a SHA1 hash of the message title and message content to determine whether or not the message needs to be exchanged.  These hashes are first exchanged between devices to determine what needs to be sent.  Thus Fluid Nexus uses a type of <a class="reference external" href="https://secure.wikimedia.org/wikipedia/en/wiki/Distributed_hash_table">distributed hash table</a> with the goal of replicating the entire table amongst all devices.</p>
 </div>
 <div class="section" id="network-modalities">
-<h2><a class="toc-backref" href="#id26">6.2&nbsp;&nbsp;&nbsp;Network Modalities</a></h2>
+<h2><a class="toc-backref" href="#id27">6.2&nbsp;&nbsp;&nbsp;Network Modalities</a></h2>
 <p>Fluid Nexus currently works using <a class="reference external" href="https://secure.wikimedia.org/wikipedia/en/wiki/Bluetooth">Bluetooth</a> and <a class="reference external" href="http://fluidnexus.net/favicon.ico">Zeroconf</a> service discovery, with Ad-Hoc Wifi to be developed.  Android requires Bluetooth devices to be paired before any data sharing can occur.  On the Desktop, sharing between <em>discoverable</em> Linux devices does not require pairing beforehand.  (Windows is to be determined.)  Zeroconf does not require any pairing and thus messages will be shared between any device running Fluid Nexus and discoverable using Zeroconf service discovery.</p>
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 <!-- FOOTER -->
@@ -389,7 +395,7 @@ message FluidNexusMessages {
 <div class="footer">
 <hr class="footer" />
 Document generated from <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> plaintext markup source
-on 2011-08-04 at 17:17:37.
+on 2011-08-06 at 20:50:50.
 </div>
 </body>
 </html>

@@ -335,8 +335,8 @@ public class ZeroconfServiceThread extends ServiceThread {
         // TODO
         // Should this value be smaller?
         try {
-            log.debug("Zeroconf service waiting for service discovery...");
-            this.sleep(60 * 1000);
+            log.debug("Zeroconf service waiting for service discovery for " + getScanFrequency() + " seconds");
+            this.sleep(getScanFrequency() * 1000);
         } catch (InterruptedException e) {
             log.error("Thread sleeping interrupted: " + e);
         }

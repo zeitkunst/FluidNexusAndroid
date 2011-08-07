@@ -468,12 +468,18 @@ public class ProtocolThread extends Thread {
                 Float received_timestamp = localCursor.getFloat(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_RECEIVED_TIME));
                 String attachmentPath = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_ATTACHMENT_PATH));
                 String attachmentOriginalFilename = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME));
+                boolean publicMessage = (localCursor.getInt(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_PUBLIC)) != 0);
+                Integer ttl = localCursor.getInt(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_TTL));
+                Integer message_type = localCursor.getInt(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_TYPE));
                 localCursor.close();
 
                 messageBuilder.setMessageTitle(title);
                 messageBuilder.setMessageContent(content);
                 messageBuilder.setMessageTimestamp(timestamp);
                 messageBuilder.setMessageReceivedTimestamp(received_timestamp);
+                messageBuilder.setMessagePublic(publicMessage);
+                messageBuilder.setMessageTtl(ttl);
+                messageBuilder.setMessageType(Protos.FluidNexusMessage.MessageType.valueOf(message_type));
 
                 if (!(attachmentPath.equals(""))) {
                     File file = new File(attachmentPath);
