@@ -397,9 +397,11 @@ public class ProtocolThread extends Thread {
 
 
 
-                    messagesProviderHelper.add_received(0, message.getMessageTimestamp(), message.getMessageReceivedTimestamp(), message.getMessageTitle(), message.getMessageContent(), destinationPath.getAbsolutePath(), message.getMessageAttachmentOriginalFilename(), message.getMessagePublic(), message.getMessageTtl());
+                    float now = (float) (System.currentTimeMillis()/1000);
+                    messagesProviderHelper.add_received(0, message.getMessageTimestamp(), now, message.getMessageTitle(), message.getMessageContent(), destinationPath.getAbsolutePath(), message.getMessageAttachmentOriginalFilename(), message.getMessagePublic(), message.getMessageTtl());
                 } else {
-                    messagesProviderHelper.add_received(0, message.getMessageTimestamp(), message.getMessageReceivedTimestamp(), message.getMessageTitle(), message.getMessageContent(), message.getMessagePublic(), message.getMessageTtl());
+                    float now = (float) (System.currentTimeMillis()/1000);
+                    messagesProviderHelper.add_received(0, message.getMessageTimestamp(), now, message.getMessageTitle(), message.getMessageContent(), message.getMessagePublic(), message.getMessageTtl());
                 }
                 count += 1;
             }
