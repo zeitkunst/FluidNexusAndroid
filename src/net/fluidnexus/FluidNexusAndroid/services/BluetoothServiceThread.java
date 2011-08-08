@@ -246,8 +246,15 @@ public class BluetoothServiceThread extends ServiceThread {
                 case UPDATE_HASHES:
                     updateHashes(sendBlacklist);
                 case SCAN_FREQUENCY_CHANGED:
-                    log.debug("Changing scan frequency to: " + msg.arg1);
-                    setScanFrequency(msg.arg1);
+                    // TODO
+                    // This is somehow getting called with an argument of 0!
+                    // This is certainly a bug, but I can't track it down, as I never explicitly send any messages from the thread
+                    // So, check if we get a zero, and if so, don't change the value
+                    if (msg.arg1 != 0) {
+                        log.debug("Changing scan frequency to: " + msg.arg1);
+                        setScanFrequency(msg.arg1);
+                    }
+
                     break;
                 default:
                     break;
