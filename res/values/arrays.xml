@@ -21,4 +21,10 @@
         <item>1800</item>
         <item>3600</item>
     </string-array>
+    <string-array name="add_attachment_array">
+        <item>None</item>
+        <item>Audio</item>
+        <item>Image</item>
+        <item>Video</item>
+    </string-array>
 </resources>
