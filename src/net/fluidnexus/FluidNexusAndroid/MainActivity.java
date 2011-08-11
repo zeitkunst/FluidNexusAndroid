@@ -162,6 +162,7 @@ public class MainActivity extends ListActivity {
     private boolean sendBlacklist = true;
 
     private BluetoothAdapter bluetoothAdapter = null;
+    private boolean askedBluetooth = false;
     private boolean enableBluetoothServicePref = true;
     private boolean vibratePref = false;
 
@@ -436,12 +437,10 @@ public class MainActivity extends ListActivity {
 
         setupPreferences();
 
-        if (bluetoothAdapter != null) {
+        if ((bluetoothAdapter != null) && (askedBluetooth == false)) {
             if (!bluetoothAdapter.isEnabled()) {
                 Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
-                toast = Toast.makeText(this, "Restart application to use bluetooth.", Toast.LENGTH_LONG);
-                toast.show();
             } else {
                 /*
                 if (networkService == null) {
@@ -899,11 +898,17 @@ public class MainActivity extends ListActivity {
                 break;
             case(REQUEST_ENABLE_BT):
                 if (resultCode == ListActivity.RESULT_OK) {
+                    toast = Toast.makeText(this, R.string.toast_bluetooth_request_ok, Toast.LENGTH_LONG);
+                    toast.show();
                     // setup services here
                 } else {
                     log.warn("Bluetooth not enabled");
-                    Toast.makeText(this, "Bluetooth was not enabled, leaving", Toast.LENGTH_SHORT).show();
-                    finish();
+                    Toast.makeText(this, R.string.toast_bluetooth_request_notok, Toast.LENGTH_SHORT).show();
+                    askedBluetooth = true;
+                    enableBluetoothServicePref = false;
+                    if (prefsEditor != null) {
+                        prefsEditor.putBoolean("enableBluetoothServicePref", false);
+                    }
                 }
         }
     }

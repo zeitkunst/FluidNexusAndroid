@@ -64,6 +64,8 @@
   <string name="notification_fluid_nexus_services_complete">Services discovery complete</string>
   <string name="notification_fluid_nexus_send_outgoing_complete">Sending outgoing message</string>
   <string name="toast_new_message_received">New message received.</string>
+  <string name="toast_bluetooth_request_notok">Bluetooth will not be started.</string>
+  <string name="toast_bluetooth_request_ok">Force close and restart application for Bluetooth to be used.</string>
   <string name="toast_message_deleted">Message deleted.</string>
   <string name="toast_message_blacklisted">Message blacklisted.</string>
   <string name="toast_message_unblacklisted">Message unblacklisted.</string>

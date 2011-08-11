@@ -101,7 +101,8 @@ public class BluetoothServerThread extends ProtocolThread {
      */
     private void doClientAccept() {
         // Check for bluetooth adapter
-        if (bluetoothAdapter == null) {
+        if (!bluetoothAdapter.isEnabled()) {
+            log.warn("Bluetooth adapter is not enabled, entering into wait loop");
             super.setConnectedState(STATE_WAIT_SERVER);
         } else {
     
@@ -130,6 +131,9 @@ public class BluetoothServerThread extends ProtocolThread {
                 tmpOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
             } catch (IOException e) {
                 log.error("Temp stream sockets not created");
+                cleanupConnection();
+            } catch (NullPointerException e) {
+                log.debug("Bluetooth socket null pointer: " + e);
                 cleanupConnection();
             }
     

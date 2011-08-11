@@ -381,7 +381,7 @@ message FluidNexusMessages {
 }
 </pre>
 <p>Note that no directly identifying information is either sent in the message nor saved in the database.  The only way identifying information might be saved is via anything placed in the message itself.  Also note that there are no limitations on the length of the message.</p>
-<p>The application uses a SHA1 hash of the message title and message content to determine whether or not the message needs to be exchanged.  These hashes are first exchanged between devices to determine what needs to be sent.  Thus Fluid Nexus uses a type of <a class="reference external" href="https://secure.wikimedia.org/wikipedia/en/wiki/Distributed_hash_table">distributed hash table</a> with the goal of replicating the entire table amongst all devices.</p>
+<p>The application uses a SHA256 hash of the message title and message content to determine whether or not the message needs to be exchanged.  These hashes are first exchanged between devices to determine what needs to be sent.  Thus Fluid Nexus uses a type of <a class="reference external" href="https://secure.wikimedia.org/wikipedia/en/wiki/Distributed_hash_table">distributed hash table</a> with the goal of replicating the entire table amongst all devices.</p>
 </div>
 <div class="section" id="network-modalities">
 <h2><a class="toc-backref" href="#id27">6.2&nbsp;&nbsp;&nbsp;Network Modalities</a></h2>
@@ -395,7 +395,7 @@ message FluidNexusMessages {
 <div class="footer">
 <hr class="footer" />
 Document generated from <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> plaintext markup source
-on 2011-08-07 at 20:09:17.
+on 2011-08-10 at 20:58:10.
 </div>
 </body>
 </html>
