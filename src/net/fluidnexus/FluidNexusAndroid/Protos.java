@@ -359,6 +359,45 @@ public final class Protos {
       // @@protoc_insertion_point(enum_scope:FluidNexus.FluidNexusMessage.MessageType)
     }
     
+    public enum MessagePriority
+        implements com.google.protobuf.Internal.EnumLite {
+      NORMAL(0, 0),
+      LIFE_OR_DEATH(1, 1),
+      ;
+      
+      
+      public final int getNumber() { return value; }
+      
+      public static MessagePriority valueOf(int value) {
+        switch (value) {
+          case 0: return NORMAL;
+          case 1: return LIFE_OR_DEATH;
+          default: return null;
+        }
+      }
+      
+      public static com.google.protobuf.Internal.EnumLiteMap<MessagePriority>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static com.google.protobuf.Internal.EnumLiteMap<MessagePriority>
+          internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<MessagePriority>() {
+              public MessagePriority findValueByNumber(int number) {
+                return MessagePriority.valueOf(number)
+      ;        }
+            };
+      
+      private final int index;
+      private final int value;
+      private MessagePriority(int index, int value) {
+        this.index = index;
+        this.value = value;
+      }
+      
+      // @@protoc_insertion_point(enum_scope:FluidNexus.FluidNexusMessage.MessagePriority)
+    }
+    
     // optional string message_title = 1;
     public static final int MESSAGE_TITLE_FIELD_NUMBER = 1;
     private boolean hasMessageTitle;
@@ -429,6 +468,13 @@ public final class Protos {
     public boolean hasMessageType() { return hasMessageType; }
     public net.fluidnexus.FluidNexusAndroid.Protos.FluidNexusMessage.MessageType getMessageType() { return messageType_; }
     
+    // optional .FluidNexus.FluidNexusMessage.MessagePriority message_priority = 18;
+    public static final int MESSAGE_PRIORITY_FIELD_NUMBER = 18;
+    private boolean hasMessagePriority;
+    private net.fluidnexus.FluidNexusAndroid.Protos.FluidNexusMessage.MessagePriority messagePriority_;
+    public boolean hasMessagePriority() { return hasMessagePriority; }
+    public net.fluidnexus.FluidNexusAndroid.Protos.FluidNexusMessage.MessagePriority getMessagePriority() { return messagePriority_; }
+    
     // optional bytes message_attachment = 8;
     public static final int MESSAGE_ATTACHMENT_FIELD_NUMBER = 8;
     private boolean hasMessageAttachment;
@@ -445,6 +491,7 @@ public final class Protos {
     
     private void initFields() {
       messageType_ = net.fluidnexus.FluidNexusAndroid.Protos.FluidNexusMessage.MessageType.TEXT;
+      messagePriority_ = net.fluidnexus.FluidNexusAndroid.Protos.FluidNexusMessage.MessagePriority.NORMAL;
     }
     public final boolean isInitialized() {
       return true;
@@ -488,6 +535,9 @@ public final class Protos {
       }
       if (hasMessageTtl()) {
         output.writeInt32(17, getMessageTtl());
+      }
+      if (hasMessagePriority()) {
+        output.writeEnum(18, getMessagePriority().getNumber());
       }
     }
     
@@ -544,6 +594,10 @@ public final class Protos {
       if (hasMessageTtl()) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(17, getMessageTtl());
+      }
+      if (hasMessagePriority()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(18, getMessagePriority().getNumber());
       }
       memoizedSerializedSize = size;
       return size;
@@ -719,6 +773,9 @@ public final class Protos {
         if (other.hasMessageType()) {
           setMessageType(other.getMessageType());
         }
+        if (other.hasMessagePriority()) {
+          setMessagePriority(other.getMessagePriority());
+        }
         if (other.hasMessageAttachment()) {
           setMessageAttachment(other.getMessageAttachment());
         }
@@ -793,6 +850,14 @@ public final class Protos {
             }
             case 136: {
               setMessageTtl(input.readInt32());
+              break;
+            }
+            case 144: {
+              int rawValue = input.readEnum();
+              net.fluidnexus.FluidNexusAndroid.Protos.FluidNexusMessage.MessagePriority value = net.fluidnexus.FluidNexusAndroid.Protos.FluidNexusMessage.MessagePriority.valueOf(rawValue);
+              if (value != null) {
+                setMessagePriority(value);
+              }
               break;
             }
           }
@@ -992,6 +1057,27 @@ public final class Protos {
       public Builder clearMessageType() {
         result.hasMessageType = false;
         result.messageType_ = net.fluidnexus.FluidNexusAndroid.Protos.FluidNexusMessage.MessageType.TEXT;
+        return this;
+      }
+      
+      // optional .FluidNexus.FluidNexusMessage.MessagePriority message_priority = 18;
+      public boolean hasMessagePriority() {
+        return result.hasMessagePriority();
+      }
+      public net.fluidnexus.FluidNexusAndroid.Protos.FluidNexusMessage.MessagePriority getMessagePriority() {
+        return result.getMessagePriority();
+      }
+      public Builder setMessagePriority(net.fluidnexus.FluidNexusAndroid.Protos.FluidNexusMessage.MessagePriority value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        result.hasMessagePriority = true;
+        result.messagePriority_ = value;
+        return this;
+      }
+      public Builder clearMessagePriority() {
+        result.hasMessagePriority = false;
+        result.messagePriority_ = net.fluidnexus.FluidNexusAndroid.Protos.FluidNexusMessage.MessagePriority.NORMAL;
         return this;
       }
       

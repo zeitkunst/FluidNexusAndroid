@@ -32,6 +32,7 @@ import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import net.fluidnexus.FluidNexusAndroid.provider.MessagesProvider;
@@ -46,6 +47,10 @@ public class ViewMessage extends Activity {
     private TextView messageTextView;
     private String attachment_path;
     private String attachment_original_filename;
+
+    // Priority codes
+    private static final int SELECT_NORMAL_PRIORITY = 0;
+    private static final int SELECT_HIGH_PRIORITY = 1;
 
     @Override
     protected void onCreate(Bundle icicle) {
@@ -64,7 +69,7 @@ public class ViewMessage extends Activity {
         Button viewAttachmentButton = (Button) findViewById(R.id.view_message_attachment);
         ImageView attachmentIconView = (ImageView) findViewById(R.id.view_message_attachment_icon);
 
-
+        RelativeLayout rl = (RelativeLayout) findViewById(R.id.message_view_message);
 
         if (extras != null) {
             String title = extras.getString(MessagesProvider.KEY_TITLE);
@@ -75,6 +80,16 @@ public class ViewMessage extends Activity {
             attachment_original_filename = extras.getString(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME); 
             Boolean mine = extras.getBoolean(MessagesProvider.KEY_MINE); 
             Boolean publicMessage = extras.getBoolean(MessagesProvider.KEY_PUBLIC); 
+            Integer priority = extras.getInt(MessagesProvider.KEY_PRIORITY); 
+
+            log.debug("priority is: " + priority);
+            if (priority != null) {
+                if (priority == SELECT_HIGH_PRIORITY) {
+                    log.debug("setting high priority");
+                    rl.setBackgroundResource(R.drawable.message_list_item_high_priority_gradient);
+                }
+
+            }
 
             if (mine != null) {
                 if (mine == false) {

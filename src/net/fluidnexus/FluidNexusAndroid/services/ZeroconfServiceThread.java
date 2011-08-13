@@ -102,7 +102,7 @@ public class ZeroconfServiceThread extends ServiceThread {
     private WifiManager wifiManager = null;
 
     // Our zeroconf type
-    private static final String zeroconfServiceName = "Fluid Nexus";
+    private static final String zeroconfServiceName = UUID.randomUUID().toString();
     private static final String zeroconfType = "_fluidnexus._tcp.local.";
     private static final int zeroconfPort = 17894;
 
@@ -290,8 +290,7 @@ public class ZeroconfServiceThread extends ServiceThread {
             jmdns = JmDNS.create();
 
             if (serverThread != null) {
-                UUID fluidNexusUUID = UUID.randomUUID();
-                serviceInfo = ServiceInfo.create(zeroconfType, fluidNexusUUID.toString(), zeroconfPort, "Fluid Nexus Zeroconf server for android");
+                serviceInfo = ServiceInfo.create(zeroconfType, zeroconfServiceName, zeroconfPort, "Fluid Nexus Zeroconf server for android");
                 jmdns.registerService(serviceInfo);
             }
             

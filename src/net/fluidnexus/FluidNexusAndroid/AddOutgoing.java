@@ -61,12 +61,25 @@ public class AddOutgoing extends Activity {
     private static final int SELECT_IMAGE = 2;
     private static final int SELECT_VIDEO = 3;
 
+    // Priority codes
+    private static final int SELECT_NORMAL_PRIORITY = 0;
+    private static final int SELECT_HIGH_PRIORITY = 1;
+
+    // Attachment widgets
+
+
     private static final int DIALOG_SAVE = 0;
 
     private int attachmentType = SELECT_TEXT;
+    private int priorityType = SELECT_NORMAL_PRIORITY;
     private Uri attachmentUri = null;
     private String attachmentPath = null;
+    private Spinner attachmentSpinner = null;
     private TextView attachmentLabel = null;
+    private TextView attachmentAddLabel = null;
+    private Button addAttachmentButton = null;
+    private Button removeAttachmentButton = null;
+
     private boolean publicMessage = false;
 
     @Override
@@ -81,13 +94,16 @@ public class AddOutgoing extends Activity {
         titleEditText = (EditText) findViewById(R.id.title_edit);
         messageEditText = (EditText) findViewById(R.id.message_edit);
 
-        Button addAttachmentButton = (Button) findViewById(R.id.add_attachment_button);
-        Button removeAttachmentButton = (Button) findViewById(R.id.remove_attachment_button);
+        addAttachmentButton = (Button) findViewById(R.id.add_attachment_button);
+        removeAttachmentButton = (Button) findViewById(R.id.remove_attachment_button);
         attachmentLabel = (TextView) findViewById(R.id.attachment_label);
+        attachmentAddLabel = (TextView) findViewById(R.id.attachment_add_label);
         attachmentLabel.setVisibility(View.GONE);
 
         CheckBox checkbox = (CheckBox) findViewById(R.id.public_checkbox);
-        Spinner attachmentSpinner = (Spinner) findViewById(R.id.add_attachment_spinner);
+
+        // Setup attachment spinner
+        attachmentSpinner = (Spinner) findViewById(R.id.add_attachment_spinner);
         ArrayAdapter adapter = ArrayAdapter.createFromResource(this, R.array.add_attachment_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         attachmentSpinner.setAdapter(adapter);
@@ -114,6 +130,30 @@ public class AddOutgoing extends Activity {
 
             }
         });            
+
+        // Priority spinner
+        Spinner prioritySpinner = (Spinner) findViewById(R.id.set_priority_spinner);
+        ArrayAdapter priorityAdapter = ArrayAdapter.createFromResource(this, R.array.set_priority_array, android.R.layout.simple_spinner_item);
+        priorityAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        prioritySpinner.setAdapter(priorityAdapter);
+        prioritySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView adapter, View v, int i, long l) {
+                if (i == 0) {
+                    priorityType = SELECT_NORMAL_PRIORITY;
+                    showAttachmentOptions(true);
+                } else if (i == 1) {
+                    priorityType = SELECT_HIGH_PRIORITY;
+                    showAttachmentOptions(false);
+                } 
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView arg0) {
+
+            }
+        });            
+
 
         addAttachmentButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
@@ -266,6 +306,25 @@ public class AddOutgoing extends Activity {
     }
 
     /**
+     * Show or hide our attachment options
+     */
+    private void showAttachmentOptions(boolean show) {
+        if (show) {
+            attachmentLabel.setVisibility(View.VISIBLE);
+            attachmentSpinner.setVisibility(View.VISIBLE);
+            attachmentAddLabel.setVisibility(View.VISIBLE);
+            addAttachmentButton.setVisibility(View.VISIBLE);
+            removeAttachmentButton.setVisibility(View.VISIBLE);
+        } else {
+            attachmentLabel.setVisibility(View.GONE);
+            attachmentSpinner.setVisibility(View.GONE);
+            attachmentAddLabel.setVisibility(View.GONE);
+            addAttachmentButton.setVisibility(View.GONE);
+            removeAttachmentButton.setVisibility(View.GONE);
+        }
+    }
+
+    /**
      * Save our state to the database
      */
     private int saveState() {
@@ -285,16 +344,16 @@ public class AddOutgoing extends Activity {
         // use defined TTL            
         if (attachmentPath == null) {
             if (publicMessage) {
-                messagesProviderHelper.add_new(0, title, message, publicMessage, 30);
+                messagesProviderHelper.add_new(0, title, message, publicMessage, 30, priorityType);
             } else {
-                messagesProviderHelper.add_new(0, title, message, publicMessage, 0);
+                messagesProviderHelper.add_new(0, title, message, publicMessage, 0, priorityType);
             }
         } else {
             File file = new File(attachmentPath);
             if (publicMessage) {
-                messagesProviderHelper.add_new(attachmentType, title, message, attachmentPath, file.getName(), publicMessage, 30);
+                messagesProviderHelper.add_new(attachmentType, title, message, attachmentPath, file.getName(), publicMessage, 30, priorityType);
             } else {
-                messagesProviderHelper.add_new(attachmentType, title, message, attachmentPath, file.getName(), publicMessage, 0);
+                messagesProviderHelper.add_new(attachmentType, title, message, attachmentPath, file.getName(), publicMessage, 0, priorityType);
             }
         }
 

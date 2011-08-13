@@ -48,7 +48,9 @@
   <string name="title_edit_label">Title:</string>
   <string name="message_edit_label">Message:</string>
   <string name="public_label">Public (push to nexus)?</string>
+  <string name="priority_label">Priority:</string>
   <string name="attachment_add_label">Attachment:</string>
+  <string name="set_priority_prompt">Message Priority</string>
   <string name="add_attachment_prompt">Attachment Type</string>
   <string name="add_attachment_button">Add Attachment...</string>
   <string name="remove_attachment_button">Remove Attachment...</string>

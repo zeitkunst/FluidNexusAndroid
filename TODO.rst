@@ -16,3 +16,5 @@ TODO
 * Take a look at ACM papers to examine distributed voting
 
 * Perhaps add priority via normal/life-death; only allow text for high priority (cut out attachment UI); add view mode
+
+* Add option to save current view mode and restore on resume

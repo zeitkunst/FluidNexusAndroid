@@ -413,10 +413,10 @@ public class ProtocolThread extends Thread {
 
 
                     float now = (float) (System.currentTimeMillis()/1000);
-                    messagesProviderHelper.add_received(0, message.getMessageTimestamp(), now, message.getMessageTitle(), message.getMessageContent(), destinationPath.getAbsolutePath(), message.getMessageAttachmentOriginalFilename(), message.getMessagePublic(), message.getMessageTtl());
+                    messagesProviderHelper.add_received(message.getMessageType().getNumber(), message.getMessageTimestamp(), now, message.getMessageTitle(), message.getMessageContent(), destinationPath.getAbsolutePath(), message.getMessageAttachmentOriginalFilename(), message.getMessagePublic(), message.getMessageTtl(), message.getMessagePriority().getNumber());
                 } else {
                     float now = (float) (System.currentTimeMillis()/1000);
-                    messagesProviderHelper.add_received(0, message.getMessageTimestamp(), now, message.getMessageTitle(), message.getMessageContent(), message.getMessagePublic(), message.getMessageTtl());
+                    messagesProviderHelper.add_received(message.getMessageType().getNumber(), message.getMessageTimestamp(), now, message.getMessageTitle(), message.getMessageContent(), message.getMessagePublic(), message.getMessageTtl(), message.getMessagePriority().getNumber());
                 }
                 count += 1;
             }
@@ -488,6 +488,8 @@ public class ProtocolThread extends Thread {
                 boolean publicMessage = (localCursor.getInt(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_PUBLIC)) != 0);
                 Integer ttl = localCursor.getInt(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_TTL));
                 Integer message_type = localCursor.getInt(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_TYPE));
+                Integer message_priority = localCursor.getInt(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_PRIORITY));
+                log.debug("message_priority is: " + message_priority);
                 localCursor.close();
 
                 messageBuilder.setMessageTitle(title);
@@ -497,6 +499,7 @@ public class ProtocolThread extends Thread {
                 messageBuilder.setMessagePublic(publicMessage);
                 messageBuilder.setMessageTtl(ttl);
                 messageBuilder.setMessageType(Protos.FluidNexusMessage.MessageType.valueOf(message_type));
+                messageBuilder.setMessagePriority(Protos.FluidNexusMessage.MessagePriority.valueOf(message_type));
 
                 if (!(attachmentPath.equals(""))) {
                     File file = new File(attachmentPath);

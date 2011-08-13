@@ -113,6 +113,12 @@ public class MessagesProvider extends ContentProvider {
     public static final String KEY_PRIORITY = "priority";
 
     /**
+     * Priority constants
+     */
+    public static final int NORMAL_PRIORITY = 0;
+    public static final int HIGH_PRIORITY = 1;
+
+    /**
      * All keys for querying
      */
 
@@ -210,6 +216,8 @@ public class MessagesProvider extends ContentProvider {
     
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            // This method of upgrading (and associated helper methods) is heavily indebted to http://stackoverflow.com/questions/3424156/upgrade-sqlite-database-from-one-version-to-another
+
             log.info("Upgrading database...");
             String dbCreateIfNotExists = 
             "create table if not exists Messages (_id integer primary key autoincrement, type integer, title text, content text, message_hash text, time float, received_time float, attachment_path text, attachment_original_filename text, mine bit, blacklist bit default 0, public bit default 0, ttl integer default 0, uploaded bit default 0, priority integer default 0);";

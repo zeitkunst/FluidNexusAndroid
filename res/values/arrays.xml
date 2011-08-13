@@ -21,14 +21,11 @@
         <item>1800</item>
         <item>3600</item>
     </string-array>
-    <string-array name="priority_names">
-        <item>normal</item>
-        <item>life or death</item>
+    <string-array name="set_priority_array">
+        <item>Normal</item>
+        <item>Life or Death</item>
     </string-array>
-    <string-array name="priority_values">
-        <item>0</item>
-        <item>1</item>
-    </string-array>
+
     <string-array name="hash_rate_priorities_names">
         <item>High Priority</item>
         <item>Recent</item>

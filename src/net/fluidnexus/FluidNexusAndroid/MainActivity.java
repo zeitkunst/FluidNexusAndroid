@@ -52,7 +52,9 @@ import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.MenuItem;
@@ -198,6 +200,128 @@ public class MainActivity extends ListActivity {
                 default:
                     super.handleMessage(msg);
             }
+        }
+    }
+
+    public class MessagesListAdapter extends SimpleCursorAdapter {
+        private Context context = null;
+        private int layout;
+        private Cursor c = null;
+        private LayoutInflater inflater = null;
+
+        public MessagesListAdapter(Context context, int layout, Cursor c, String[] from, int[] to) {
+            super(context, layout, c, from, to);
+            this.context = context;
+            this.layout = layout;
+            this.c = c;
+            this.inflater = LayoutInflater.from(context);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            convertView = super.getView(position, convertView, parent);
+            
+            if (c.moveToPosition(position)) {
+                if (convertView == null) {
+                    convertView = inflater.inflate(layout, parent, false);
+                }
+
+                this.setMessageItemValues(convertView, c);
+            }
+            
+            return convertView;        
+        }
+
+        private void setMessageItemValues(View v, Cursor cursor) {
+            int i = 0;
+            TextView tv = null;
+            ImageView iv = null;
+            Float s_float = null;
+            Long s = null;
+            Time t = null;
+            String formattedTime = null;
+
+            // Set title 
+            i = cursor.getColumnIndex(MessagesProvider.KEY_TITLE);
+            String title = cursor.getString(i);
+            tv = (TextView) v.findViewById(R.id.message_list_item);
+            tv.setText(title);
+
+            // Set content
+            i = cursor.getColumnIndex(MessagesProvider.KEY_CONTENT);
+            String fullMessage = cursor.getString(i);
+            tv = (TextView) v.findViewById(R.id.message_list_data);
+            int stringLen = fullMessage.length();
+            if (stringLen < MESSAGE_VIEW_LENGTH) {
+                tv.setText(fullMessage);
+            } else {
+                tv.setText(fullMessage.substring(0, MESSAGE_VIEW_LENGTH) + " ...");
+            }
+
+            // Set icons
+            i = cursor.getColumnIndex(MessagesProvider.KEY_MINE);
+            iv = (ImageView) v.findViewById(R.id.message_list_item_icon);
+            int mine = cursor.getInt(i);
+            boolean publicMessage = cursor.getInt(cursor.getColumnIndex(MessagesProvider.KEY_PUBLIC)) > 0;
+
+            if (mine == 0) {
+                if (publicMessage) {
+                    iv.setImageResource(R.drawable.menu_public_other);
+                } else {
+                    iv.setImageResource(R.drawable.menu_all);
+                }
+            } else if (mine == 1) {
+                if (publicMessage) {
+                    iv.setImageResource(R.drawable.menu_public);
+                } else {
+                    iv.setImageResource(R.drawable.menu_outgoing);
+                }
+            }
+
+            // set created time
+            i = cursor.getColumnIndex(MessagesProvider.KEY_TIME);
+            s_float = cursor.getFloat(i);
+            s = s_float.longValue() * 1000;
+            t = new Time();
+            t.set(s);
+            tv = (TextView) v.findViewById(R.id.message_list_created_time);
+            formattedTime = t.format(getString(R.string.message_list_created_time) + " %c");
+            tv.setText(formattedTime);
+
+            // set received time
+            i = cursor.getColumnIndex(MessagesProvider.KEY_RECEIVED_TIME);
+            s_float = cursor.getFloat(i);
+            s = s_float.longValue() * 1000;
+            t = new Time();
+            t.set(s);
+            tv = (TextView) v.findViewById(R.id.message_list_received_time);
+            formattedTime = t.format(getString(R.string.message_list_received_time) + " %c");
+            tv.setText(formattedTime);
+
+            // set attachment infos
+            i = cursor.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME);
+            final String attachmentFilename = cursor.getString(i);
+            final String attachmentPath = cursor.getString(cursor.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_PATH));
+            tv = (TextView) v.findViewById(R.id.message_list_attachment);
+
+            if (attachmentFilename.equals("")) {
+                tv.setVisibility(View.GONE);
+            } else {
+                tv.setVisibility(View.VISIBLE);
+                tv.setText("Has attachment: " + attachmentFilename);
+            }
+
+            // Set priority
+            i = cursor.getColumnIndex(MessagesProvider.KEY_PRIORITY);
+            int priority = cursor.getInt(i);
+
+            if (priority == MessagesProvider.HIGH_PRIORITY) {
+                v.setBackgroundResource(R.drawable.message_list_item_high_priority_gradient);
+            } else {
+                v.setBackgroundResource(R.drawable.message_list_item_gradient);
+            }
+
+
         }
     }
 
@@ -633,6 +757,7 @@ public class MainActivity extends ListActivity {
         Intent i = new Intent(this, EditMessage.class);
         i.putExtra(MessagesProvider._ID, localCursor.getInt(localCursor.getColumnIndex(MessagesProvider._ID)));
         i.putExtra(MessagesProvider.KEY_TYPE, localCursor.getInt(localCursor.getColumnIndex(MessagesProvider.KEY_TYPE)));
+        i.putExtra(MessagesProvider.KEY_PRIORITY, localCursor.getInt(localCursor.getColumnIndex(MessagesProvider.KEY_PRIORITY)));
         i.putExtra(MessagesProvider.KEY_TITLE, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_TITLE)));
         i.putExtra(MessagesProvider.KEY_CONTENT, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_CONTENT)));
         i.putExtra(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME)));
@@ -871,6 +996,7 @@ public class MainActivity extends ListActivity {
         i.putExtra(MessagesProvider.KEY_ATTACHMENT_PATH, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_PATH)));
         i.putExtra(MessagesProvider.KEY_TIME, localCursor.getFloat(localCursor.getColumnIndex(MessagesProvider.KEY_TIME)));
         i.putExtra(MessagesProvider.KEY_RECEIVED_TIME, localCursor.getFloat(localCursor.getColumnIndex(MessagesProvider.KEY_RECEIVED_TIME)));
+        i.putExtra(MessagesProvider.KEY_PRIORITY, localCursor.getInt(localCursor.getColumnIndex(MessagesProvider.KEY_PRIORITY)));
         c.close();
         startActivityForResult(i, ACTIVITY_VIEW_MESSAGE);
         localCursor.close();
@@ -942,12 +1068,9 @@ public class MainActivity extends ListActivity {
         }
 
 
-        TextView tv;
-        tv = (TextView) findViewById(R.id.message_list_item);
-        
-        String[] from = new String[] {MessagesProvider.KEY_TITLE, MessagesProvider.KEY_CONTENT, MessagesProvider.KEY_MINE, MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME, MessagesProvider.KEY_TIME, MessagesProvider.KEY_RECEIVED_TIME};
-        String[] projection = new String[] {MessagesProvider._ID, MessagesProvider.KEY_TITLE, MessagesProvider.KEY_CONTENT, MessagesProvider.KEY_MINE, MessagesProvider.KEY_ATTACHMENT_PATH, MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME, MessagesProvider.KEY_PUBLIC};
-        int[] to = new int[] {R.id.message_list_item, R.id.message_list_data, R.id.message_list_item_icon, R.id.message_list_attachment, R.id.message_list_created_time, R.id.message_list_received_time};
+        String[] from = new String[] {MessagesProvider.KEY_TITLE, MessagesProvider.KEY_CONTENT, MessagesProvider.KEY_MINE, MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME, MessagesProvider.KEY_TIME, MessagesProvider.KEY_RECEIVED_TIME, MessagesProvider.KEY_PRIORITY};
+        //String[] projection = new String[] {MessagesProvider._ID, MessagesProvider.KEY_TITLE, MessagesProvider.KEY_CONTENT, MessagesProvider.KEY_MINE, MessagesProvider.KEY_ATTACHMENT_PATH, MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME, MessagesProvider.KEY_PUBLIC};
+        int[] to = new int[] {R.id.message_list_item, R.id.message_list_data, R.id.message_list_item_icon, R.id.message_list_attachment, R.id.message_list_created_time, R.id.message_list_received_time, R.id.message_list_item};
         
         if (viewType == 0) {
             // Get the non-blacklisted messages
@@ -960,11 +1083,14 @@ public class MainActivity extends ListActivity {
             c = messagesProviderHelper.blacklist();
         }
 
-        SimpleCursorAdapter messagesAdapter = new SimpleCursorAdapter(this, R.layout.message_list_item, c, from, to);
+        //SimpleCursorAdapter messagesAdapter = new SimpleCursorAdapter(this, R.layout.message_list_item, c, from, to);
+        MessagesListAdapter messagesAdapter = new MessagesListAdapter(this, R.layout.message_list_item, c, from, to);
+
         ListView lv;
         lv = (ListView) getListView();
-        lv.setSelection(0);
-
+        //lv.setSelection(0);
+        
+        /*
         messagesAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
             public boolean setViewValue(View view, Cursor cursor, int i) {
             
@@ -979,6 +1105,22 @@ public class MainActivity extends ListActivity {
                     }
 
                     return true;
+                }
+
+                if (i == cursor.getColumnIndex(MessagesProvider.KEY_PRIORITY)) {
+                    TextView tv = (TextView) view;
+
+                    int priority = cursor.getInt(cursor.getColumnIndex(MessagesProvider.KEY_PRIORITY));
+
+                    if (priority == MessagesProvider.NORMAL_PRIORITY) {
+                        tv.setVisibility(View.GONE);
+                    } else if (priority == MessagesProvider.HIGH_PRIORITY) {
+                        tv.setVisibility(View.VISIBLE);
+                        tv.setText("!!!!!");
+                    }
+
+                    return true;
+
                 }
 
                 if (i == cursor.getColumnIndex(MessagesProvider.KEY_MINE)) {
@@ -1054,8 +1196,9 @@ public class MainActivity extends ListActivity {
                 return false;
             }
         });
-
+        */
         setListAdapter(messagesAdapter);
 
     }
+
 }

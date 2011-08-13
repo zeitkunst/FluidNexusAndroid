@@ -31,8 +31,6 @@ android:textColor="@color/text_color"
 android:layout_alignParentTop="true"
 android:layout_toRightOf="@+id/message_list_item_icon"
 >
-<!-- 
--->
 </TextView>
 <TextView
 android:id="@+id/message_list_received_time"
