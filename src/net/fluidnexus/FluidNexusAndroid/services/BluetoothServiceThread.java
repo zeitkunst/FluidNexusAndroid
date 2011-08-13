@@ -199,6 +199,7 @@ public class BluetoothServiceThread extends ServiceThread {
         if (serverThread == null) {
 
             serverThread = new BluetoothServerThread(ctx, threadHandler, clients);
+            serverThread.setThreadType(serverThread.TYPE_BLUETOOTH);
             serverThread.setHashes(currentHashes);
             serverThread.setData(currentData);
             serverThread.setSendBlacklist(sendBlacklist);
@@ -329,6 +330,7 @@ public class BluetoothServiceThread extends ServiceThread {
         // State the thread that connects to the remove device only if we're not already connecting
         //ConnectThread connectThread = new ConnectThread(device, threadHandler);
         BluetoothClientThread connectThread = new BluetoothClientThread(context, device, threadHandler, clients);
+        connectThread.setThreadType(connectThread.TYPE_BLUETOOTH);
         connectThread.setHashes(currentHashes);
         connectThread.setData(currentData);
         connectedDevices.add(device);            

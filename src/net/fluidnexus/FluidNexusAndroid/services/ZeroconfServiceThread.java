@@ -202,6 +202,7 @@ public class ZeroconfServiceThread extends ServiceThread {
         if (serverThread == null) {
 
             serverThread = new ZeroconfServerThread(ctx, threadHandler, clients);
+            serverThread.setThreadType(serverThread.TYPE_ZEROCONF);
             serverThread.setHashes(currentHashes);
             serverThread.setData(currentData);
             serverThread.start();
@@ -312,6 +313,7 @@ public class ZeroconfServiceThread extends ServiceThread {
         log.debug("Connecting to " + host + ":" + port);
 
         ZeroconfClientThread connectThread = new ZeroconfClientThread(context, threadHandler, clients, host, port, sendBlacklist);
+        connectThread.setThreadType(connectThread.TYPE_ZEROCONF);
         connectThread.setHashes(currentHashes);
         connectThread.setData(currentData);
         connectedDevices.add(host);            

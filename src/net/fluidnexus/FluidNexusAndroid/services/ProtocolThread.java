@@ -79,6 +79,12 @@ public class ProtocolThread extends Thread {
 
     private char connectedState = 0x00;
 
+    public final char TYPE_BLUETOOTH = 0x10;
+    public final char TYPE_ZEROCONF = 0x20;
+    public final char TYPE_NEXUS = 0x30;
+    public char threadType = 0x00;
+    public final long MAX_BLUETOOTH_FILESIZE = 2000000;
+
     public final char STATE_START = 0x00;
     public final char STATE_WRITE_HELO = 0x10;
     public final char STATE_READ_HELO = 0x20;        
@@ -155,6 +161,20 @@ public class ProtocolThread extends Thread {
         stateMapping.put(0x90, "STATE_WRITE_DONE");
         stateMapping.put(0xA0, "STATE_READ_DONE");
         stateMapping.put(0xF0, "STATE_QUIT");
+    }
+
+    /**
+     * Set the thread type
+     */
+    public void setThreadType(char givenThreadType) {
+        threadType = givenThreadType;
+    }
+
+    /**
+     * Get the thread type
+     */
+    public char getThreadType() {
+        return threadType;
     }
 
     /**
@@ -503,17 +523,21 @@ public class ProtocolThread extends Thread {
 
                 if (!(attachmentPath.equals(""))) {
                     File file = new File(attachmentPath);
-                    FileInputStream fin = new FileInputStream(file);
-                    BufferedInputStream bin = new BufferedInputStream(fin);
-                    int length = (int) file.length();
 
-                    // TODO
-                    // Is there a better way of doing this, other than reading everything in at once?
-                    byte[] data = new byte[length];
-                    bin.read(data, 0, length);
-                    com.google.protobuf.ByteString bs = com.google.protobuf.ByteString.copyFrom(data);
-                    messageBuilder.setMessageAttachmentOriginalFilename(attachmentOriginalFilename);
-                    messageBuilder.setMessageAttachment(bs);
+                    // Ensure that any files are smaller than our bluetooth filesize
+                    if ((this.threadType == (TYPE_BLUETOOTH)) && (file.length() <= MAX_BLUETOOTH_FILESIZE)) {
+                        FileInputStream fin = new FileInputStream(file);
+                        BufferedInputStream bin = new BufferedInputStream(fin);
+                        int length = (int) file.length();
+    
+                        // TODO
+                        // Is there a better way of doing this, other than reading everything in at once?
+                        byte[] data = new byte[length];
+                        bin.read(data, 0, length);
+                        com.google.protobuf.ByteString bs = com.google.protobuf.ByteString.copyFrom(data);
+                        messageBuilder.setMessageAttachmentOriginalFilename(attachmentOriginalFilename);
+                        messageBuilder.setMessageAttachment(bs);
+                    }
                 }
                 
                 Protos.FluidNexusMessage message = messageBuilder.build();
