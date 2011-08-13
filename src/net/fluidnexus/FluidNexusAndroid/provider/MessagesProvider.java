@@ -18,7 +18,11 @@
 
 package net.fluidnexus.FluidNexusAndroid.provider;
 
+import java.lang.StringBuilder;
+import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import android.content.ContentProvider;
 import android.content.ContentUris;
@@ -44,7 +48,7 @@ public class MessagesProvider extends ContentProvider {
     // Database constants
     private static final String DATABASE_NAME = "FluidNexusDatabase.db";
     private static final String DATABASE_TABLE = "Messages";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     private static final String AUTHORITY = "net.fluidnexus.FluidNexusAndroid.provider.MessagesProvider";
 
@@ -106,12 +110,13 @@ public class MessagesProvider extends ContentProvider {
     public static final String KEY_PUBLIC = "public";
     public static final String KEY_TTL = "ttl";
     public static final String KEY_UPLOADED = "uploaded";
+    public static final String KEY_PRIORITY = "priority";
 
     /**
      * All keys for querying
      */
 
-    public static final String[] ALL_PROJECTION = new String[] {_ID, KEY_TYPE, KEY_TITLE, KEY_CONTENT, KEY_MESSAGE_HASH, KEY_TIME, KEY_RECEIVED_TIME, KEY_ATTACHMENT_PATH, KEY_ATTACHMENT_ORIGINAL_FILENAME, KEY_MINE, KEY_BLACKLIST, KEY_PUBLIC, KEY_TTL, KEY_UPLOADED};
+    public static final String[] ALL_PROJECTION = new String[] {_ID, KEY_TYPE, KEY_TITLE, KEY_CONTENT, KEY_MESSAGE_HASH, KEY_TIME, KEY_RECEIVED_TIME, KEY_ATTACHMENT_PATH, KEY_ATTACHMENT_ORIGINAL_FILENAME, KEY_MINE, KEY_BLACKLIST, KEY_PUBLIC, KEY_TTL, KEY_UPLOADED, KEY_PRIORITY};
 
     /**
      * Hashes keys
@@ -178,6 +183,7 @@ public class MessagesProvider extends ContentProvider {
         messagesProjectionMap.put(KEY_PUBLIC, KEY_PUBLIC);
         messagesProjectionMap.put(KEY_TTL, KEY_TTL);
         messagesProjectionMap.put(KEY_UPLOADED, KEY_UPLOADED);
+        messagesProjectionMap.put(KEY_PRIORITY, KEY_PRIORITY);
     }
 
 
@@ -190,7 +196,7 @@ public class MessagesProvider extends ContentProvider {
         private static Logger log = Logger.getLogger("FluidNexus"); 
     
         private static final String DATABASE_CREATE =
-            "create table Messages (_id integer primary key autoincrement, type integer, title text, content text, message_hash text, time float, received_time float, attachment_path text, attachment_original_filename text, mine bit, blacklist bit default 0, public bit default 0, ttl integer default 0, uploaded bit default 0);";
+            "create table Messages (_id integer primary key autoincrement, type integer, title text, content text, message_hash text, time float, received_time float, attachment_path text, attachment_original_filename text, mine bit, blacklist bit default 0, public bit default 0, ttl integer default 0, uploaded bit default 0, priority integer default 0);";
     
         public MessagesDbHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -203,8 +209,79 @@ public class MessagesProvider extends ContentProvider {
         }
     
         @Override
-        public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             log.info("Upgrading database...");
+            String dbCreateIfNotExists = 
+            "create table if not exists Messages (_id integer primary key autoincrement, type integer, title text, content text, message_hash text, time float, received_time float, attachment_path text, attachment_original_filename text, mine bit, blacklist bit default 0, public bit default 0, ttl integer default 0, uploaded bit default 0, priority integer default 0);";
+            String tableName = "Messages";
+
+            // Start our upgrade transaction
+            db.beginTransaction();
+            db.execSQL(dbCreateIfNotExists);
+
+            // Get list of columns in old table
+            List<String> columns = getColumns(db, tableName);
+
+            // Backup original table
+            String alterQuery = "alter table " + tableName + " rename to 'temp_" + tableName + "'";
+            db.execSQL(alterQuery);
+
+            // Recreate table with new schema
+            db.execSQL(dbCreateIfNotExists);
+
+            // Get intersection with new columns taken from upgraded table
+            columns.retainAll(getColumns(db, tableName));
+
+            // Restore the data
+            String cols = join(columns, ",");
+            db.execSQL(String.format("insert into %s (%s) select %s from temp_%s", tableName, cols, cols, tableName));
+
+            // Remove backup table
+            db.execSQL("drop table 'temp_" + tableName + "'");
+
+            // Finish transaction
+            db.setTransactionSuccessful();
+            db.endTransaction();
+        }
+
+        /**
+         * Get a list of columns in the database
+         */
+        List<String> getColumns(SQLiteDatabase db, String tableName) {
+            List<String> ar = null;
+            Cursor c = null;
+
+            try {
+                c = db.rawQuery("select * from " + tableName + " limit 1", null);
+                if (c != null) {
+                    ar = new ArrayList<String>(Arrays.asList(c.getColumnNames()));
+                }
+            } catch (Exception e) {
+                log.error("Error getting database columns: " + e.getMessage(), e);
+                e.printStackTrace();
+            } finally {
+                if (c != null) {
+                    c.close();
+                }
+
+            }
+
+            return ar;
+        }
+
+        /**
+         * Join an arraylist into a string
+         */
+        public static String join(List<String> list, String delim) {
+            StringBuilder buf = new StringBuilder();
+            int num = list.size();
+            for (int i = 0; i < num; i++) {
+                if (i != 0) {
+                    buf.append(delim);
+                }
+                buf.append((String) list.get(i));
+            }
+            return buf.toString();
         }
     
     }

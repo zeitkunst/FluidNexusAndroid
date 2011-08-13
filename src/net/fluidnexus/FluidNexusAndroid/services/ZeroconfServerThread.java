@@ -123,7 +123,6 @@ public class ZeroconfServerThread extends ProtocolThread {
         lock = wifiManager.createMulticastLock("ZeroconfServerLock");
         lock.setReferenceCounted(true);
 
-
         try {
             serverSocket = new ServerSocket(ZEROCONF_PORT);
         } catch (IOException e) {
@@ -159,24 +158,6 @@ public class ZeroconfServerThread extends ProtocolThread {
         setInputStream(tmpIn);
         setOutputStream(tmpOut);
     }
-
-    /**
-     * Advertise our service
-     */
-    public void advertiseService() {
-        lock.acquire();
-        log.debug("Advertising our service");
-        serviceInfo = ServiceInfo.create(zeroconfType, "Fluid Nexus", 0, "Fluid Nexus Zeroconf server for android");
-        try {
-            jmdns = JmDNS.create();
-            jmdns.registerService(serviceInfo);
-        } catch (IOException e) {
-            log.error("Unable to register zeroconf service.");
-            e.printStackTrace();
-        }
-        lock.release();
-    }
-
 
     /**
      * Cleanup the connection and exit out of main loop

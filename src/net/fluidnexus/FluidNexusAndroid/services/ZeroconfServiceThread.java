@@ -44,6 +44,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 import java.util.Vector;
 
 import android.content.Context;
@@ -289,7 +290,8 @@ public class ZeroconfServiceThread extends ServiceThread {
             jmdns = JmDNS.create();
 
             if (serverThread != null) {
-                serviceInfo = ServiceInfo.create(zeroconfType, zeroconfServiceName, zeroconfPort, "Fluid Nexus Zeroconf server for android");
+                UUID fluidNexusUUID = UUID.randomUUID();
+                serviceInfo = ServiceInfo.create(zeroconfType, fluidNexusUUID.toString(), zeroconfPort, "Fluid Nexus Zeroconf server for android");
                 jmdns.registerService(serviceInfo);
             }
             
@@ -297,7 +299,7 @@ public class ZeroconfServiceThread extends ServiceThread {
             jmdns.addServiceListener(zeroconfType, serviceListener);
             setServiceState(STATE_WAIT_FOR_CONNECTIONS);
         } catch (IOException e) {
-            log.error("Some sort of problem trying to start our service listeners.");
+            log.error("Some sort of problem trying to start our service listeners: " + e);
             e.printStackTrace();
         }
     }

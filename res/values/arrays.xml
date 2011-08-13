@@ -21,6 +21,27 @@
         <item>1800</item>
         <item>3600</item>
     </string-array>
+    <string-array name="priority_names">
+        <item>normal</item>
+        <item>life or death</item>
+    </string-array>
+    <string-array name="priority_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+    <string-array name="hash_rate_priorities_names">
+        <item>High Priority</item>
+        <item>Recent</item>
+        <item>Oldest</item>
+        <item>Random</item>
+    </string-array>
+    <string-array name="hash_rate_priorities_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
     <string-array name="add_attachment_array">
         <item>None</item>
         <item>Audio</item>

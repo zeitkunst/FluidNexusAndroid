@@ -90,6 +90,7 @@
   <string name="preferences_category_bluetooth">Bluetooth</string>
   <string name="preferences_category_zeroconf">Zeroconf</string>
   <string name="preferences_category_nexus">Nexus</string>
+  <string name="preferences_category_advanced">Advanced</string>
   <string name="preferences_show_messages">Show messages?</string>
   <string name="preferences_show_messages_summary">Whether or not to show messages in the interface.</string>
   <string name="preferences_send_blacklist">Send blacklist messages?</string>
@@ -122,6 +123,9 @@
   <string name="preferences_nexus_token_secret">Nexus Token Secret</string>
   <string name="preferences_nexus_token_secret_summary">The token secret provided by to you on the Fluid Nexus website for posting to the Nexus. This is added automatically upon pressing Request authorization token in the main menu.</string>
   <string name="preferences_nexus_token_secret_title">Nexus Token Secret</string>
+  <string name="preferences_hash_rate_priorities_summary">The priority for hashes to be sent.</string>
+  <string name="preferences_hash_rate_priorities_title">Hash Priority</string>
+
   <string name="toast_tokens_updated">Tokens updated; application is now authorized to post to the Nexus.</string>
   <string name="about_text">&lt;p&gt;In the second decade of the twenty-first century, networks continue to be defined by their stable topology represented in an image or graph. Peer-to-peer technologies promised new arrangements absent centralized control, but they still rely on stationary devices. Mobile phones remain wedded to conventional network providers.&lt;/p&gt; &lt;p&gt;Instead, the combination of peer-to-peer with mobility enables a new concept of an information transfer infrastructure that relies on fluid, temporary, ad-hoc networks. People and devices are at once implicated as mobile nodes in this network (known in computer science as a sneakernet (http://en.wikipedia.org/wiki/Sneakernet)).&lt;/p&gt; &lt;p&gt;Fluid Nexus bypasses Internet intermediaries\' control over the identification and circulation of messages. This makes Fluid Nexus an important tool for activists. Access to the data stored by Fluid Nexus requires a search warrant for &lt;em&gt;your own&lt;/em&gt; devices&amp;mdash;or another device running the software. No identifying information regarding the sender is attached to a message, putting the sender in control. And in conjunction with other software such as ObscuraCam (https://guardianproject.info/apps/securecam/) identities can be further obfuscated as desired or necessary.&lt;/p&gt; &lt;p&gt;In the event that information needs to reach a broad audience, we\'ve added another feature called the Nexus (http://fluidnexus.net/nexus). The Nexus is a space on this site for public messages to be automatically uploaded by any Fluid Nexus user. The Nexus includes text, audio, images, and video capabilities. The sender has control whether the message will become public or not.&lt;/p&gt; &lt;p&gt;For more information on Fluid Nexus, see the paper Transnetworks and the Fluid Nexus Project (http://fluidnexus.net/static/pdfs/DCM2009Submitted.pdf), forthcoming in Fall 2011 in the proceedings of dis/connecting/media 2009.&lt;/p&gt;</string>
   <string name="ro_perm_label">read messages</string>

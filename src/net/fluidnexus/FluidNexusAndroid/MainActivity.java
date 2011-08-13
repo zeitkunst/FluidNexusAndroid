@@ -695,6 +695,17 @@ public class MainActivity extends ListActivity {
                     } catch (RemoteException e) {
                         log.error("Unable to send bonded only flag message: " + e);
                     }
+                } else if (key.equals("zeroconfScanFrequency")) {
+                    try {
+                        Message msg = Message.obtain(null, NetworkService.MSG_ZEROCONF_SCAN_FREQUENCY);
+                        msg.arg1 = Integer.parseInt(prefs.getString("bluetoothScanFrequency", "120"));
+                        msg.replyTo = messenger;
+                        networkService.send(msg);
+
+                    } catch (RemoteException e) {
+                        log.error("Unable to send scan frequency message: " + e);
+                    }
+
                 } else if (key.equals("vibratePref")) {
                     vibratePref = prefs.getBoolean("vibratePref", false);
                 } else if (key.equals("showMessagesPref")) {

@@ -105,7 +105,7 @@ public class BluetoothServerThread extends ProtocolThread {
             log.warn("Bluetooth adapter is not enabled, entering into wait loop");
             super.setConnectedState(STATE_WAIT_SERVER);
         } else {
-    
+                
             try {
                 serverSocket = bluetoothAdapter.listenUsingRfcommWithServiceRecord("Fluid Nexus", FluidNexusUUID);;
             } catch (IOException e) {
@@ -139,6 +139,9 @@ public class BluetoothServerThread extends ProtocolThread {
     
             setInputStream(tmpIn);
             setOutputStream(tmpOut);
+
+            updateHashes(getSendBlacklist());
+            setHashes(currentHashes);
             super.setConnectedState(STATE_READ_HELO);
         }
     }

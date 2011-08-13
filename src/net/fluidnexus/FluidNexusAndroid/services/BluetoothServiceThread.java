@@ -201,6 +201,7 @@ public class BluetoothServiceThread extends ServiceThread {
             serverThread = new BluetoothServerThread(ctx, threadHandler, clients);
             serverThread.setHashes(currentHashes);
             serverThread.setData(currentData);
+            serverThread.setSendBlacklist(sendBlacklist);
             serverThread.start();
         }
     }

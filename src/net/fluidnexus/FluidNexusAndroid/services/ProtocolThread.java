@@ -103,12 +103,13 @@ public class ProtocolThread extends Thread {
     private HashSet<String> hashesToSend = new HashSet<String>();
 
     // Keeping track of items from the database
-    private HashSet<String> currentHashes = new HashSet<String>();
-    private ArrayList<Vector> currentData = new ArrayList<Vector>();
+    public HashSet<String> currentHashes = new HashSet<String>();
+    public ArrayList<Vector> currentData = new ArrayList<Vector>();
 
     // For database access
     public MessagesProviderHelper messagesProviderHelper = null;
     public Context context = null;
+    public boolean sendBlacklist = false;
 
     // keeps track of connected clients
     // will likely always be only a single client, but what the hey
@@ -175,6 +176,20 @@ public class ProtocolThread extends Thread {
      */
     public void setHashes(HashSet<String> givenHashes) {
         currentHashes = givenHashes;
+    }
+
+    /**
+     * Set our send blacklist option
+     */
+    public void setSendBlacklist(boolean givenSendBlacklist) {
+        sendBlacklist = givenSendBlacklist;
+    }
+
+    /**
+     * Get our send blacklist option
+     */
+    public boolean getSendBlacklist() {
+        return sendBlacklist;
     }
 
     /**

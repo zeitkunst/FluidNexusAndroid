@@ -104,5 +104,14 @@
             android:key="nexusTokenSecretPref" />
 
     </PreferenceCategory>
+    <PreferenceCategory android:title="@string/preferences_category_advanced">
+        <ListPreference 
+            android:title="@string/preferences_hash_rate_priorities_title"
+            android:summary="@string/preferences_hash_rate_priorities_summary"
+            android:defaultValue="300"
+            android:key="zeroconfScanFrequency"
+            android:entries="@array/hash_rate_priorities_names"
+            android:entryValues="@array/hash_rate_priorities_values" />
 
+    </PreferenceCategory>
 </PreferenceScreen>
