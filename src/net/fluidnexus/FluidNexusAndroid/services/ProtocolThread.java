@@ -509,7 +509,6 @@ public class ProtocolThread extends Thread {
                 Integer ttl = localCursor.getInt(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_TTL));
                 Integer message_type = localCursor.getInt(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_TYPE));
                 Integer message_priority = localCursor.getInt(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_PRIORITY));
-                log.debug("message_priority is: " + message_priority);
                 localCursor.close();
 
                 messageBuilder.setMessageTitle(title);
@@ -519,13 +518,13 @@ public class ProtocolThread extends Thread {
                 messageBuilder.setMessagePublic(publicMessage);
                 messageBuilder.setMessageTtl(ttl);
                 messageBuilder.setMessageType(Protos.FluidNexusMessage.MessageType.valueOf(message_type));
-                messageBuilder.setMessagePriority(Protos.FluidNexusMessage.MessagePriority.valueOf(message_type));
+                messageBuilder.setMessagePriority(Protos.FluidNexusMessage.MessagePriority.valueOf(message_priority));
 
                 if (!(attachmentPath.equals(""))) {
                     File file = new File(attachmentPath);
 
                     // Ensure that any files are smaller than our bluetooth filesize
-                    if ((this.threadType == (TYPE_BLUETOOTH)) && (file.length() <= MAX_BLUETOOTH_FILESIZE)) {
+                    if (((this.threadType == (TYPE_BLUETOOTH)) && (file.length() <= MAX_BLUETOOTH_FILESIZE)) || (this.threadType == TYPE_ZEROCONF) || (this.threadType == TYPE_NEXUS)) {
                         FileInputStream fin = new FileInputStream(file);
                         BufferedInputStream bin = new BufferedInputStream(fin);
                         int length = (int) file.length();
