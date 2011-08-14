@@ -8,6 +8,10 @@
         android:title="@string/menu_view_all"
         android:icon="@drawable/menu_all"
         android:alphabeticShortcut="v" />
+    <item android:id="@+id/menu_view_high_priority"
+        android:title="@string/menu_view_high_priority"
+        android:icon="@drawable/menu_high_priority"
+        android:alphabeticShortcut="i" />
     <item android:id="@+id/menu_view_outgoing"
         android:title="@string/menu_view_outgoing"
         android:icon="@drawable/menu_outgoing"

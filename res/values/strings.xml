@@ -18,6 +18,7 @@
   <string name="message_list_header_text_public">PUBLIC MESSAGES</string>
   <string name="message_list_header_text_outgoing">OUTGOING MESSAGES</string>
   <string name="message_list_header_text_blacklist">BLACKLISTED MESSAGES</string>
+  <string name="message_list_header_text_high_priority">HIGH PRIORITY MESSAGES</string>
   <string name="menu_message_list_context_title">Context menu</string>
   <string name="message_list_created_time">Created on</string>
   <string name="message_list_received_time">Received on</string>
@@ -26,6 +27,7 @@
   <string name="menu_view_public">View Public</string>
   <string name="menu_view_outgoing">View Outgoing</string>
   <string name="menu_view_blacklist">View Blacklist</string>
+  <string name="menu_view_high_priority">View High Priority</string>
   <string name="menu_delete">Delete Message</string>
   <string name="menu_blacklist">Blacklist Message</string>
   <string name="menu_unblacklist">Unblacklist Message</string>

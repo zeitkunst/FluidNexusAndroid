@@ -106,6 +106,15 @@ public class MessagesProviderHelper {
     }
 
     /**
+     * Get our high priority messages
+     */
+    public Cursor highPriority() {
+            Cursor c = cr.query(MessagesProvider.HIGH_PRIORITY_URI, MessagesProvider.ALL_PROJECTION, null, null, null);
+            c.moveToFirst();
+            return c;
+    }
+
+    /**
      * Get our hashes 
      */
     public Cursor hashes() {

@@ -59,6 +59,7 @@ public class MessagesProvider extends ContentProvider {
     public static final String PATH_PUBLIC = "/public";
     public static final String PATH_OUTGOING = "/outgoing";
     public static final String PATH_BLACKLIST = "/blacklist";
+    public static final String PATH_HIGH_PRIORITY = "/highPriority";
     public static final String PATH_MESSAGES = "/messages";
     public static final String PATH_MESSAGES_ID = "/messages/";
     public static final String PATH_HASHES_STRING = "/hashes/";
@@ -67,6 +68,7 @@ public class MessagesProvider extends ContentProvider {
     public static final Uri PUBLIC_URI = Uri.parse(SCHEME + AUTHORITY + PATH_PUBLIC);
     public static final Uri OUTGOING_URI = Uri.parse(SCHEME + AUTHORITY + PATH_OUTGOING);
     public static final Uri BLACKLIST_URI = Uri.parse(SCHEME + AUTHORITY + PATH_BLACKLIST);
+    public static final Uri HIGH_PRIORITY_URI = Uri.parse(SCHEME + AUTHORITY + PATH_HIGH_PRIORITY);
     public static final Uri MESSAGES_URI = Uri.parse(SCHEME + AUTHORITY + PATH_MESSAGES);
     public static final Uri MESSAGES_URI_ID_BASE = Uri.parse(SCHEME + AUTHORITY + PATH_MESSAGES_ID);
     public static final Uri MESSAGES_URI_ID_PATTERN = Uri.parse(SCHEME + AUTHORITY + PATH_MESSAGES_ID + "/#");
@@ -92,6 +94,7 @@ public class MessagesProvider extends ContentProvider {
     private static final int HASHES = 7;
     private static final int HASHES_STRING = 8;
     private static final int PUBLIC = 9;
+    private static final int HIGH_PRIORITY_MATCHER = 10;
 
     /**
      * Keys for the database
@@ -160,6 +163,9 @@ public class MessagesProvider extends ContentProvider {
 
         // add pattern for blacklisted messages
         uriMatcher.addURI(AUTHORITY, "blacklist", BLACKLIST);
+
+        // add pattern for high priority messages
+        uriMatcher.addURI(AUTHORITY, "highPriority", HIGH_PRIORITY_MATCHER);
 
         // add pattern for a message
         uriMatcher.addURI(AUTHORITY, "messages", MESSAGES);
@@ -342,6 +348,12 @@ public class MessagesProvider extends ContentProvider {
                 qb.setProjectionMap(messagesProjectionMap);
                 qb.appendWhere(
                         KEY_BLACKLIST + "=1"
+                );
+                break;
+            case HIGH_PRIORITY_MATCHER:
+                qb.setProjectionMap(messagesProjectionMap);
+                qb.appendWhere(
+                        KEY_PRIORITY + "=1"
                 );
                 break;
             case MESSAGES_ID:
@@ -569,6 +581,7 @@ public class MessagesProvider extends ContentProvider {
             case ALL_NOBLACKLIST:
             case OUTGOING:
             case BLACKLIST:
+            case HIGH_PRIORITY_MATCHER:
             case MESSAGES:
             case MESSAGES_ID:
                 return CONTENT_TYPE;

@@ -132,6 +132,7 @@ public class MainActivity extends ListActivity {
     private static final int VIEW_PUBLIC = 1;
     private static final int VIEW_OUTGOING = 2;
     private static final int VIEW_BLACKLIST = 3;
+    private static final int VIEW_HIGH_PRIORITY = 4;
     private static int VIEW_MODE = VIEW_ALL;
 
     private static final int MESSAGE_VIEW_LENGTH = 300;
@@ -900,6 +901,15 @@ public class MainActivity extends ListActivity {
                 tv.setText(R.string.message_list_header_text_outgoing);
 
                 return true;
+            case R.id.menu_view_high_priority:
+                VIEW_MODE = VIEW_HIGH_PRIORITY;
+                fillListView(VIEW_MODE);
+
+                // Update our header text view
+                tv = (TextView) findViewById(R.id.message_list_header_text);
+                tv.setText(R.string.message_list_header_text_high_priority);
+
+                return true;
             case R.id.menu_view_blacklist:
                 VIEW_MODE = VIEW_BLACKLIST;
                 fillListView(VIEW_MODE);
@@ -1072,15 +1082,17 @@ public class MainActivity extends ListActivity {
         //String[] projection = new String[] {MessagesProvider._ID, MessagesProvider.KEY_TITLE, MessagesProvider.KEY_CONTENT, MessagesProvider.KEY_MINE, MessagesProvider.KEY_ATTACHMENT_PATH, MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME, MessagesProvider.KEY_PUBLIC};
         int[] to = new int[] {R.id.message_list_item, R.id.message_list_data, R.id.message_list_item_icon, R.id.message_list_attachment, R.id.message_list_created_time, R.id.message_list_received_time, R.id.message_list_item};
         
-        if (viewType == 0) {
+        if (viewType == VIEW_ALL) {
             // Get the non-blacklisted messages
             c = messagesProviderHelper.allNoBlacklist();
-        } else if (viewType == 1) {
+        } else if (viewType == VIEW_PUBLIC) {
             c = messagesProviderHelper.publicMessages();
-        } else if (viewType == 2) {
+        } else if (viewType == VIEW_OUTGOING) {
             c = messagesProviderHelper.outgoing();
-        } else if (viewType == 3) {
+        } else if (viewType == VIEW_BLACKLIST) {
             c = messagesProviderHelper.blacklist();
+        } else if (viewType == VIEW_HIGH_PRIORITY) {
+            c = messagesProviderHelper.highPriority();
         }
 
         //SimpleCursorAdapter messagesAdapter = new SimpleCursorAdapter(this, R.layout.message_list_item, c, from, to);
