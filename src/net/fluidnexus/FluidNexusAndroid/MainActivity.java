@@ -824,7 +824,7 @@ public class MainActivity extends ListActivity {
                 } else if (key.equals("zeroconfScanFrequency")) {
                     try {
                         Message msg = Message.obtain(null, NetworkService.MSG_ZEROCONF_SCAN_FREQUENCY);
-                        msg.arg1 = Integer.parseInt(prefs.getString("bluetoothScanFrequency", "120"));
+                        msg.arg1 = Integer.parseInt(prefs.getString("zeroconfScanFrequency", "120"));
                         msg.replyTo = messenger;
                         networkService.send(msg);
 
