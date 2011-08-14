@@ -53,18 +53,18 @@
      inkscape:groupmode="layer"
      id="layer1">
     <image
-       y="146.64789"
-       x="97.571449"
-       id="image3111"
+       y="144.04225"
+       x="98.360504"
+       id="image3152"
        xlink:href="file:///home/nknouf/Documents/Research/Projects/FluidNexus/code/website/FluidNexusWebsite/FluidNexus/fluidnexus/static/images/desktop_main_interface.png"
-       height="800"
-       width="502"
+       height="758"
+       width="472"
        inkscape:export-filename="/home/nknouf/Documents/Research/Projects/FluidNexus/code/website/FluidNexusWebsite/FluidNexus/fluidnexus/static/images/desktop_view_message_type.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
-       style="fill:#84302d;stroke:#84302d;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1;opacity:0.45238095"
-       d="m 183.84776,266.4635 126.26907,0 0,-35.35534 -82.83251,0 0,-25.25381 -42.4264,0 z"
+       style="opacity:0.45238097;fill:#84302d;fill-opacity:1;stroke:#84302d;stroke-width:1.13117623px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 176.77669,264.44319 161.56881,0 0,-35.35534 -105.98914,0 0,-25.25381 -54.28711,0 z"
        id="path3116"
        inkscape:connector-curvature="0"
        inkscape:export-filename="/home/nknouf/Documents/Research/Projects/FluidNexus/code/website/FluidNexusWebsite/FluidNexus/fluidnexus/static/images/desktop_view_message_type.png"
@@ -76,7 +76,8 @@
        style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
        inkscape:export-filename="/home/nknouf/Documents/Research/Projects/FluidNexus/code/website/FluidNexusWebsite/FluidNexus/fluidnexus/static/images/desktop_view_message_type.png"
        inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90"><flowRegion
+       inkscape:export-ydpi="90"
+       transform="translate(22.223356,0)"><flowRegion
          id="flowRegion4448"><rect
            id="rect4450"
            width="265.6701"
@@ -84,5 +85,5 @@
            x="324.25897"
            y="216.96603" /></flowRegion><flowPara
          id="flowPara4452"
-         style="-inkscape-font-specification:Delicious Bold;font-family:Delicious;font-weight:bold;font-style:normal;font-stretch:normal;font-variant:normal;fill:#84302d;fill-opacity:1">View Options</flowPara></flowRoot>  </g>
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#84302d;fill-opacity:1;font-family:Delicious;-inkscape-font-specification:Delicious Bold">View Options</flowPara></flowRoot>  </g>
 </svg>
