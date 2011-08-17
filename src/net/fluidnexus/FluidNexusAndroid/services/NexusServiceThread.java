@@ -118,7 +118,7 @@ public class NexusServiceThread extends ServiceThread {
 
     // API infos
 
-    private static final String API_BASE = "http://dev.fluidnexus.net/api/01/";
+    private static final String API_BASE = "http://fluidnexus.net/api/01/";
     private static final String HASH_REQUEST_URL = API_BASE + "nexus/hashes/";
     private static final String NEXUS_NONCE_URL = API_BASE + "nexus/message/nonce.json";
     private static final String NEXUS_MESSAGE_URL = API_BASE + "nexus/message/update.json";
@@ -189,6 +189,7 @@ public class NexusServiceThread extends ServiceThread {
                         message.put("message_type", c.getInt(c.getColumnIndex(MessagesProvider.KEY_TYPE)));
                         message.put("message_time", c.getFloat(c.getColumnIndex(MessagesProvider.KEY_TIME)));
                         message.put("message_received_time", c.getFloat(c.getColumnIndex(MessagesProvider.KEY_RECEIVED_TIME)));
+                        message.put("message_priority", c.getInt(c.getColumnIndex(MessagesProvider.KEY_PRIORITY)));
                         
                         String attachment_path = c.getString(c.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_PATH));
     

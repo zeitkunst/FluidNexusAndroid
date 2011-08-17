@@ -174,7 +174,7 @@ public class MainActivity extends ListActivity {
     private File attachmentsDir = null;
 
     // oauth constants
-    private static final String API_BASE = "http://dev.fluidnexus.net/api/01/";
+    private static final String API_BASE = "http://fluidnexus.net/api/01/";
     private static final String REQUEST_URL = API_BASE + "request_token/android";
     private static final String ACCESS_URL = API_BASE + "access_token";
     private static final String AUTH_URL = API_BASE + "authorize_token/android";

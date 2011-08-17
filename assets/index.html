@@ -83,33 +83,36 @@ a:hover {
 <li><a class="reference internal" href="#suggestions-errata-and-translations" id="id8">1.2&nbsp;&nbsp;&nbsp;Suggestions, Errata, and Translations</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#introduction" id="id9">2&nbsp;&nbsp;&nbsp;Introduction</a></li>
-<li><a class="reference internal" href="#terminology-icons" id="id10">3&nbsp;&nbsp;&nbsp;Terminology &amp; Icons</a></li>
-<li><a class="reference internal" href="#security" id="id11">4&nbsp;&nbsp;&nbsp;Security</a><ul class="auto-toc">
-<li><a class="reference internal" href="#identifying-information" id="id12">4.1&nbsp;&nbsp;&nbsp;Identifying Information</a></li>
-<li><a class="reference internal" href="#data-sharing" id="id13">4.2&nbsp;&nbsp;&nbsp;Data Sharing</a><ul class="auto-toc">
-<li><a class="reference internal" href="#bluetooth" id="id14">4.2.1&nbsp;&nbsp;&nbsp;Bluetooth</a></li>
-<li><a class="reference internal" href="#zeroconf" id="id15">4.2.2&nbsp;&nbsp;&nbsp;Zeroconf</a></li>
+<li><a class="reference internal" href="#introduction" id="id9">2&nbsp;&nbsp;&nbsp;Introduction</a><ul class="auto-toc">
+<li><a class="reference internal" href="#articles-of-interest" id="id10">2.1&nbsp;&nbsp;&nbsp;Articles of Interest</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#terminology-icons" id="id11">3&nbsp;&nbsp;&nbsp;Terminology &amp; Icons</a></li>
+<li><a class="reference internal" href="#security" id="id12">4&nbsp;&nbsp;&nbsp;Security</a><ul class="auto-toc">
+<li><a class="reference internal" href="#identifying-information" id="id13">4.1&nbsp;&nbsp;&nbsp;Identifying Information</a></li>
+<li><a class="reference internal" href="#data-sharing" id="id14">4.2&nbsp;&nbsp;&nbsp;Data Sharing</a><ul class="auto-toc">
+<li><a class="reference internal" href="#bluetooth" id="id15">4.2.1&nbsp;&nbsp;&nbsp;Bluetooth</a></li>
+<li><a class="reference internal" href="#zeroconf" id="id16">4.2.2&nbsp;&nbsp;&nbsp;Zeroconf</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#using-fluid-nexus" id="id16">5&nbsp;&nbsp;&nbsp;Using Fluid Nexus</a><ul class="auto-toc">
-<li><a class="reference internal" href="#creating-a-new-message" id="id17">5.1&nbsp;&nbsp;&nbsp;Creating a new message</a></li>
-<li><a class="reference internal" href="#editing-messages" id="id18">5.2&nbsp;&nbsp;&nbsp;Editing Messages</a></li>
-<li><a class="reference internal" href="#preferences" id="id19">5.3&nbsp;&nbsp;&nbsp;Preferences</a><ul class="auto-toc">
-<li><a class="reference internal" href="#general" id="id20">5.3.1&nbsp;&nbsp;&nbsp;General</a></li>
-<li><a class="reference internal" href="#network" id="id21">5.3.2&nbsp;&nbsp;&nbsp;Network</a></li>
-<li><a class="reference internal" href="#id2" id="id22">5.3.3&nbsp;&nbsp;&nbsp;Bluetooth</a></li>
-<li><a class="reference internal" href="#scan-frequency" id="id23">5.3.4&nbsp;&nbsp;&nbsp;Scan Frequency</a></li>
-<li><a class="reference internal" href="#id3" id="id24">5.3.5&nbsp;&nbsp;&nbsp;Nexus</a></li>
+<li><a class="reference internal" href="#using-fluid-nexus" id="id17">5&nbsp;&nbsp;&nbsp;Using Fluid Nexus</a><ul class="auto-toc">
+<li><a class="reference internal" href="#creating-a-new-message" id="id18">5.1&nbsp;&nbsp;&nbsp;Creating a new message</a></li>
+<li><a class="reference internal" href="#editing-messages" id="id19">5.2&nbsp;&nbsp;&nbsp;Editing Messages</a></li>
+<li><a class="reference internal" href="#preferences" id="id20">5.3&nbsp;&nbsp;&nbsp;Preferences</a><ul class="auto-toc">
+<li><a class="reference internal" href="#general" id="id21">5.3.1&nbsp;&nbsp;&nbsp;General</a></li>
+<li><a class="reference internal" href="#network" id="id22">5.3.2&nbsp;&nbsp;&nbsp;Network</a></li>
+<li><a class="reference internal" href="#id2" id="id23">5.3.3&nbsp;&nbsp;&nbsp;Bluetooth</a></li>
+<li><a class="reference internal" href="#scan-frequency" id="id24">5.3.4&nbsp;&nbsp;&nbsp;Scan Frequency</a></li>
+<li><a class="reference internal" href="#id3" id="id25">5.3.5&nbsp;&nbsp;&nbsp;Nexus</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#technical-information" id="id25">6&nbsp;&nbsp;&nbsp;Technical Information</a><ul class="auto-toc">
-<li><a class="reference internal" href="#protocol-buffer-implementation" id="id26">6.1&nbsp;&nbsp;&nbsp;Protocol Buffer implementation</a></li>
-<li><a class="reference internal" href="#network-modalities" id="id27">6.2&nbsp;&nbsp;&nbsp;Network Modalities</a></li>
+<li><a class="reference internal" href="#technical-information" id="id26">6&nbsp;&nbsp;&nbsp;Technical Information</a><ul class="auto-toc">
+<li><a class="reference internal" href="#protocol-buffer-implementation" id="id27">6.1&nbsp;&nbsp;&nbsp;Protocol Buffer implementation</a></li>
+<li><a class="reference internal" href="#network-modalities" id="id28">6.2&nbsp;&nbsp;&nbsp;Network Modalities</a></li>
 </ul>
 </li>
 </ul>
@@ -129,14 +132,25 @@ a:hover {
 </div>
 <div class="section" id="introduction">
 <h1><a class="toc-backref" href="#id9">2&nbsp;&nbsp;&nbsp;Introduction</a></h1>
-<p>Fluid Nexus is an intervention into staid practices surrounding networks. In the second decade of the twenty-first century, networks continue to be defined by their stable topology, their ability to be captured in an image or graph. Peer-to-peer technologies have promised new arrangements absent centralized control, but they still rely on stationary devices. Mobile phones bring movement and motion but nevertheless remain wedded to conventional network providers.</p>
-<p>Networks do not need to be understood as stable entities with well-traversed paths. Instead, we can combine peer-to-peer with movement to use machines and humans as equal parts of an information transfer infrastructure. Fluid, temporary, ad-hoc networks can be created and destroyed as necessary, passing information from one person to another, spreading out as a contagion and eventually reaching everyone using the service. People become mobile nodes in the network (known in computer science as a <a class="reference external" href="http://en.wikipedia.org/wiki/Sneakernet">sneaker net</a>) while their devices take care of transferring data from one device to another.</p>
-<p>Since information in Fluid Nexus does not travel through any centralized networks it cannot be saved by any Internet intermediary, potentially revealing identifiable information. Nor can any intermediary decide to censor a particular message. These facts make Fluid Nexus an important tool for activists. Access to the data stored by Fluid Nexus requires a search warrant---or another device running the software. Indeed it is this &quot;broadcast&quot; nature of Fluid Nexus that makes it such a potent tool. In the long-run, anyone else running the software will eventually have every message sent by any other user, making it nigh impossible to censor any single message. No identifying information regarding the sender is attached to a message---the sender is in control of what he or she wishes to reveal. And in conjunction with other software such as <a class="reference external" href="https://guardianproject.info/apps/securecam/">ObscuraCam</a> identities can be further obfuscated as desired or necessary.</p>
-<p>Yet sometimes it is important for information to reach a broader audience, and at this time that requires going through the Internet. To facilitate this we've created the <a class="reference external" href="http://fluidnexus.net/nexus">Nexus</a>, a place for certain types of messages which are marked as &quot;public&quot; to be automatically uploaded by any Fluid Nexus user to this website. Again, the control of whether a message can be uploaded or not is left in the fingertips of the sender. The Nexus can become a place to distribute necessary bits of text, audio, images, and video to a wider audience.</p>
-<p>For more information regarding our theoretical motivations, see &quot;<a class="reference external" href="http://fluidnexus.net/static/pdfs/DCM2009Submitted.pdf">Transnetworks and the Fluid Nexus Project</a>&quot; to be published in Fall 2011 in the proceedings of dis/connecting/media 2009.</p>
+<p>In the second decade of the twenty-first century, networks continue to be defined by their stable topology represented in an image or graph.  Peer-to-peer technologies promised new arrangements absent centralized control, but they still rely on stationary devices.  Mobile phones remain wedded to conventional network providers.</p>
+<p>Instead, the combination of peer-to-peer with mobility enables a new concept of an information transfer infrastructure that relies on fluid, temporary, ad-hoc networks.  People and devices are at once implicated as mobile nodes in this network (known in computer science as a <a class="reference external" href="http://en.wikipedia.org/wiki/Sneakernet">sneakernet</a>).</p>
+<p>Fluid Nexus bypasses Internet intermediaries' control over the identification and circulation of messages.  This makes Fluid Nexus an important tool for activists.  Access to the data stored by Fluid Nexus requires a search warrant for <em>your own</em> devices---or another device running the software.  No identifying information regarding the sender is attached to a message, putting the sender in control.  And in conjunction with other software such as <a class="reference external" href="https://guardianproject.info/apps/securecam/">ObscuraCam</a> identities can be further obfuscated as desired or necessary.</p>
+<p>In the event that information needs to reach a broad audience, we've added another feature called the <a class="reference external" href="http://fluidnexus.net/nexus">Nexus</a>.  The Nexus is a space on this site for &quot;public&quot; messages to be automatically uploaded by any Fluid Nexus user.  The Nexus includes text, audio, images, and video capabilities.  The sender has control whether the message will become public or not.</p>
+<p>For more information on Fluid Nexus, see the paper &quot;<a class="reference external" href="http://fluidnexus.net/static/pdfs/DCM2009Submitted.pdf">Transnetworks and the Fluid Nexus Project</a>&quot;, forthcoming in Fall 2011 in the proceedings of dis/connecting/media 2009.</p>
+<div class="section" id="articles-of-interest">
+<h2><a class="toc-backref" href="#id10">2.1&nbsp;&nbsp;&nbsp;Articles of Interest</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="https://www.nytimes.com/2011/06/12/world/12internet.html?pagewanted=1&amp;_r=1&amp;hp">U.S. Underwrites Internet Detour Around Censors</a></li>
+<li><a class="reference external" href="http://www.cbc.ca/news/technology/story/2011/01/28/f-egypt-web-blackout.html">Busting Egypt's web blackout: Savvy Egyptians using dial-up connections, unused ports to stay connected</a></li>
+<li><a class="reference external" href="http://techcrunch.com/2011/02/27/humans-are-the-routers/">Humans Are The Routers</a></li>
+<li><a class="reference external" href="http://www.physorg.com/news198298057.html">New project enables mobile phone use in areas with no reception</a></li>
+<li><a class="reference external" href="http://www.guardian.co.uk/world/2009/oct/04/man-arrested-twitter-g20-us?INTCMP=SRCH">New York man accused of using Twitter to direct protesters during G20 summit</a></li>
+<li><a class="reference external" href="http://www.techdirt.com/articles/20080330/234737699.shtml">New York City Subpoenas TXTmob For All Text Messages Sent At Republican Convention</a></li>
+</ul>
+</div>
 </div>
 <div class="section" id="terminology-icons">
-<h1><a class="toc-backref" href="#id10">3&nbsp;&nbsp;&nbsp;Terminology &amp; Icons</a></h1>
+<h1><a class="toc-backref" href="#id11">3&nbsp;&nbsp;&nbsp;Terminology &amp; Icons</a></h1>
 <p>In this manual <strong>Android</strong> refers to the Android application, while <strong>Desktop</strong> refers to the application for Windows and Linux PCs.</p>
 <p>The following icons are used throughout the manual and in the applications themselves:</p>
 <dl class="docutils">
@@ -169,29 +183,29 @@ a:hover {
 </dl>
 </div>
 <div class="section" id="security">
-<h1><a class="toc-backref" href="#id11">4&nbsp;&nbsp;&nbsp;Security</a></h1>
+<h1><a class="toc-backref" href="#id12">4&nbsp;&nbsp;&nbsp;Security</a></h1>
 <div class="section" id="identifying-information">
-<h2><a class="toc-backref" href="#id12">4.1&nbsp;&nbsp;&nbsp;Identifying Information</a></h2>
+<h2><a class="toc-backref" href="#id13">4.1&nbsp;&nbsp;&nbsp;Identifying Information</a></h2>
 <p>Data is stored unencrypted in a local sqlite database.  It is best that you     take care of encryption yourself, such as by using ecryptfs home directories or LUKS encrypted devices on Linux.  For Android we plan on implementing <a class="reference external" href="https://guardianproject.info/code/sqlcipher/">SQLCipher</a> in the near future.</p>
 <p>Data is sent over <a class="reference external" href="https://secure.wikimedia.org/wikipedia/en/wiki/Bluetooth">Bluetooth</a> without any transport layer encryption.  This is    something we plan on implementing in the future.</p>
 <p>Data is sent over link-local wifi using zeroconf for service discovery without  any transport layer encryption.  This is something we plan on implementing in   the future.</p>
 <p>While we do not save any identifying information, it is possible that you may inadvertently identify yourself through something you write or share using Fluid Nexus.  Please take this into account when using the software.  On Android, we suggest the use of <a class="reference external" href="https://guardianproject.info/apps/securecam/">ObscuraCam</a> to anonymize any photos that you decide to share.</p>
 </div>
 <div class="section" id="data-sharing">
-<h2><a class="toc-backref" href="#id13">4.2&nbsp;&nbsp;&nbsp;Data Sharing</a></h2>
+<h2><a class="toc-backref" href="#id14">4.2&nbsp;&nbsp;&nbsp;Data Sharing</a></h2>
 <div class="section" id="bluetooth">
-<h3><a class="toc-backref" href="#id14">4.2.1&nbsp;&nbsp;&nbsp;Bluetooth</a></h3>
+<h3><a class="toc-backref" href="#id15">4.2.1&nbsp;&nbsp;&nbsp;Bluetooth</a></h3>
 <p>On Android, devices must be paired before any data sharing can occur.  This should happen in a safe location prior to an event.  Because of this need for pairing it is less likely that those unknown to you will be able to access Fluid Nexus messages <em>when you are using the Bluetooth_ network modality alone</em>; however, it is still possible that someone can sniff your Bluetooth traffic and thus see what messages are being sent.</p>
 <p>On the Desktop in our testing we have not needed to pair devices ahead of time to share data amongst Linux and Windows clients.  Reports from other uses would be welcome.</p>
 </div>
 <div class="section" id="zeroconf">
-<h3><a class="toc-backref" href="#id15">4.2.2&nbsp;&nbsp;&nbsp;Zeroconf</a></h3>
+<h3><a class="toc-backref" href="#id16">4.2.2&nbsp;&nbsp;&nbsp;Zeroconf</a></h3>
 <p>On Android and the Desktop, devices will share messages with <em>any other device running Fluid Nexus</em>.  This means that others, whom you do not know, will be able to receive Fluid Nexus message (but Fluid Nexus Messages alone) from your device.  This is by design, as Fluid Nexus is a broadcast flooding protocol, meant to spread messages as far and as wide as possible.  Please take care to remove identifying information if you deem this to be a risk.</p>
 </div>
 </div>
 </div>
 <div class="section" id="using-fluid-nexus">
-<h1><a class="toc-backref" href="#id16">5&nbsp;&nbsp;&nbsp;Using Fluid Nexus</a></h1>
+<h1><a class="toc-backref" href="#id17">5&nbsp;&nbsp;&nbsp;Using Fluid Nexus</a></h1>
 <p>The main interface provides a list of all of the messages that have been created or received, sorted from newest to oldest.</p>
 <div class="figure">
 <img alt="android main interface" src="images/android_main_interface.png" style="width: 400px;" />
@@ -226,7 +240,7 @@ a:hover {
 <p class="caption">Options for viewing different message types on the desktop version.  On the toolbar, from left to right the options are: all, nexus messages, outgoing messages, and blacklisted messages.</p>
 </div>
 <div class="section" id="creating-a-new-message">
-<h2><a class="toc-backref" href="#id17">5.1&nbsp;&nbsp;&nbsp;Creating a new message</a></h2>
+<h2><a class="toc-backref" href="#id18">5.1&nbsp;&nbsp;&nbsp;Creating a new message</a></h2>
 <p>New messages can be created by selecting the &quot;New Message&quot; menu item on Android or by clicking the &quot;New Message&quot; button on the Desktop toolbar (also available under the &quot;File&quot; menu).  This will open up a new message window.</p>
 <div class="figure">
 <img alt="android new message" src="images/android_new_message.png" style="width: 400px;" />
@@ -258,7 +272,7 @@ a:hover {
 </div>
 </div>
 <div class="section" id="editing-messages">
-<h2><a class="toc-backref" href="#id18">5.2&nbsp;&nbsp;&nbsp;Editing Messages</a></h2>
+<h2><a class="toc-backref" href="#id19">5.2&nbsp;&nbsp;&nbsp;Editing Messages</a></h2>
 <p>Messages you create can be edited or deleted, while messages you receive can be deleted or blacklisted.  On Android, to edit or delete a message you have created, long tap the desired message in the main window to open up a context menu.</p>
 <div class="figure">
 <img alt="android outgoing context menu" src="images/android_context_menu_outgoing.png" style="width: 400px;" />
@@ -283,15 +297,15 @@ a:hover {
 <p>On the desktop, click the <img alt="Unblacklist message" src="images/menu_unblacklist.png" style="width: 32px;" /> unblacklist message icon.</p>
 </div>
 <div class="section" id="preferences">
-<h2><a class="toc-backref" href="#id19">5.3&nbsp;&nbsp;&nbsp;Preferences</a></h2>
+<h2><a class="toc-backref" href="#id20">5.3&nbsp;&nbsp;&nbsp;Preferences</a></h2>
 <p>Both the Android and the Desktop applications have preferences that allow you to control how the applications behave.</p>
 <div class="section" id="general">
-<h3><a class="toc-backref" href="#id20">5.3.1&nbsp;&nbsp;&nbsp;General</a></h3>
+<h3><a class="toc-backref" href="#id21">5.3.1&nbsp;&nbsp;&nbsp;General</a></h3>
 <p>On both Android and the Desktop is an option whether or not to pass along messages you have blacklisted.  If checked, blacklisted messages will be sent.</p>
 <p>On Android you additionally have an option to vibrate when new messages arrive.</p>
 </div>
 <div class="section" id="network">
-<h3><a class="toc-backref" href="#id21">5.3.2&nbsp;&nbsp;&nbsp;Network</a></h3>
+<h3><a class="toc-backref" href="#id22">5.3.2&nbsp;&nbsp;&nbsp;Network</a></h3>
 <p>The &quot;Network&quot; section provides checkboxes to enable or disable particular network modalities.  Fluid Nexus is opportunistic and tries to use whatever modality is available to spread messages.  Multiple modalities can run in parallel without problems.  At the moment we have implemented three modalities:</p>
 <ul class="simple">
 <li><a class="reference external" href="https://secure.wikimedia.org/wikipedia/en/wiki/Bluetooth">Bluetooth</a>: connects to nearby devices running Fluid Nexus.  On Android, attempts to connect to paired Bluetooth devices only.</li>
@@ -309,11 +323,11 @@ a:hover {
 <p>Ad-Hoc Wifi is still under development.</p>
 </div>
 <div class="section" id="id2">
-<h3><a class="toc-backref" href="#id22">5.3.3&nbsp;&nbsp;&nbsp;Bluetooth</a></h3>
+<h3><a class="toc-backref" href="#id23">5.3.3&nbsp;&nbsp;&nbsp;Bluetooth</a></h3>
 <p>For the Android version you have the additional option to only connect to previously paired or &quot;bonded&quot; devices.  This will skip the device discovery step.  While saving battery life, connecting to bonded devices also adds a small layer of security by only sharing data between devices that you already know about.</p>
 </div>
 <div class="section" id="scan-frequency">
-<h3><a class="toc-backref" href="#id23">5.3.4&nbsp;&nbsp;&nbsp;Scan Frequency</a></h3>
+<h3><a class="toc-backref" href="#id24">5.3.4&nbsp;&nbsp;&nbsp;Scan Frequency</a></h3>
 <p>For each of the network modalities (with the exception of &quot;Nexus&quot;) you also have the possibility of setting the &quot;Scan Frequency&quot;; this is the amount of time between successive scans for nearby devices.  Lower values mean more frequent scans.  On Android, low values for the <a class="reference external" href="https://secure.wikimedia.org/wikipedia/en/wiki/Bluetooth">Bluetooth</a> Scan Frequency will <em>severely</em> impact battery life.</p>
 <div class="figure">
 <img alt="android bluetooth scan frequency" src="images/android_preferences_bluetooth_scan_frequency.png" style="width: 400px;" />
@@ -325,7 +339,7 @@ a:hover {
 </div>
 </div>
 <div class="section" id="id3">
-<h3><a class="toc-backref" href="#id24">5.3.5&nbsp;&nbsp;&nbsp;Nexus</a></h3>
+<h3><a class="toc-backref" href="#id25">5.3.5&nbsp;&nbsp;&nbsp;Nexus</a></h3>
 <p>Finally, the &quot;Nexus&quot; section allows you to set your key and secret for posting to the Nexus.  To set this up, first register for an account at <a class="reference external" href="http://fluidnexus.net">http://fluidnexus.net</a> (by either creating a new account there or by logging in using your Google Account).  Then, on your user page click &quot;Request  a key and secret&quot;.  Enter these 20-digit numbers into the corresponding boxes in your Android or Desktop application.</p>
 <div class="figure">
 <img alt="android nexus preferences" src="images/android_preferences_nexus.png" style="width: 400px;" />
@@ -349,9 +363,9 @@ a:hover {
 </div>
 </div>
 <div class="section" id="technical-information">
-<h1><a class="toc-backref" href="#id25">6&nbsp;&nbsp;&nbsp;Technical Information</a></h1>
+<h1><a class="toc-backref" href="#id26">6&nbsp;&nbsp;&nbsp;Technical Information</a></h1>
 <div class="section" id="protocol-buffer-implementation">
-<h2><a class="toc-backref" href="#id26">6.1&nbsp;&nbsp;&nbsp;Protocol Buffer implementation</a></h2>
+<h2><a class="toc-backref" href="#id27">6.1&nbsp;&nbsp;&nbsp;Protocol Buffer implementation</a></h2>
 <p>Fluid Nexus uses protocol buffers to share data.  The following documents our message format:</p>
 <pre class="literal-block">
 message FluidNexusHashes {
@@ -389,7 +403,7 @@ message FluidNexusMessages {
 <p>The application uses a SHA256 hash of the message title and message content to determine whether or not the message needs to be exchanged.  These hashes are first exchanged between devices to determine what needs to be sent.  Thus Fluid Nexus uses a type of <a class="reference external" href="https://secure.wikimedia.org/wikipedia/en/wiki/Distributed_hash_table">distributed hash table</a> with the goal of replicating the entire table amongst all devices.</p>
 </div>
 <div class="section" id="network-modalities">
-<h2><a class="toc-backref" href="#id27">6.2&nbsp;&nbsp;&nbsp;Network Modalities</a></h2>
+<h2><a class="toc-backref" href="#id28">6.2&nbsp;&nbsp;&nbsp;Network Modalities</a></h2>
 <p>Fluid Nexus currently works using <a class="reference external" href="https://secure.wikimedia.org/wikipedia/en/wiki/Bluetooth">Bluetooth</a> and <a class="reference external" href="http://fluidnexus.net/favicon.ico">Zeroconf</a> service discovery, with Ad-Hoc Wifi to be developed.  Android requires Bluetooth devices to be paired before any data sharing can occur.  On the Desktop, sharing between <em>discoverable</em> Linux devices does not require pairing beforehand.  (Windows is to be determined.)  Zeroconf does not require any pairing and thus messages will be shared between any device running Fluid Nexus and discoverable using Zeroconf service discovery.</p>
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 <!-- FOOTER -->
@@ -400,7 +414,7 @@ message FluidNexusMessages {
 <div class="footer">
 <hr class="footer" />
 Document generated from <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> plaintext markup source
-on 2011-08-14 at 12:21:48.
+on 2011-08-16 at 19:42:20.
 </div>
 </body>
 </html>
