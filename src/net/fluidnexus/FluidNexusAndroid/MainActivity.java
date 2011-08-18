@@ -143,6 +143,7 @@ public class MainActivity extends ListActivity {
     private static final int DIALOG_REALLY_BLACKLIST = 1;
     private static final int DIALOG_REALLY_UNBLACKLIST = 2;
     private static final int DIALOG_NO_KEY = 3;
+    private static final int DIALOG_DISCLAIMER = 4;
 
     private static final int MENU_ADD_ID = Menu.FIRST;
     private static final int MENU_VIEW_ID = Menu.FIRST + 1;
@@ -444,6 +445,9 @@ public class MainActivity extends ListActivity {
             case DIALOG_NO_KEY:
                 dialog = noKeyDialog();
                 break;
+            case DIALOG_DISCLAIMER:
+                dialog = disclaimerDialog();
+                break;
             default:
                 dialog = null;
         }
@@ -545,6 +549,20 @@ public class MainActivity extends ListActivity {
         builder.setMessage(R.string.no_key_dialog)
             .setCancelable(false)
             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                }
+            });
+        return builder.create();
+    }
+
+    /**
+     * Method to create our lack of nexus key or secret dialog
+     */
+    private AlertDialog disclaimerDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.disclaimer_dialog)
+            .setCancelable(false)
+            .setPositiveButton(R.string.understand_answer, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                 }
             });
@@ -781,6 +799,7 @@ public class MainActivity extends ListActivity {
 
             messagesProviderHelper.initialPopulate();            
             fillListView(VIEW_MODE);
+            showDialog(DIALOG_DISCLAIMER);
         }
         
         showMessages = prefs.getBoolean("showMessagesPref", true);
