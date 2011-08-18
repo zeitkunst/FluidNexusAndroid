@@ -272,7 +272,6 @@ public class BluetoothServiceThread extends ServiceThread {
      */
     @Override
     public synchronized void setServiceState(int newState) {
-        //log.debug("Changing state from " + state + " to " + newState);
         state = newState;
     }
 
