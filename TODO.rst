@@ -1,6 +1,8 @@
 TODO
 ====
 
+* Add check for message with same hash in add_received to fix possible race condition
+
 * Figure out why we can't resolve a zeroconf service created on Android
 
 * Figure out good way to stop FN service upon request

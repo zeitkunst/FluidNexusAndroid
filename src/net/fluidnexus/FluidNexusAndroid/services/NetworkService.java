@@ -181,6 +181,8 @@ public class NetworkService extends Service {
                             bluetoothServiceThread.setScanFrequency(msg.arg2);
                             log.info("Starting our bluetooth service thread for discovered and paired devices...");
                             bluetoothServiceThread.start();
+                            notificationFlags |= BLUETOOTH_FLAG;
+                            updateNotification();
                         } 
                         /*
                         else {
@@ -193,8 +195,6 @@ public class NetworkService extends Service {
                         */
                     }
                     bluetoothEnabled = msg.arg1;
-                    notificationFlags |= BLUETOOTH_FLAG;
-                    updateNotification();
                     break;
                 case MSG_BLUETOOTH_BONDED_ONLY_FLAG:
                     log.debug("Changing bluetooth bonded only flag to: " + msg.arg1);
@@ -213,12 +213,12 @@ public class NetworkService extends Service {
                             zeroconfServiceThread.setScanFrequency(msg.arg2);
                             log.info("Starting our zeroconf service thread...");
                             zeroconfServiceThread.start();
+                            notificationFlags |= ZEROCONF_FLAG;
+                            updateNotification();
                         } 
 
                     }
                     zeroconfEnabled = msg.arg1;
-                    notificationFlags |= ZEROCONF_FLAG;
-                    updateNotification();
                     break;
                 case MSG_NEXUS_START:
                     if (msg.arg1 != nexusEnabled) {
@@ -232,11 +232,11 @@ public class NetworkService extends Service {
                             nexusServiceThread.setScanFrequency(msg.arg2);
                             log.info("Starting our nexus service thread...");
                             nexusServiceThread.start();
+                            notificationFlags |= NEXUS_FLAG;
+                            updateNotification();
                         }
 
                         nexusEnabled = msg.arg1;
-                        notificationFlags |= NEXUS_FLAG;
-                        updateNotification();
                     }
 
 
@@ -300,10 +300,16 @@ public class NetworkService extends Service {
         if (bluetoothServiceThread != null) {
             bluetoothServiceThread.cancel();
         }
+
         if (zeroconfServiceThread != null) {
             zeroconfServiceThread.unregisterService();
             zeroconfServiceThread.cancel();
         }
+
+        if (nexusServiceThread != null) {
+            nexusServiceThread.cancel();
+        }
+
     }
 
 
