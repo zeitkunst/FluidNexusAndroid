@@ -41,7 +41,7 @@
   <string name="really_blacklist_dialog">Are you sure you want to blacklist this message?</string>
   <string name="really_unblacklist_dialog">Are you sure you want to remove this message from the blacklist?</string>
   <string name="no_key_dialog">No Nexus Key or Nexus Secret exists. These are necessary in order to request authorization. Please visit http://fluidnexus.net and create an account (or login to an existing one) and request a Nexus Key and Secret. If you already have a Key and Secret, please enter them into the Preferences.</string>
-  <string name="disclaimer_dialog">Fluid Nexus works on a broadcast model.  This means that any other device running the software can receive the messages you create.  Therefore, messages are sent unencrypted.  You have been warned.</string>
+  <string name="disclaimer_dialog">Fluid Nexus works on a broadcast model.  This means that any other device running the software can receive the messages you create.  Therefore, messages are sent unencrypted.  IT IS NOT DESIGNED FOR SECURE COMMUNICATIONS.  IT IS DESIGNED FOR SPREADING NECESSARY TEXT, AUDIO, IMAGES, AND VIDEO AS WIDE AS POSSIBLE, WHICH MIGHT INCLUDE ADVERSARIES.  You have been warned.</string>
   <string name="understand_answer">I understand</string>
   <string name="really_save_dialog">Do you want to save this message?</string>
   <string name="same_dialog">The message you are trying to save already exists in the database; please change the title and/or the content.</string>
@@ -77,6 +77,7 @@
   <string name="toast_message_unblacklisted">Message unblacklisted.</string>
   <string name="toast_discoverable_ok">Device set to be discoverable for %d seconds.</string>
   <string name="toast_discoverable_notok">Device not set to be discoverable</string>
+  <string name="toast_wifi_not_enabled">Wifi is not enabled; zeroconf service cannot start.</string>
   <string name="intent_new_message">net.fluidnexus.FluidNexusAndroid.NEW_MESSAGE</string>
   <string name="intent_discovery_started">net.fluidnexus.FluidNexusAndroid.DISCOVERY_STARTED</string>
   <string name="intent_device_found">net.fluidnexus.FluidNexusAndroid.REMOTE_DEVICE_FOUND</string>

@@ -830,9 +830,6 @@ public class MainActivity extends ListActivity {
 
                     } catch (RemoteException e) {
                         log.error("Unable to send scan frequency message: " + e);
-                    } catch (ArrayIndexOutOfBoundsException e) {
-                        log.error("Some sort of error: " + e);
-
                     }
                 } else if (key.equals("bluetoothBondedOnlyFlag")) {
                     try {

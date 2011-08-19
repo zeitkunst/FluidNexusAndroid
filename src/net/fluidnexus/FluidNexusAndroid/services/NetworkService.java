@@ -56,6 +56,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.BroadcastReceiver;
 import android.database.Cursor;
+import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.Environment;
 import android.os.Bundle;
@@ -111,6 +112,7 @@ public class NetworkService extends Service {
     public static final int MSG_NEXUS_START = 0x70;
     public static final int MSG_SEND_BLACKLISTED = 0x80;
 
+    private WifiManager wifiManager = null;
     private int bluetoothEnabled = 0;
     private int zeroconfEnabled = 0;
     private int nexusEnabled = 0;
@@ -209,12 +211,20 @@ public class NetworkService extends Service {
                 case MSG_ZEROCONF_ENABLED:
                     if (msg.arg1 != zeroconfEnabled) {
                         if ((msg.arg1 == 1) && (zeroconfServiceThread == null)) {
-                            zeroconfServiceThread = new ZeroconfServiceThread(getApplicationContext(), clients, sendBlacklist);
-                            zeroconfServiceThread.setScanFrequency(msg.arg2);
-                            log.info("Starting our zeroconf service thread...");
-                            zeroconfServiceThread.start();
-                            notificationFlags |= ZEROCONF_FLAG;
-                            updateNotification();
+
+                            wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+
+                            if (wifiManager.getWifiState() == wifiManager.WIFI_STATE_ENABLED) {
+                                zeroconfServiceThread = new ZeroconfServiceThread(getApplicationContext(), clients, sendBlacklist);
+                                zeroconfServiceThread.setScanFrequency(msg.arg2);
+                                log.info("Starting our zeroconf service thread...");
+                                zeroconfServiceThread.start();
+                                notificationFlags |= ZEROCONF_FLAG;
+                                updateNotification();
+                            } else {
+                                Toast.makeText(getApplicationContext(), R.string.toast_wifi_not_enabled, Toast.LENGTH_SHORT).show();
+                                log.warn("Wifi not enabled; zeroconf service cannot start.");
+                            }
                         } 
 
                     }
