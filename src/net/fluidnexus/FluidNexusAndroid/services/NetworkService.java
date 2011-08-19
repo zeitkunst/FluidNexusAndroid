@@ -109,7 +109,7 @@ public class NetworkService extends Service {
     public static final int MSG_ZEROCONF_SCAN_FREQUENCY = 0x40;
     public static final int MSG_BLUETOOTH_ENABLED = 0x50;
     public static final int MSG_ZEROCONF_ENABLED = 0x60;
-    public static final int MSG_NEXUS_START = 0x70;
+    public static final int MSG_NEXUS_ENABLED= 0x70;
     public static final int MSG_SEND_BLACKLISTED = 0x80;
 
     private WifiManager wifiManager = null;
@@ -230,7 +230,7 @@ public class NetworkService extends Service {
                     }
                     zeroconfEnabled = msg.arg1;
                     break;
-                case MSG_NEXUS_START:
+                case MSG_NEXUS_ENABLED:
                     if (msg.arg1 != nexusEnabled) {
                         if ((msg.arg1 == 1) && (nexusServiceThread == null)) {
                             Bundle b = msg.getData();
@@ -239,7 +239,12 @@ public class NetworkService extends Service {
                             String token = b.getString("token");
                             String token_secret = b.getString("token_secret");
                             nexusServiceThread = new NexusServiceThread(getApplicationContext(), clients, key, secret, token, token_secret);
-                            nexusServiceThread.setScanFrequency(msg.arg2);
+                            if (msg.arg2 == 0) {
+                                nexusServiceThread.setScanFrequency(300);
+                            } else {
+                                nexusServiceThread.setScanFrequency(msg.arg2);
+
+                            }
                             log.info("Starting our nexus service thread...");
                             nexusServiceThread.start();
                             notificationFlags |= NEXUS_FLAG;

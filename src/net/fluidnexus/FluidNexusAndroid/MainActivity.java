@@ -168,6 +168,8 @@ public class MainActivity extends ListActivity {
     private BluetoothAdapter bluetoothAdapter = null;
     private boolean askedBluetooth = false;
     private boolean enableBluetoothServicePref = true;
+    private boolean enableZeroconfServicePref = true;
+    private boolean enableNexusServicePref = true;
     private boolean vibratePref = false;
 
     private Vibrator vibrator = null;
@@ -345,8 +347,8 @@ public class MainActivity extends ListActivity {
 
                 // Send bluetooth enabled bit on start
                 msg = Message.obtain(null, NetworkService.MSG_BLUETOOTH_ENABLED);
-                msg.arg1 = (prefs.getBoolean("enableBluetoothServicePref", true))? 1 : 0;
-                msg.arg2 = Integer.parseInt(prefs.getString("bluetoothScanFrequency", "120"));
+                msg.arg1 = (prefs.getBoolean("enableBluetoothServicePref", false))? 1 : 0;
+                msg.arg2 = Integer.parseInt(prefs.getString("bluetoothScanFrequency", "300"));
                 msg.replyTo = messenger;
                 networkService.send(msg);
                 
@@ -360,17 +362,15 @@ public class MainActivity extends ListActivity {
 
                 // Send zeroconf enabled bit on start
                 msg = Message.obtain(null, NetworkService.MSG_ZEROCONF_ENABLED);
-                msg.arg1 = (prefs.getBoolean("enableZeroconfServicePref", true)) ? 1 : 0;
-                msg.arg2 = Integer.parseInt(prefs.getString("zeroconfScanFrequency", "120"));
+                msg.arg1 = (prefs.getBoolean("enableZeroconfServicePref", false)) ? 1 : 0;
+                msg.arg2 = Integer.parseInt(prefs.getString("zeroconfScanFrequency", "300"));
                 msg.replyTo = messenger;
                 networkService.send(msg);
 
                 // Send bit for starting nexus service
-                msg = Message.obtain(null, NetworkService.MSG_NEXUS_START);
-                msg.arg1 = (prefs.getBoolean("enableNexusServicePref", true)) ? 1 : 0;
-                // TODO
-                // Make this configurable?
-                msg.arg2 = 120;
+                msg = Message.obtain(null, NetworkService.MSG_NEXUS_ENABLED);
+                msg.arg1 = (prefs.getBoolean("enableNexusServicePref", false)) ? 1 : 0;
+                msg.arg2 = Integer.parseInt(prefs.getString("nexusScanFrequency", "300"));
                 Bundle bundle = new Bundle();
                 bundle.putString("key", prefs.getString("nexusKeyPref", ""));
                 bundle.putString("secret", prefs.getString("nexusSecretPref", ""));
@@ -810,21 +810,50 @@ public class MainActivity extends ListActivity {
         preferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences pref, String key) {
                 if (key.equals("enableBluetoothServicePref")) {
-                    boolean tmp = prefs.getBoolean("enableBluetoothServicePref", true);
+                    boolean tmp = prefs.getBoolean("enableBluetoothServicePref", false);
                     try {
                         // Send bluetooth enabled bit
                         Message msg = Message.obtain(null, NetworkService.MSG_BLUETOOTH_ENABLED);
                         msg.arg1 = (prefs.getBoolean("enableBluetoothServicePref", false))? 1 : 0;
+                        msg.arg2 = Integer.parseInt(prefs.getString("bluetoothScanFrequency", "300"));
                         msg.replyTo = messenger;
                         networkService.send(msg);
                         enableBluetoothServicePref = tmp;
                     } catch (RemoteException e) {
                         log.error("Unable to send MSG_BLUETOOTH_ENABLED");
                     }
+                } else if (key.equals("enableZeroconfServicePref")) {
+                    boolean tmp = prefs.getBoolean("enableZeroconfServicePref", false);
+                    try {
+                        // Send zeroconf enabled bit
+                        Message msg = Message.obtain(null, NetworkService.MSG_ZEROCONF_ENABLED);
+                        msg.arg1 = (prefs.getBoolean("enableZeroconfServicePref", false))? 1 : 0;
+                        msg.arg2 = Integer.parseInt(prefs.getString("zeroconfScanFrequency", "300"));
+                        msg.replyTo = messenger;
+                        networkService.send(msg);
+                        enableZeroconfServicePref = tmp;
+                    } catch (RemoteException e) {
+                        log.error("Unable to send MSG_ZEROCONF_ENABLED");
+                    }
+                } else if (key.equals("enableNexusServicePref")) {
+                    boolean tmp = prefs.getBoolean("enableNexusServicePref", false);
+                    try {
+                        // Send nexus enabled bit
+                        Message msg = Message.obtain(null, NetworkService.MSG_NEXUS_ENABLED);
+                        msg.arg1 = (prefs.getBoolean("enableNexusServicePref", false))? 1 : 0;
+                        // TODO
+                        // Add preference for this
+                        msg.arg2 = Integer.parseInt(prefs.getString("nexusScanFrequency", "300"));
+                        msg.replyTo = messenger;
+                        networkService.send(msg);
+                        enableNexusServicePref = tmp;
+                    } catch (RemoteException e) {
+                        log.error("Unable to send MSG_NEXUS_ENABLED");
+                    }
                 } else if (key.equals("bluetoothScanFrequency")) {
                     try {
                         Message msg = Message.obtain(null, NetworkService.MSG_BLUETOOTH_SCAN_FREQUENCY);
-                        msg.arg1 = Integer.parseInt(prefs.getString("bluetoothScanFrequency", "120"));
+                        msg.arg1 = Integer.parseInt(prefs.getString("bluetoothScanFrequency", "300"));
                         msg.replyTo = messenger;
                         networkService.send(msg);
 
@@ -843,7 +872,7 @@ public class MainActivity extends ListActivity {
                 } else if (key.equals("zeroconfScanFrequency")) {
                     try {
                         Message msg = Message.obtain(null, NetworkService.MSG_ZEROCONF_SCAN_FREQUENCY);
-                        msg.arg1 = Integer.parseInt(prefs.getString("zeroconfScanFrequency", "120"));
+                        msg.arg1 = Integer.parseInt(prefs.getString("zeroconfScanFrequency", "300"));
                         msg.replyTo = messenger;
                         networkService.send(msg);
 

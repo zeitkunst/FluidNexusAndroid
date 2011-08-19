@@ -24,23 +24,23 @@
         android:title="@string/preferences_category_network">
         <CheckBoxPreference
             android:title="@string/preferences_enable_bluetooth_service"
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:summary="@string/preferences_enable_bluetooth_service_summary"
             android:key="enableBluetoothServicePref" />
         <CheckBoxPreference
             android:title="@string/preferences_enable_zeroconf_service"
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:summary="@string/preferences_enable_zeroconf_service_summary"
             android:key="enableZeroconfServicePref" />
         <CheckBoxPreference
             android:title="@string/preferences_enable_adhocwifi_service"
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:enabled="false"
             android:summary="@string/preferences_enable_adhocwifi_service_summary"
             android:key="enableAdhocwifiServicePref" />
         <CheckBoxPreference
             android:title="@string/preferences_enable_nexus_service"
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:summary="@string/preferences_enable_nexus_service_summary"
             android:key="enableNexusServicePref" />
 
@@ -102,6 +102,14 @@
             android:numeric="decimal"
             android:title="@string/preferences_nexus_token_secret_title"
             android:key="nexusTokenSecretPref" />
+        <ListPreference 
+            android:title="@string/preferences_nexus_scan_frequency"
+            android:summary="@string/preferences_nexus_scan_frequency_summary"
+            android:defaultValue="300"
+            android:key="nexusScanFrequency"
+            android:entries="@array/scan_frequency_names"
+            android:entryValues="@array/scan_frequency_values" />
+
 
     </PreferenceCategory>
     <!--

@@ -41,7 +41,7 @@
   <string name="really_blacklist_dialog">Are you sure you want to blacklist this message?</string>
   <string name="really_unblacklist_dialog">Are you sure you want to remove this message from the blacklist?</string>
   <string name="no_key_dialog">No Nexus Key or Nexus Secret exists. These are necessary in order to request authorization. Please visit http://fluidnexus.net and create an account (or login to an existing one) and request a Nexus Key and Secret. If you already have a Key and Secret, please enter them into the Preferences.</string>
-  <string name="disclaimer_dialog">Fluid Nexus works on a broadcast model.  This means that any other device running the software can receive the messages you create.  Therefore, messages are sent unencrypted.  IT IS NOT DESIGNED FOR SECURE COMMUNICATIONS.  IT IS DESIGNED FOR SPREADING NECESSARY TEXT, AUDIO, IMAGES, AND VIDEO AS WIDE AS POSSIBLE, WHICH MIGHT INCLUDE ADVERSARIES.  You have been warned.</string>
+  <string name="disclaimer_dialog">Fluid Nexus works on a broadcast model.  This means that any other device running the software can receive the messages you create.  Therefore, messages are sent unencrypted.  IT IS NOT DESIGNED FOR SECURE COMMUNICATIONS.  IT IS DESIGNED FOR SPREADING NECESSARY TEXT, AUDIO, IMAGES, AND VIDEO AS WIDE AS POSSIBLE, WHICH MIGHT INCLUDE ADVERSARIES.  You must choose for yourself what network modalities to enable.  You have been warned.</string>
   <string name="understand_answer">I understand</string>
   <string name="really_save_dialog">Do you want to save this message?</string>
   <string name="same_dialog">The message you are trying to save already exists in the database; please change the title and/or the content.</string>
@@ -118,6 +118,9 @@
   <string name="preferences_bluetooth_scan_frequency_summary">How often to scan for other devices. Shorter durations will severely impact battery life.</string>
   <string name="preferences_zeroconf_scan_frequency">Scan Frequency</string>
   <string name="preferences_zeroconf_scan_frequency_summary">How often to scan for other devices. Shorter durations will severely impact battery life.</string>
+  <string name="preferences_nexus_scan_frequency">Scan Frequency</string>
+  <string name="preferences_nexus_scan_frequency_summary">How often to scan for potential uploads to the Nexus.  Shorter durations will severely impact battery life.</string>
+
   <string name="preferences_nexus_key">Nexus Key</string>
   <string name="preferences_nexus_key_summary">The key provided by to you on the Fluid Nexus website for posting to the Nexus</string>
   <string name="preferences_nexus_key_title">Nexus Key</string>
