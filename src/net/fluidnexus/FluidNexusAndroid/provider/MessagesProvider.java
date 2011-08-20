@@ -50,6 +50,10 @@ public class MessagesProvider extends ContentProvider {
     private static final String DATABASE_TABLE = "Messages";
     private static final int DATABASE_VERSION = 2;
 
+    // TODO
+    // ONLY FOR TESTING!
+    private static final String DATABASE_KEY = "";
+
     private static final String AUTHORITY = "net.fluidnexus.FluidNexusAndroid.provider.MessagesProvider";
 
     // URIs for our provider
@@ -212,6 +216,7 @@ public class MessagesProvider extends ContentProvider {
     
         public MessagesDbHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
+            //SQLiteDatabase.loadLibs(context);
         }
     
         @Override
@@ -377,6 +382,7 @@ public class MessagesProvider extends ContentProvider {
         }
 
         // Open in read mode since no changes are to be done
+        //SQLiteDatabase db = messagesDbHelper.getReadableDatabase(DATABASE_KEY);
         SQLiteDatabase db = messagesDbHelper.getReadableDatabase();
 
         /*
@@ -406,6 +412,7 @@ public class MessagesProvider extends ContentProvider {
      */
     @Override
     public int update(Uri uri, ContentValues values, String where, String[] whereArgs) {
+        //SQLiteDatabase db = messagesDbHelper.getWritableDatabase(DATABASE_KEY);
         SQLiteDatabase db = messagesDbHelper.getWritableDatabase();
         int count;
         String finalWhere;
@@ -463,6 +470,7 @@ public class MessagesProvider extends ContentProvider {
      */
      @Override
     public int delete(Uri uri, String where, String[] whereArgs) {
+        //SQLiteDatabase db = messagesDbHelper.getWritableDatabase(DATABASE_KEY);
         SQLiteDatabase db = messagesDbHelper.getWritableDatabase();
         String finalWhere;
 
@@ -543,6 +551,7 @@ public class MessagesProvider extends ContentProvider {
         }
 
         // Open database in write mode
+        //SQLiteDatabase db = messagesDbHelper.getWritableDatabase(DATABASE_KEY);
         SQLiteDatabase db = messagesDbHelper.getWritableDatabase();
         
         // Perform the actual insert and return the new ID
