@@ -36,6 +36,8 @@ The google protobuf library is licensed under the BSD 2-Clause license.
 
 The jmdns library is licensed under Apache V2.0 or LGPL and is based on the modified version by twitwi (https://github.com/twitwi/AndroidDnssdDemo).
 
+SQLCipher licensed under a BSD-style license from Zetetic LLC (https://github.com/guardianproject/android-database-sqlcipher/blob/master/SQLCIPHER_LICENSE).  SQLite is in the public domain (http://www.sqlite.org/copyright.html).
+
 TODO
 ====
 
