@@ -1,5 +1,16 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <string name="welcome_welcome_title">Welcome to Fluid Nexus!</string>
+  <string name="welcome_concept_title">The Concept</string>
+  <string name="welcome_security_title">Fluid Nexus Security</string>
+  <string name="welcome_passphrase_title">Passphrase Selection</string>
+  <string name="welcome_welcome_message">Welcome</string>
+  <string name="welcome_concept_message">Concept</string>
+  <string name="welcome_security_message">Security</string>
+  <string name="welcome_passphrase_message">Passphrase</string>
+  <string name="button_back">Back</string>
+  <string name="button_next">Next</string>
+  <string name="button_choose_passphrase">Choose Passphrase</string>
   <string name="show_messages_check">Show messages?</string>
   <string name="view_message_title_string">Title:</string>
   <string name="view_message_data_string">Message:</string>

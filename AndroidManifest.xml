@@ -58,6 +58,7 @@
         </activity>
         <!-- <activity android:name=".FluidNexusViewOutgoing"></activity> -->
         <activity android:name=".AddOutgoing"></activity>
+        <activity android:name=".WelcomeActivity"></activity>
         <activity android:name=".Help"></activity>
         <activity android:name=".About"></activity>
         <activity android:name=".EditMessage"></activity>
@@ -68,12 +69,6 @@
                 <action android:name="net.fluidnexus.FluidNexusAndroid.services.NetworkService" />
             </intent-filter>
         </service>
-        <provider
-            android:authorities="net.fluidnexus.FluidNexusAndroid.provider.MessagesProvider"
-            android:multiprocess="true"
-            android:readPermission="net.fluidnexus.FluidNexusAndroid.permission.READ_ONLY"
-            android:writePermission="net.fluidnexus.FluidNexusAndroid.permission.WRITE_ONLY"
-            android:name="net.fluidnexus.FluidNexusAndroid.provider.MessagesProvider" />
 
     </application>
 </manifest> 

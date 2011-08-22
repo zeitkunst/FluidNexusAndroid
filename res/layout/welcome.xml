@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <TextView
+        android:text="TITLE"
+        android:textColor="@color/fluid_nexus_red"
+        android:background="@color/light_grey"
+        android:id="@+id/welcome_title"
+        android:textStyle="bold"
+        android:textSize="18pt"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:fadingEdge="vertical">
+    </TextView>
+
+    <TableLayout
+        android:id="@+id/table_layout"
+        android:stretchColumns="*"
+        android:layout_height="fill_parent"
+        android:background="@drawable/message_list_item_gradient"
+        android:layout_width="wrap_content">
+
+        <TableRow
+            android:id="@+id/table_row001"
+            android:layout_weight="1"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+            <ScrollView
+                android:id="@+id/welcome_scrollview"
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android_layout_height="fill_parent"
+                android:layout_span="3">
+
+                <TextView
+                    android:id="@+id/welcome_text"
+                    android:textSize="14pt"
+                    android:textColor="@color/text_color" 
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="To be replaced.">
+                </TextView>
+            </ScrollView>
+        </TableRow> 
+
+        <TableRow
+            android:id="@+id/table_row002"
+            android:textColor="@color/text_color"
+            android:layout_width="fill_parent"
+            android:layout_height="30dip">
+            
+            <Button
+                android:text="button1"
+                android:id="@+id/welcome_button1"
+                android:layout_weight="1"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content">
+            </Button>
+            <Button
+                android:text="button2"
+                android:id="@+id/welcome_button2"
+                android:layout_weight="1"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content">
+            </Button>
+
+        </TableRow>
+    </TableLayout>
+
+</LinearLayout>
