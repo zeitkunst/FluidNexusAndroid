@@ -73,7 +73,7 @@ public class MessagesProviderHelper {
 
     private static final String DATABASE_CREATE =
             "create table messages (_id integer primary key autoincrement, type integer, title text, content text, message_hash text, time float, received_time float, attachment_path text, attachment_original_filename text, mine bit, blacklist bit default 0, public bit default 0, ttl integer default 0, uploaded bit default 0, priority integer default 0);";
-    private static final String DATABASE_NAME = "messages";
+    private static final String DATABASE_NAME = "FluidNexusDatabase.db";
     private static final String DATABASE_TABLE = "messages";
     private static final int DATABASE_VERSION = 2;
 
