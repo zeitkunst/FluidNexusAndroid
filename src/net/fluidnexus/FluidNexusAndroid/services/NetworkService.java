@@ -70,7 +70,6 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
 
-import net.fluidnexus.FluidNexusAndroid.provider.MessagesProvider;
 import net.fluidnexus.FluidNexusAndroid.provider.MessagesProviderHelper;
 import net.fluidnexus.FluidNexusAndroid.Logger;
 import net.fluidnexus.FluidNexusAndroid.MainActivity;
@@ -199,7 +198,6 @@ public class NetworkService extends Service {
                     bluetoothEnabled = msg.arg1;
                     break;
                 case MSG_BLUETOOTH_BONDED_ONLY_FLAG:
-                    log.debug("Changing bluetooth bonded only flag to: " + msg.arg1);
                     if (bluetoothServiceThread != null) {
                         bluetoothServiceThread.setBondedOnly(msg.arg1 != 0);
                     }
@@ -295,7 +293,10 @@ public class NetworkService extends Service {
 
 
         // setup database object
-        messagesProviderHelper = new MessagesProviderHelper(this);
+        //messagesProviderHelper = new MessagesProviderHelper(this);
+        if (messagesProviderHelper == null) {
+            messagesProviderHelper = MessagesProviderHelper.getInstance(getApplicationContext());
+        }
 
         // Show a notification regarding the service
         showNotification();

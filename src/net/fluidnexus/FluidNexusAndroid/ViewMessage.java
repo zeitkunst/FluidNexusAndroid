@@ -22,6 +22,7 @@ package net.fluidnexus.FluidNexusAndroid;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.PixelFormat;
 import android.net.Uri;
 import android.os.Bundle;
@@ -35,9 +36,11 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import net.fluidnexus.FluidNexusAndroid.provider.MessagesProvider;
+
+import net.fluidnexus.FluidNexusAndroid.provider.MessagesProviderHelper;
 
 public class ViewMessage extends Activity {
+    private MessagesProviderHelper messagesProviderHelper = null;
 
     private static Logger log = Logger.getLogger("FluidNexus"); 
     private ImageView typeImageView;
@@ -52,10 +55,17 @@ public class ViewMessage extends Activity {
     private static final int SELECT_NORMAL_PRIORITY = 0;
     private static final int SELECT_HIGH_PRIORITY = 1;
 
+    private long rowID = -1;
+
     @Override
     protected void onCreate(Bundle icicle) {
 
         super.onCreate(icicle);
+
+        if (messagesProviderHelper == null) {
+            messagesProviderHelper = MessagesProviderHelper.getInstance(getApplicationContext());
+        }
+
         setTheme(android.R.style.Theme_Dialog);
         setContentView(R.layout.message_view);
         setTitle(R.string.message_view_title);
@@ -72,17 +82,20 @@ public class ViewMessage extends Activity {
         RelativeLayout rl = (RelativeLayout) findViewById(R.id.message_view_message);
 
         if (extras != null) {
-            String title = extras.getString(MessagesProvider.KEY_TITLE);
-            String message = extras.getString(MessagesProvider.KEY_CONTENT); 
-            Float createdTime = extras.getFloat(MessagesProvider.KEY_TIME);
-            Float receivedTime = extras.getFloat(MessagesProvider.KEY_RECEIVED_TIME);
-            attachment_path = extras.getString(MessagesProvider.KEY_ATTACHMENT_PATH);
-            attachment_original_filename = extras.getString(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME); 
-            Boolean mine = extras.getBoolean(MessagesProvider.KEY_MINE); 
-            Boolean publicMessage = extras.getBoolean(MessagesProvider.KEY_PUBLIC); 
-            Integer priority = extras.getInt(MessagesProvider.KEY_PRIORITY); 
+            rowID = extras.getLong(MessagesProviderHelper.KEY_ID);
+            Cursor localCursor = MessagesProviderHelper.getInstance(this).returnItemByID(rowID);
+            startManagingCursor(localCursor);
 
-            log.debug("priority is: " + priority);
+            String title = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProviderHelper.KEY_TITLE));
+            String message = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProviderHelper.KEY_CONTENT)); 
+            Float createdTime = localCursor.getFloat(localCursor.getColumnIndexOrThrow(MessagesProviderHelper.KEY_TIME));
+            Float receivedTime = localCursor.getFloat(localCursor.getColumnIndexOrThrow(MessagesProviderHelper.KEY_RECEIVED_TIME));
+            attachment_path = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProviderHelper.KEY_ATTACHMENT_PATH));
+            attachment_original_filename = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProviderHelper.KEY_ATTACHMENT_ORIGINAL_FILENAME)); 
+            Boolean mine = localCursor.getInt(localCursor.getColumnIndexOrThrow(MessagesProviderHelper.KEY_MINE)) > 0; 
+            Boolean publicMessage = localCursor.getInt(localCursor.getColumnIndexOrThrow(MessagesProviderHelper.KEY_PUBLIC)) > 0; 
+            Integer priority = localCursor.getInt(localCursor.getColumnIndexOrThrow(MessagesProviderHelper.KEY_PRIORITY)); 
+
             if (priority != null) {
                 if (priority == SELECT_HIGH_PRIORITY) {
                     log.debug("setting high priority");

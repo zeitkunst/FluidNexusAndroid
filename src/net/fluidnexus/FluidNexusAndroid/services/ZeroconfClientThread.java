@@ -60,7 +60,6 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
 
-import net.fluidnexus.FluidNexusAndroid.provider.MessagesProvider;
 import net.fluidnexus.FluidNexusAndroid.provider.MessagesProviderHelper;
 import net.fluidnexus.FluidNexusAndroid.Logger;
 

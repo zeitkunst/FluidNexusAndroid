@@ -86,7 +86,11 @@ public class AddOutgoing extends Activity {
     protected void onCreate(Bundle icicle) {
 
         super.onCreate(icicle);
-        messagesProviderHelper = new MessagesProviderHelper(this);
+        //messagesProviderHelper = new MessagesProviderHelper(this);
+        if (messagesProviderHelper == null) {
+            messagesProviderHelper = MessagesProviderHelper.getInstance(getApplicationContext());
+        }
+
 
         setContentView(R.layout.message_edit);
         setTitle(R.string.message_add_outgoing_title);

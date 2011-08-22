@@ -85,7 +85,6 @@ import oauth.signpost.exception.OAuthMessageSignerException;
 import oauth.signpost.exception.OAuthNotAuthorizedException;
 import oauth.signpost.http.HttpParameters;
 
-import net.fluidnexus.FluidNexusAndroid.provider.MessagesProvider;
 import net.fluidnexus.FluidNexusAndroid.provider.MessagesProviderHelper;
 import net.fluidnexus.FluidNexusAndroid.Logger;
 
@@ -177,21 +176,21 @@ public class NexusServiceThread extends ServiceThread {
             Cursor c = messagesProviderHelper.publicMessages();
 
             while (c.isAfterLast() == false) {
-                String message_hash = c.getString(c.getColumnIndex(MessagesProvider.KEY_MESSAGE_HASH));
+                String message_hash = c.getString(c.getColumnIndex(MessagesProviderHelper.KEY_MESSAGE_HASH));
                 boolean result = checkHash(message_hash);
 
                 if (!result) {
                     try {
                         JSONObject message = new JSONObject();
-                        message.put("message_title", c.getString(c.getColumnIndex(MessagesProvider.KEY_TITLE)));
-                        message.put("message_content", c.getString(c.getColumnIndex(MessagesProvider.KEY_CONTENT)));
-                        message.put("message_hash", c.getString(c.getColumnIndex(MessagesProvider.KEY_MESSAGE_HASH)));
-                        message.put("message_type", c.getInt(c.getColumnIndex(MessagesProvider.KEY_TYPE)));
-                        message.put("message_time", c.getFloat(c.getColumnIndex(MessagesProvider.KEY_TIME)));
-                        message.put("message_received_time", c.getFloat(c.getColumnIndex(MessagesProvider.KEY_RECEIVED_TIME)));
-                        message.put("message_priority", c.getInt(c.getColumnIndex(MessagesProvider.KEY_PRIORITY)));
+                        message.put("message_title", c.getString(c.getColumnIndex(MessagesProviderHelper.KEY_TITLE)));
+                        message.put("message_content", c.getString(c.getColumnIndex(MessagesProviderHelper.KEY_CONTENT)));
+                        message.put("message_hash", c.getString(c.getColumnIndex(MessagesProviderHelper.KEY_MESSAGE_HASH)));
+                        message.put("message_type", c.getInt(c.getColumnIndex(MessagesProviderHelper.KEY_TYPE)));
+                        message.put("message_time", c.getFloat(c.getColumnIndex(MessagesProviderHelper.KEY_TIME)));
+                        message.put("message_received_time", c.getFloat(c.getColumnIndex(MessagesProviderHelper.KEY_RECEIVED_TIME)));
+                        message.put("message_priority", c.getInt(c.getColumnIndex(MessagesProviderHelper.KEY_PRIORITY)));
                         
-                        String attachment_path = c.getString(c.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_PATH));
+                        String attachment_path = c.getString(c.getColumnIndex(MessagesProviderHelper.KEY_ATTACHMENT_PATH));
     
     
                         //String serializedMessage = message.toString();
@@ -220,7 +219,7 @@ public class NexusServiceThread extends ServiceThread {
                             entity.addPart("message_attachment", cbFile);
 
                             // add the original filename to the message
-                            message.put("message_attachment_original_filename", c.getString(c.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME)));
+                            message.put("message_attachment_original_filename", c.getString(c.getColumnIndex(MessagesProviderHelper.KEY_ATTACHMENT_ORIGINAL_FILENAME)));
                         }
 
                         String serializedMessage = message.toString();
@@ -240,9 +239,9 @@ public class NexusServiceThread extends ServiceThread {
                         
                         if (message_result) {
                             ContentValues values = new ContentValues();
-                            values.put(MessagesProvider.KEY_MESSAGE_HASH, message_hash);
-                            values.put(MessagesProvider.KEY_UPLOADED, 1);
-                            int res = messagesProviderHelper.setPublic(c.getLong(c.getColumnIndex(MessagesProvider._ID)), values);
+                            values.put(MessagesProviderHelper.KEY_MESSAGE_HASH, message_hash);
+                            values.put(MessagesProviderHelper.KEY_UPLOADED, 1);
+                            int res = messagesProviderHelper.setPublic(c.getLong(c.getColumnIndex(MessagesProviderHelper.KEY_ID)), values);
                             if (res == 0) {
                                 log.debug("Message with hash " + message_hash + " not found; this should never happen!");
                             }

@@ -24,6 +24,9 @@
         android:title="@string/menu_view_blacklist"
         android:icon="@drawable/menu_blacklist"
         android:alphabeticShortcut="b" />
+    <item android:id="@+id/menu_change_passphrase"
+        android:title="@string/menu_change_passphrase"
+        android:alphabeticShortcut="c" />
     <item android:id="@+id/menu_preferences"
         android:title="@string/menu_preferences"
         android:icon="@drawable/menu_preferences"

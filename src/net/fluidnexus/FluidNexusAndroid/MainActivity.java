@@ -60,6 +60,7 @@ import android.view.WindowManager;
 import android.view.MenuItem;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -93,9 +94,10 @@ import oauth.signpost.exception.OAuthMessageSignerException;
 import oauth.signpost.exception.OAuthNotAuthorizedException;
 import oauth.signpost.http.HttpParameters;
 
-import net.fluidnexus.FluidNexusAndroid.provider.MessagesProvider;
+import info.guardianproject.database.sqlcipher.SQLiteDatabase;
 import net.fluidnexus.FluidNexusAndroid.provider.MessagesProviderHelper;
 import net.fluidnexus.FluidNexusAndroid.services.NetworkService;
+
 /*
  * TODO
  * * deal with new binding to the service when clicking on the notification; this shouldn't happen
@@ -110,10 +112,6 @@ public class MainActivity extends ListActivity {
     private SharedPreferences prefs;
     private Editor prefsEditor;
     private SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener;
-
-    // just for testing
-    private BroadcastReceiver iReceiver;
-    private IntentFilter iFilter;
 
     private static Logger log = Logger.getLogger("FluidNexus"); 
 
@@ -144,6 +142,8 @@ public class MainActivity extends ListActivity {
     private static final int DIALOG_REALLY_UNBLACKLIST = 2;
     private static final int DIALOG_NO_KEY = 3;
     private static final int DIALOG_DISCLAIMER = 4;
+    private static final int DIALOG_PASSPHRASE = 5;
+    private static final int DIALOG_CHANGE_PASSPHRASE = 6;
 
     private static final int MENU_ADD_ID = Menu.FIRST;
     private static final int MENU_VIEW_ID = Menu.FIRST + 1;
@@ -152,6 +152,7 @@ public class MainActivity extends ListActivity {
     private static final int MENU_DELETE_ID = Menu.FIRST + 4;
     private static final int MENU_HELP_ID = Menu.FIRST + 5;
     private static final int MENU_BLACKLIST_ID = Menu.FIRST + 5;
+    private static final int MENU_REKEY_ID = Menu.FIRST + 6;
 
     // messages to/from bluetooth service
     Messenger networkService = null;
@@ -210,14 +211,14 @@ public class MainActivity extends ListActivity {
     public class MessagesListAdapter extends SimpleCursorAdapter {
         private Context context = null;
         private int layout;
-        private Cursor c = null;
+        private Cursor localCursor = null;
         private LayoutInflater inflater = null;
 
         public MessagesListAdapter(Context context, int layout, Cursor c, String[] from, int[] to) {
             super(context, layout, c, from, to);
             this.context = context;
             this.layout = layout;
-            this.c = c;
+            this.localCursor = c;
             this.inflater = LayoutInflater.from(context);
         }
 
@@ -225,12 +226,12 @@ public class MainActivity extends ListActivity {
         public View getView(int position, View convertView, ViewGroup parent) {
             convertView = super.getView(position, convertView, parent);
             
-            if (c.moveToPosition(position)) {
+            if (localCursor.moveToPosition(position)) {
                 if (convertView == null) {
                     convertView = inflater.inflate(layout, parent, false);
                 }
 
-                this.setMessageItemValues(convertView, c);
+                this.setMessageItemValues(convertView, localCursor);
             }
             
             return convertView;        
@@ -246,13 +247,13 @@ public class MainActivity extends ListActivity {
             String formattedTime = null;
 
             // Set title 
-            i = cursor.getColumnIndex(MessagesProvider.KEY_TITLE);
+            i = cursor.getColumnIndex(MessagesProviderHelper.KEY_TITLE);
             String title = cursor.getString(i);
             tv = (TextView) v.findViewById(R.id.message_list_item);
             tv.setText(title);
 
             // Set content
-            i = cursor.getColumnIndex(MessagesProvider.KEY_CONTENT);
+            i = cursor.getColumnIndex(MessagesProviderHelper.KEY_CONTENT);
             String fullMessage = cursor.getString(i);
             tv = (TextView) v.findViewById(R.id.message_list_data);
             int stringLen = fullMessage.length();
@@ -263,10 +264,10 @@ public class MainActivity extends ListActivity {
             }
 
             // Set icons
-            i = cursor.getColumnIndex(MessagesProvider.KEY_MINE);
+            i = cursor.getColumnIndex(MessagesProviderHelper.KEY_MINE);
             iv = (ImageView) v.findViewById(R.id.message_list_item_icon);
             int mine = cursor.getInt(i);
-            boolean publicMessage = cursor.getInt(cursor.getColumnIndex(MessagesProvider.KEY_PUBLIC)) > 0;
+            boolean publicMessage = cursor.getInt(cursor.getColumnIndex(MessagesProviderHelper.KEY_PUBLIC)) > 0;
 
             if (mine == 0) {
                 if (publicMessage) {
@@ -283,7 +284,7 @@ public class MainActivity extends ListActivity {
             }
 
             // set created time
-            i = cursor.getColumnIndex(MessagesProvider.KEY_TIME);
+            i = cursor.getColumnIndex(MessagesProviderHelper.KEY_TIME);
             s_float = cursor.getFloat(i);
             s = s_float.longValue() * 1000;
             t = new Time();
@@ -293,7 +294,7 @@ public class MainActivity extends ListActivity {
             tv.setText(formattedTime);
 
             // set received time
-            i = cursor.getColumnIndex(MessagesProvider.KEY_RECEIVED_TIME);
+            i = cursor.getColumnIndex(MessagesProviderHelper.KEY_RECEIVED_TIME);
             s_float = cursor.getFloat(i);
             s = s_float.longValue() * 1000;
             t = new Time();
@@ -303,9 +304,9 @@ public class MainActivity extends ListActivity {
             tv.setText(formattedTime);
 
             // set attachment infos
-            i = cursor.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME);
+            i = cursor.getColumnIndex(MessagesProviderHelper.KEY_ATTACHMENT_ORIGINAL_FILENAME);
             final String attachmentFilename = cursor.getString(i);
-            final String attachmentPath = cursor.getString(cursor.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_PATH));
+            final String attachmentPath = cursor.getString(cursor.getColumnIndex(MessagesProviderHelper.KEY_ATTACHMENT_PATH));
             tv = (TextView) v.findViewById(R.id.message_list_attachment);
 
             if (attachmentFilename.equals("")) {
@@ -316,10 +317,10 @@ public class MainActivity extends ListActivity {
             }
 
             // Set priority
-            i = cursor.getColumnIndex(MessagesProvider.KEY_PRIORITY);
+            i = cursor.getColumnIndex(MessagesProviderHelper.KEY_PRIORITY);
             int priority = cursor.getInt(i);
 
-            if (priority == MessagesProvider.HIGH_PRIORITY) {
+            if (priority == MessagesProviderHelper.HIGH_PRIORITY) {
                 v.setBackgroundResource(R.drawable.message_list_item_high_priority_gradient);
             } else {
                 v.setBackgroundResource(R.drawable.message_list_item_gradient);
@@ -399,11 +400,16 @@ public class MainActivity extends ListActivity {
     public void onCreate(Bundle icicle)
     {
         super.onCreate(icicle);
-        log.verbose("unfreezing...");
 
+        // Load the libs necessary for sqlcipher
+        SQLiteDatabase.loadLibs(this);
+
+        /*
         if (messagesProviderHelper == null) {
             messagesProviderHelper = new MessagesProviderHelper(this);
         }
+        */
+        setupPreferences();
 
         setContentView(R.layout.message_list);
         registerForContextMenu(getListView());
@@ -448,6 +454,12 @@ public class MainActivity extends ListActivity {
             case DIALOG_DISCLAIMER:
                 dialog = disclaimerDialog();
                 break;
+            case DIALOG_PASSPHRASE:
+                dialog = passphraseDialog();
+                break;
+            case DIALOG_CHANGE_PASSPHRASE:
+                dialog = changePassphraseDialog();
+                break;
             default:
                 dialog = null;
         }
@@ -465,9 +477,9 @@ public class MainActivity extends ListActivity {
             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     Cursor localCursor = messagesProviderHelper.returnItemByID(currentRowID);
-                    String attachmentPath = localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_PATH));
-                    boolean mine = localCursor.getInt(localCursor.getColumnIndex(MessagesProvider.KEY_MINE)) > 0;
-                    localCursor.close();
+                    startManagingCursor(localCursor);
+                    String attachmentPath = localCursor.getString(localCursor.getColumnIndex(MessagesProviderHelper.KEY_ATTACHMENT_PATH));
+                    boolean mine = localCursor.getInt(localCursor.getColumnIndex(MessagesProviderHelper.KEY_MINE)) > 0;
                     
                     if ((!(attachmentPath.equals(""))) && (!mine)) {
                         File f = new File(attachmentPath);
@@ -504,7 +516,7 @@ public class MainActivity extends ListActivity {
             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     ContentValues values = new ContentValues();
-                    values.put(MessagesProvider.KEY_BLACKLIST, 1);
+                    values.put(MessagesProviderHelper.KEY_BLACKLIST, 1);
                     messagesProviderHelper.updateItemByID(currentRowID, values);
 
                     currentRowID = -1;
@@ -528,7 +540,7 @@ public class MainActivity extends ListActivity {
             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     ContentValues values = new ContentValues();
-                    values.put(MessagesProvider.KEY_BLACKLIST, 0);
+                    values.put(MessagesProviderHelper.KEY_BLACKLIST, 0);
                     messagesProviderHelper.updateItemByID(currentRowID, values);
 
                     currentRowID = -1;
@@ -574,11 +586,10 @@ public class MainActivity extends ListActivity {
     public void onStart() {
         super.onStart();
 
-        fillListView(VIEW_MODE);
 
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-
-        setupPreferences();
+        
+        //askForPassphrase();
 
         if ((bluetoothAdapter != null) && (askedBluetooth == false)) {
             if (!bluetoothAdapter.isEnabled()) {
@@ -617,21 +628,92 @@ public class MainActivity extends ListActivity {
         lv.setSelection(scrollPos);
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        
-        /*
-        ListView lv;
-        lv = (ListView) getListView();
+    /**
+     * Show the ask for passphrase dialog box
+     */
+    private AlertDialog passphraseDialog() {
+        LayoutInflater factory = LayoutInflater.from(this);
+        final View textEntryView = factory.inflate(R.layout.ask_for_passphrase, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+            .setTitle(getString(R.string.app_name))
+            .setView(textEntryView)
+            .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    EditText et = ((EditText) textEntryView.findViewById(R.id.ask_for_passphrase_edit));
+                    String passphrase = et.getText().toString();
+                    unlockDatabase(passphrase);
 
-        int scroll = lv.getScrollY();
-        log.debug("ON PAUSE: " + scroll);
-        SharedPreferences p = getSharedPreferences("SCROLL", 0);
-        SharedPreferences.Editor e = p.edit();
-        e.putInt("ScrollValue", scroll);
-        e.commit();
-        */
+                    et.setText("");
+                    System.gc();
+                }
+            })
+            .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+
+                }
+            });
+
+        return builder.create();
+    }
+
+    /**
+     * Show the change passphrase dialog box
+     */
+    private AlertDialog changePassphraseDialog() {
+        LayoutInflater factory = LayoutInflater.from(this);
+        final View textEntryView = factory.inflate(R.layout.change_passphrase, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+            .setTitle(getString(R.string.app_name))
+            .setView(textEntryView)
+            .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    EditText et = ((EditText) textEntryView.findViewById(R.id.ask_for_passphrase_edit));
+                    String passphrase = et.getText().toString();
+
+                    rekeyDatabase(passphrase);
+
+                    et.setText("");
+                    System.gc();
+                }
+            })
+            .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+
+                }
+            });
+
+        return builder.create();
+    }
+
+
+    /**
+     * Unlock the database with the provided passphrase 
+     */
+    private void unlockDatabase(String passphrase) {
+        if (messagesProviderHelper == null) {
+            messagesProviderHelper = MessagesProviderHelper.getInstance(this);
+        }
+
+        try {
+            messagesProviderHelper.open(passphrase);
+            fillListView(VIEW_MODE);
+        } catch (Exception e) {
+            Toast.makeText(this, R.string.toast_unable_to_unlock, Toast.LENGTH_LONG).show();
+            showDialog(DIALOG_PASSPHRASE);
+        }
+
+    }
+
+    /**
+     * Rekey the database with the new passphrase
+     */
+    private void rekeyDatabase(String passphrase) {
+        try {
+            messagesProviderHelper.rekey(passphrase);
+        } catch (Exception e) {
+            Toast.makeText(this, R.string.toast_unable_to_rekey, Toast.LENGTH_LONG);
+            log.error("Error rekeying database: " + e.getMessage());
+        }
     }
 
     @Override
@@ -646,6 +728,14 @@ public class MainActivity extends ListActivity {
         lv = (ListView) getListView();
         lv.scrollTo(0, scroll);
         */
+
+        messagesProviderHelper = MessagesProviderHelper.getInstance(this);
+        if (!messagesProviderHelper.isOpen()) {
+            showDialog(DIALOG_PASSPHRASE);
+        } else {
+            fillListView(VIEW_MODE);
+        }
+
 
         // Parse a URI result as sent from the browser on Nexus confirmation
         Uri uri = this.getIntent().getData();
@@ -670,7 +760,10 @@ public class MainActivity extends ListActivity {
     protected void onDestroy() {
         super.onDestroy();
         prefs.unregisterOnSharedPreferenceChangeListener(preferenceChangeListener);
-        c.close();
+        
+        if (c != null) {
+            c.close();
+        }
 
         try {
             if (bound) {
@@ -693,8 +786,9 @@ public class MainActivity extends ListActivity {
         currentRowID = info.id;
         
         Cursor localCursor = messagesProviderHelper.returnItemByID(currentRowID);
-        menu.setHeaderTitle(localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_TITLE)));
-        int mine = localCursor.getInt(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_MINE));
+        startManagingCursor(localCursor);
+        menu.setHeaderTitle(localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProviderHelper.KEY_TITLE)));
+        int mine = localCursor.getInt(localCursor.getColumnIndexOrThrow(MessagesProviderHelper.KEY_MINE));
 
         if (VIEW_MODE == VIEW_BLACKLIST) {
             MenuInflater inflater = getMenuInflater();
@@ -709,7 +803,7 @@ public class MainActivity extends ListActivity {
             }
         }
 
-        localCursor.close();
+        //localCursor.close();
     }
 
     @Override
@@ -771,19 +865,21 @@ public class MainActivity extends ListActivity {
      */
     private void editMessage() {
 
-        Cursor localCursor = messagesProviderHelper.returnItemByID(currentRowID);
+        //Cursor localCursor = messagesProviderHelper.returnItemByID(currentRowID);
 
         Intent i = new Intent(this, EditMessage.class);
-        i.putExtra(MessagesProvider._ID, localCursor.getInt(localCursor.getColumnIndex(MessagesProvider._ID)));
-        i.putExtra(MessagesProvider.KEY_TYPE, localCursor.getInt(localCursor.getColumnIndex(MessagesProvider.KEY_TYPE)));
-        i.putExtra(MessagesProvider.KEY_PRIORITY, localCursor.getInt(localCursor.getColumnIndex(MessagesProvider.KEY_PRIORITY)));
-        i.putExtra(MessagesProvider.KEY_TITLE, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_TITLE)));
-        i.putExtra(MessagesProvider.KEY_CONTENT, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_CONTENT)));
-        i.putExtra(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME)));
-        i.putExtra(MessagesProvider.KEY_ATTACHMENT_PATH, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_PATH)));
-        i.putExtra(MessagesProvider.KEY_PUBLIC, localCursor.getInt(localCursor.getColumnIndex(MessagesProvider.KEY_PUBLIC)) > 0);
+        i.putExtra(MessagesProviderHelper.KEY_ID, currentRowID);
+        /*
+        i.putExtra(MessagesProviderHelper.KEY_TYPE, localCursor.getInt(localCursor.getColumnIndex(MessagesProviderHelper.KEY_TYPE)));
+        i.putExtra(MessagesProviderHelper.KEY_PRIORITY, localCursor.getInt(localCursor.getColumnIndex(MessagesProviderHelper.KEY_PRIORITY)));
+        i.putExtra(MessagesProviderHelper.KEY_TITLE, localCursor.getString(localCursor.getColumnIndex(MessagesProviderHelper.KEY_TITLE)));
+        i.putExtra(MessagesProviderHelper.KEY_CONTENT, localCursor.getString(localCursor.getColumnIndex(MessagesProviderHelper.KEY_CONTENT)));
+        i.putExtra(MessagesProviderHelper.KEY_ATTACHMENT_ORIGINAL_FILENAME, localCursor.getString(localCursor.getColumnIndex(MessagesProviderHelper.KEY_ATTACHMENT_ORIGINAL_FILENAME)));
+        i.putExtra(MessagesProviderHelper.KEY_ATTACHMENT_PATH, localCursor.getString(localCursor.getColumnIndex(MessagesProviderHelper.KEY_ATTACHMENT_PATH)));
+        i.putExtra(MessagesProviderHelper.KEY_PUBLIC, localCursor.getInt(localCursor.getColumnIndex(MessagesProviderHelper.KEY_PUBLIC)) > 0);
+        */
 
-        localCursor.close();
+        //localCursor.close();
         startActivityForResult(i, ACTIVITY_EDIT_MESSAGE);
 
     }
@@ -797,9 +893,12 @@ public class MainActivity extends ListActivity {
             prefsEditor.putBoolean("FirstRun", false);
             prefsEditor.commit();
 
-            messagesProviderHelper.initialPopulate();            
-            fillListView(VIEW_MODE);
-            showDialog(DIALOG_DISCLAIMER);
+            showDialog(DIALOG_PASSPHRASE);
+
+            if (messagesProviderHelper != null) {
+                messagesProviderHelper.initialPopulate();            
+                fillListView(VIEW_MODE);
+            }
         }
         
         showMessages = prefs.getBoolean("showMessagesPref", true);
@@ -1013,6 +1112,9 @@ public class MainActivity extends ListActivity {
             case R.id.menu_preferences:
                 editPreferences();
                 return true;
+            case R.id.menu_change_passphrase:
+                showDialog(DIALOG_CHANGE_PASSPHRASE);
+                return true;
             case R.id.menu_discoverable:
                 if (bluetoothAdapter != null) {
                     i = new Intent();
@@ -1041,23 +1143,24 @@ public class MainActivity extends ListActivity {
     protected void onListItemClick(ListView l, View v, int position, long id) {
         // We will need to be careful later here about the different uses of position and rowID
         super.onListItemClick(l, v, position, id);
-        Cursor localCursor = messagesProviderHelper.returnItemByID(id);
+        //Cursor localCursor = messagesProviderHelper.returnItemByID(id);
+        //startManagingCursor(localCursor);
         //localCursor.moveToPosition(position);
 
         Intent i = new Intent(this, ViewMessage.class);
-        i.putExtra(MessagesProvider._ID, localCursor.getInt(localCursor.getColumnIndex(MessagesProvider._ID)));
-        i.putExtra(MessagesProvider.KEY_TITLE, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_TITLE)));
-        i.putExtra(MessagesProvider.KEY_CONTENT, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_CONTENT)));
-        i.putExtra(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME)));
-        i.putExtra(MessagesProvider.KEY_MINE, localCursor.getInt(localCursor.getColumnIndex(MessagesProvider.KEY_MINE)) > 0);
-        i.putExtra(MessagesProvider.KEY_PUBLIC, localCursor.getInt(localCursor.getColumnIndex(MessagesProvider.KEY_PUBLIC)) > 0);
-        i.putExtra(MessagesProvider.KEY_ATTACHMENT_PATH, localCursor.getString(localCursor.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_PATH)));
-        i.putExtra(MessagesProvider.KEY_TIME, localCursor.getFloat(localCursor.getColumnIndex(MessagesProvider.KEY_TIME)));
-        i.putExtra(MessagesProvider.KEY_RECEIVED_TIME, localCursor.getFloat(localCursor.getColumnIndex(MessagesProvider.KEY_RECEIVED_TIME)));
-        i.putExtra(MessagesProvider.KEY_PRIORITY, localCursor.getInt(localCursor.getColumnIndex(MessagesProvider.KEY_PRIORITY)));
-        c.close();
+        i.putExtra(MessagesProviderHelper.KEY_ID, id);
+        /*
+        i.putExtra(MessagesProviderHelper.KEY_TITLE, localCursor.getString(localCursor.getColumnIndex(MessagesProviderHelper.KEY_TITLE)));
+        i.putExtra(MessagesProviderHelper.KEY_CONTENT, localCursor.getString(localCursor.getColumnIndex(MessagesProviderHelper.KEY_CONTENT)));
+        i.putExtra(MessagesProviderHelper.KEY_ATTACHMENT_ORIGINAL_FILENAME, localCursor.getString(localCursor.getColumnIndex(MessagesProviderHelper.KEY_ATTACHMENT_ORIGINAL_FILENAME)));
+        i.putExtra(MessagesProviderHelper.KEY_MINE, localCursor.getInt(localCursor.getColumnIndex(MessagesProviderHelper.KEY_MINE)) > 0);
+        i.putExtra(MessagesProviderHelper.KEY_PUBLIC, localCursor.getInt(localCursor.getColumnIndex(MessagesProviderHelper.KEY_PUBLIC)) > 0);
+        i.putExtra(MessagesProviderHelper.KEY_ATTACHMENT_PATH, localCursor.getString(localCursor.getColumnIndex(MessagesProviderHelper.KEY_ATTACHMENT_PATH)));
+        i.putExtra(MessagesProviderHelper.KEY_TIME, localCursor.getFloat(localCursor.getColumnIndex(MessagesProviderHelper.KEY_TIME)));
+        i.putExtra(MessagesProviderHelper.KEY_RECEIVED_TIME, localCursor.getFloat(localCursor.getColumnIndex(MessagesProviderHelper.KEY_RECEIVED_TIME)));
+        i.putExtra(MessagesProviderHelper.KEY_PRIORITY, localCursor.getInt(localCursor.getColumnIndex(MessagesProviderHelper.KEY_PRIORITY)));
+        */
         startActivityForResult(i, ACTIVITY_VIEW_MESSAGE);
-        localCursor.close();
     }
 
     @Override
@@ -1126,137 +1229,32 @@ public class MainActivity extends ListActivity {
         }
 
 
-        String[] from = new String[] {MessagesProvider.KEY_TITLE, MessagesProvider.KEY_CONTENT, MessagesProvider.KEY_MINE, MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME, MessagesProvider.KEY_TIME, MessagesProvider.KEY_RECEIVED_TIME, MessagesProvider.KEY_PRIORITY};
-        //String[] projection = new String[] {MessagesProvider._ID, MessagesProvider.KEY_TITLE, MessagesProvider.KEY_CONTENT, MessagesProvider.KEY_MINE, MessagesProvider.KEY_ATTACHMENT_PATH, MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME, MessagesProvider.KEY_PUBLIC};
+        String[] from = new String[] {MessagesProviderHelper.KEY_TITLE, MessagesProviderHelper.KEY_CONTENT, MessagesProviderHelper.KEY_MINE, MessagesProviderHelper.KEY_ATTACHMENT_ORIGINAL_FILENAME, MessagesProviderHelper.KEY_TIME, MessagesProviderHelper.KEY_RECEIVED_TIME, MessagesProviderHelper.KEY_PRIORITY};
+        //String[] projection = new String[] {MessagesProviderHelper._ID, MessagesProviderHelper.KEY_TITLE, MessagesProviderHelper.KEY_CONTENT, MessagesProviderHelper.KEY_MINE, MessagesProviderHelper.KEY_ATTACHMENT_PATH, MessagesProviderHelper.KEY_ATTACHMENT_ORIGINAL_FILENAME, MessagesProviderHelper.KEY_PUBLIC};
         int[] to = new int[] {R.id.message_list_item, R.id.message_list_data, R.id.message_list_item_icon, R.id.message_list_attachment, R.id.message_list_created_time, R.id.message_list_received_time, R.id.message_list_item};
         
         if (viewType == VIEW_ALL) {
-            // Get the non-blacklisted messages
             c = messagesProviderHelper.allNoBlacklist();
+            startManagingCursor(c);
         } else if (viewType == VIEW_PUBLIC) {
             c = messagesProviderHelper.publicMessages();
+            startManagingCursor(c);
         } else if (viewType == VIEW_OUTGOING) {
             c = messagesProviderHelper.outgoing();
+            startManagingCursor(c);
         } else if (viewType == VIEW_BLACKLIST) {
             c = messagesProviderHelper.blacklist();
+            startManagingCursor(c);
         } else if (viewType == VIEW_HIGH_PRIORITY) {
             c = messagesProviderHelper.highPriority();
+            startManagingCursor(c);
         }
 
-        //SimpleCursorAdapter messagesAdapter = new SimpleCursorAdapter(this, R.layout.message_list_item, c, from, to);
         MessagesListAdapter messagesAdapter = new MessagesListAdapter(this, R.layout.message_list_item, c, from, to);
 
         ListView lv;
         lv = (ListView) getListView();
-        //lv.setSelection(0);
         
-        /*
-        messagesAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
-            public boolean setViewValue(View view, Cursor cursor, int i) {
-            
-                if (i == cursor.getColumnIndex(MessagesProvider.KEY_CONTENT)) {
-                    String fullMessage = cursor.getString(i);
-                    TextView tv = (TextView) view;
-                    int stringLen = fullMessage.length();
-                    if (stringLen < MESSAGE_VIEW_LENGTH) {
-                        tv.setText(fullMessage);
-                    } else {
-                        tv.setText(fullMessage.substring(0, MESSAGE_VIEW_LENGTH) + " ...");
-                    }
-
-                    return true;
-                }
-
-                if (i == cursor.getColumnIndex(MessagesProvider.KEY_PRIORITY)) {
-                    TextView tv = (TextView) view;
-
-                    int priority = cursor.getInt(cursor.getColumnIndex(MessagesProvider.KEY_PRIORITY));
-
-                    if (priority == MessagesProvider.NORMAL_PRIORITY) {
-                        tv.setVisibility(View.GONE);
-                    } else if (priority == MessagesProvider.HIGH_PRIORITY) {
-                        tv.setVisibility(View.VISIBLE);
-                        tv.setText("!!!!!");
-                    }
-
-                    return true;
-
-                }
-
-                if (i == cursor.getColumnIndex(MessagesProvider.KEY_MINE)) {
-                    ImageView iv = (ImageView) view;
-                    int mine = cursor.getInt(i);
-                    boolean publicMessage = cursor.getInt(cursor.getColumnIndex(MessagesProvider.KEY_PUBLIC)) > 0;
-
-                    if (mine == 0) {
-                        if (publicMessage) {
-                            iv.setImageResource(R.drawable.menu_public_other);
-                        } else {
-                            iv.setImageResource(R.drawable.menu_all);
-                        }
-                    } else if (mine == 1) {
-                        if (publicMessage) {
-
-                            iv.setImageResource(R.drawable.menu_public);
-                        } else {
-                            iv.setImageResource(R.drawable.menu_outgoing);
-                        }
-                    }
-
-                    
-                    
-                    return true;
-                }
-
-                if (i == cursor.getColumnIndex(MessagesProvider.KEY_TIME)) {
-                    Float s_float = cursor.getFloat(i);
-                    Long s = s_float.longValue() * 1000;
-                    Time t = new Time();
-                    t.set(s);
-
-                    TextView timeView = (TextView) view;
-
-                    String formattedTime = t.format(getString(R.string.message_list_created_time) + " %c");
-                    timeView.setText(formattedTime);
-
-                    return true;
-                }
-
-                if (i == cursor.getColumnIndex(MessagesProvider.KEY_RECEIVED_TIME)) {
-                    Float s_float = cursor.getFloat(i);
-                    Long s = s_float.longValue() * 1000;
-                    Time t = new Time();
-                    t.set(s);
-
-                    TextView timeView = (TextView) view;
-
-                    String formattedTime = t.format(getString(R.string.message_list_received_time) + " %c");
-                    timeView.setText(formattedTime);
-
-                    return true;
-                }
-
-
-                if (i == cursor.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME)) {
-
-                    final String attachmentFilename = cursor.getString(i);
-                    final String attachmentPath = cursor.getString(cursor.getColumnIndex(MessagesProvider.KEY_ATTACHMENT_PATH));
-                    TextView viewAttachment = (TextView) view;
-                   
-                    if (attachmentFilename.equals("")) {
-                        viewAttachment.setVisibility(View.GONE);
-                    } else {
-                        viewAttachment.setVisibility(View.VISIBLE);
-                        viewAttachment.setText("Has attachment: " + attachmentFilename);
-                    }
-
-                    return true;
-
-                }
-                return false;
-            }
-        });
-        */
         setListAdapter(messagesAdapter);
 
     }

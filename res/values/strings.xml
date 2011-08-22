@@ -9,6 +9,8 @@
   <string name="app_name">Fluid Nexus</string>
   <string name="settings_title">Settings (Fluid Nexus)</string>
   <string name="message_view_title">View Message (Fluid Nexus)</string>
+  <string name="ask_for_passphrase">Enter your passphrase:</string>
+  <string name="change_passphrase">Enter your new passphrase:</string>
   <string name="help_title">Help (Fluid Nexus)</string>
   <string name="about_title">About (Fluid Nexus)</string>
   <string name="message_add_outgoing_title">New Message (Fluid Nexus)</string>
@@ -32,6 +34,7 @@
   <string name="menu_blacklist">Blacklist Message</string>
   <string name="menu_unblacklist">Unblacklist Message</string>
   <string name="menu_edit">Edit Message</string>
+  <string name="menu_change_passphrase">Change Passphrase</string>
   <string name="menu_preferences">Preferences</string>
   <string name="menu_discoverable">Make discoverable</string>
   <string name="menu_request_authorization">Request Nexus Authorization</string>
@@ -78,6 +81,8 @@
   <string name="toast_discoverable_ok">Device set to be discoverable for %d seconds.</string>
   <string name="toast_discoverable_notok">Device not set to be discoverable</string>
   <string name="toast_wifi_not_enabled">Wifi is not enabled; zeroconf service cannot start.</string>
+  <string name="toast_unable_to_unlock">Unable to unlock the messages database; are you sure you entered the right passphrase?</string>
+  <string name="toast_unable_to_rekey">Unable to change the passphrase; please send us a bug report with the information from logcat.</string>
   <string name="intent_new_message">net.fluidnexus.FluidNexusAndroid.NEW_MESSAGE</string>
   <string name="intent_discovery_started">net.fluidnexus.FluidNexusAndroid.DISCOVERY_STARTED</string>
   <string name="intent_device_found">net.fluidnexus.FluidNexusAndroid.REMOTE_DEVICE_FOUND</string>

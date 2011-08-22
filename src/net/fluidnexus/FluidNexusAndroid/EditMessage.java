@@ -53,7 +53,6 @@ import android.widget.Toast;
 
 import java.io.File;
 
-import net.fluidnexus.FluidNexusAndroid.provider.MessagesProvider;
 import net.fluidnexus.FluidNexusAndroid.provider.MessagesProviderHelper;
 
 public class EditMessage extends Activity {
@@ -104,7 +103,11 @@ public class EditMessage extends Activity {
 
         super.onCreate(icicle);
 
-        messagesProviderHelper = new MessagesProviderHelper(this);
+        //messagesProviderHelper = new MessagesProviderHelper(this);
+        if (messagesProviderHelper == null) {
+            messagesProviderHelper = MessagesProviderHelper.getInstance(getApplicationContext());
+        }
+
 
         setContentView(R.layout.message_edit);
         setTitle(R.string.message_edit_title);
@@ -133,14 +136,18 @@ public class EditMessage extends Activity {
         prioritySpinner.setAdapter(priorityAdapter);
 
         if (extras != null) {
-            id = extras.getInt(MessagesProvider._ID);
-            originalTitle = extras.getString(MessagesProvider.KEY_TITLE);
-            originalMessage = extras.getString(MessagesProvider.KEY_CONTENT); 
-            originalAttachmentPath = extras.getString(MessagesProvider.KEY_ATTACHMENT_PATH); 
-            originalAttachmentOriginalFilename = extras.getString(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME); 
-            originalType = extras.getInt(MessagesProvider.KEY_TYPE); 
-            originalPriority = extras.getInt(MessagesProvider.KEY_PRIORITY); 
-            originalPublic = extras.getBoolean(MessagesProvider.KEY_PUBLIC); 
+            id = extras.getLong(MessagesProviderHelper.KEY_ID);
+
+            Cursor localCursor = MessagesProviderHelper.getInstance(this).returnItemByID(id);
+            startManagingCursor(localCursor);
+
+            originalTitle = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProviderHelper.KEY_TITLE));
+            originalMessage = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProviderHelper.KEY_CONTENT)); 
+            originalAttachmentPath = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProviderHelper.KEY_ATTACHMENT_PATH)); 
+            originalAttachmentOriginalFilename = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProviderHelper.KEY_ATTACHMENT_ORIGINAL_FILENAME)); 
+            originalType = localCursor.getInt(localCursor.getColumnIndexOrThrow(MessagesProviderHelper.KEY_TYPE)); 
+            originalPriority = localCursor.getInt(localCursor.getColumnIndexOrThrow(MessagesProviderHelper.KEY_PRIORITY)); 
+            originalPublic = localCursor.getInt(localCursor.getColumnIndexOrThrow(MessagesProviderHelper.KEY_PUBLIC)) > 0; 
             attachmentType = originalType;
             priorityType = originalPriority;
             
@@ -343,22 +350,22 @@ public class EditMessage extends Activity {
         String message = messageEditText.getText().toString();
 
         ContentValues values = new ContentValues();
-        values.put(MessagesProvider.KEY_TITLE, title);
-        values.put(MessagesProvider.KEY_CONTENT, message);
-        values.put(MessagesProvider.KEY_MESSAGE_HASH, MessagesProviderHelper.makeSHA256(title + message));
-        values.put(MessagesProvider.KEY_PUBLIC, publicMessage);
-        values.put(MessagesProvider.KEY_PRIORITY, priorityType);
+        values.put(MessagesProviderHelper.KEY_TITLE, title);
+        values.put(MessagesProviderHelper.KEY_CONTENT, message);
+        values.put(MessagesProviderHelper.KEY_MESSAGE_HASH, MessagesProviderHelper.makeSHA256(title + message));
+        values.put(MessagesProviderHelper.KEY_PUBLIC, publicMessage);
+        values.put(MessagesProviderHelper.KEY_PRIORITY, priorityType);
 
         if (attachmentPath != null) {
             if (attachmentPath.equals("")) {
-                values.put(MessagesProvider.KEY_ATTACHMENT_PATH, "");
-                values.put(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME, "");
+                values.put(MessagesProviderHelper.KEY_ATTACHMENT_PATH, "");
+                values.put(MessagesProviderHelper.KEY_ATTACHMENT_ORIGINAL_FILENAME, "");
 
             } else {
                 File file = new File(attachmentPath);
-                values.put(MessagesProvider.KEY_ATTACHMENT_PATH, attachmentPath);
-                values.put(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME, file.getName());
-                values.put(MessagesProvider.KEY_TYPE, attachmentType);
+                values.put(MessagesProviderHelper.KEY_ATTACHMENT_PATH, attachmentPath);
+                values.put(MessagesProviderHelper.KEY_ATTACHMENT_ORIGINAL_FILENAME, file.getName());
+                values.put(MessagesProviderHelper.KEY_TYPE, attachmentType);
             }
         }
 

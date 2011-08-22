@@ -69,7 +69,6 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
 
-import net.fluidnexus.FluidNexusAndroid.provider.MessagesProvider;
 import net.fluidnexus.FluidNexusAndroid.provider.MessagesProviderHelper;
 import net.fluidnexus.FluidNexusAndroid.Logger;
 import net.fluidnexus.FluidNexusAndroid.MainActivity;
@@ -116,7 +115,11 @@ public class ServiceThread extends Thread {
         
         context = ctx;
         clients = givenClients;
-        messagesProviderHelper = new MessagesProviderHelper(context);
+        //messagesProviderHelper = new MessagesProviderHelper(context);
+        if (messagesProviderHelper == null) {
+            messagesProviderHelper = MessagesProviderHelper.getInstance(context);
+        }
+
 
         setName("GenericServiceThread");
 
@@ -180,7 +183,7 @@ public class ServiceThread extends Thread {
 
         while (hashesCursor.isAfterLast() == false) {
             // Get the hash from the cursor
-            currentHashes.add(hashesCursor.getString(hashesCursor.getColumnIndex(MessagesProvider.KEY_MESSAGE_HASH)));
+            currentHashes.add(hashesCursor.getString(hashesCursor.getColumnIndex(MessagesProviderHelper.KEY_MESSAGE_HASH)));
             hashesCursor.moveToNext();
         }
         hashesCursor.close();
@@ -195,7 +198,7 @@ public class ServiceThread extends Thread {
         dataCursor.moveToFirst();
         currentData.clear();
 
-        String[] fields = new String[] {MessagesProvider.KEY_MESSAGE_HASH, MessagesProvider.KEY_TIME, MessagesProvider.KEY_TITLE, MessagesProvider.KEY_CONTENT};
+        String[] fields = new String[] {MessagesProviderHelper.KEY_MESSAGE_HASH, MessagesProviderHelper.KEY_TIME, MessagesProviderHelper.KEY_TITLE, MessagesProviderHelper.KEY_CONTENT};
         while (dataCursor.isAfterLast() == false) {
             // I'm still not sure why I have to instantiate a new vector each time here, rather than using the local vector from earlier
             // This is one of those things of java that just makes me want to pull my hair out...

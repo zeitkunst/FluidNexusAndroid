@@ -56,7 +56,6 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
 
-import net.fluidnexus.FluidNexusAndroid.provider.MessagesProvider;
 import net.fluidnexus.FluidNexusAndroid.provider.MessagesProviderHelper;
 import net.fluidnexus.FluidNexusAndroid.Logger;
 import net.fluidnexus.FluidNexusAndroid.Protos;
@@ -136,7 +135,11 @@ public class ProtocolThread extends Thread {
         context = ctx;
 
         // setup database object
-        messagesProviderHelper = new MessagesProviderHelper(context);
+        //messagesProviderHelper = new MessagesProviderHelper(context);
+        if (messagesProviderHelper == null) {
+            messagesProviderHelper = MessagesProviderHelper.getInstance(context);
+        }
+
 
         //updateHashes();
         //updateData();
@@ -238,7 +241,7 @@ public class ProtocolThread extends Thread {
 
         while (hashesCursor.isAfterLast() == false) {
             // Get the hash from the cursor
-            currentHashes.add(hashesCursor.getString(hashesCursor.getColumnIndex(MessagesProvider.KEY_MESSAGE_HASH)));
+            currentHashes.add(hashesCursor.getString(hashesCursor.getColumnIndex(MessagesProviderHelper.KEY_MESSAGE_HASH)));
             hashesCursor.moveToNext();
         }
         hashesCursor.close();
@@ -255,7 +258,7 @@ public class ProtocolThread extends Thread {
         dataCursor.moveToFirst();
         currentData.clear();
 
-        String[] fields = new String[] {MessagesProvider.KEY_MESSAGE_HASH, MessagesProvider.KEY_TIME, MessagesProvider.KEY_RECEIVED_TIME, MessagesProvider.KEY_TITLE, MessagesProvider.KEY_CONTENT};
+        String[] fields = new String[] {MessagesProviderHelper.KEY_MESSAGE_HASH, MessagesProviderHelper.KEY_TIME, MessagesProviderHelper.KEY_RECEIVED_TIME, MessagesProviderHelper.KEY_TITLE, MessagesProviderHelper.KEY_CONTENT};
         while (dataCursor.isAfterLast() == false) {
             // I'm still not sure why I have to instantiate a new vector each time here, rather than using the local vector from earlier
             // This is one of those things of java that just makes me want to pull my hair out...
@@ -499,16 +502,16 @@ public class ProtocolThread extends Thread {
 
                 Cursor localCursor = messagesProviderHelper.returnItemBasedOnHash(currentHash);
     
-                String title = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_TITLE));
-                String content = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_CONTENT));
-                Float timestamp = localCursor.getFloat(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_TIME));
-                Float received_timestamp = localCursor.getFloat(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_RECEIVED_TIME));
-                String attachmentPath = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_ATTACHMENT_PATH));
-                String attachmentOriginalFilename = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_ATTACHMENT_ORIGINAL_FILENAME));
-                boolean publicMessage = (localCursor.getInt(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_PUBLIC)) != 0);
-                Integer ttl = localCursor.getInt(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_TTL));
-                Integer message_type = localCursor.getInt(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_TYPE));
-                Integer message_priority = localCursor.getInt(localCursor.getColumnIndexOrThrow(MessagesProvider.KEY_PRIORITY));
+                String title = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProviderHelper.KEY_TITLE));
+                String content = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProviderHelper.KEY_CONTENT));
+                Float timestamp = localCursor.getFloat(localCursor.getColumnIndexOrThrow(MessagesProviderHelper.KEY_TIME));
+                Float received_timestamp = localCursor.getFloat(localCursor.getColumnIndexOrThrow(MessagesProviderHelper.KEY_RECEIVED_TIME));
+                String attachmentPath = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProviderHelper.KEY_ATTACHMENT_PATH));
+                String attachmentOriginalFilename = localCursor.getString(localCursor.getColumnIndexOrThrow(MessagesProviderHelper.KEY_ATTACHMENT_ORIGINAL_FILENAME));
+                boolean publicMessage = (localCursor.getInt(localCursor.getColumnIndexOrThrow(MessagesProviderHelper.KEY_PUBLIC)) != 0);
+                Integer ttl = localCursor.getInt(localCursor.getColumnIndexOrThrow(MessagesProviderHelper.KEY_TTL));
+                Integer message_type = localCursor.getInt(localCursor.getColumnIndexOrThrow(MessagesProviderHelper.KEY_TYPE));
+                Integer message_priority = localCursor.getInt(localCursor.getColumnIndexOrThrow(MessagesProviderHelper.KEY_PRIORITY));
                 localCursor.close();
 
                 messageBuilder.setMessageTitle(title);
