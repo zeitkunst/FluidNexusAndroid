@@ -11,7 +11,7 @@
         android:background="@color/light_grey"
         android:id="@+id/welcome_title"
         android:textStyle="bold"
-        android:textSize="18pt"
+        android:textSize="14pt"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
@@ -40,10 +40,12 @@
 
                 <TextView
                     android:id="@+id/welcome_text"
-                    android:textSize="14pt"
+                    android:textSize="10pt"
                     android:textColor="@color/text_color" 
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:autoLink="web"
+                    android:linksClickable="true"
                     android:text="To be replaced.">
                 </TextView>
             </ScrollView>

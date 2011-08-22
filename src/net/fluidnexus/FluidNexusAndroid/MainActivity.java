@@ -171,6 +171,7 @@ public class MainActivity extends ListActivity {
     private boolean enableZeroconfServicePref = true;
     private boolean enableNexusServicePref = true;
     private boolean vibratePref = false;
+    private boolean firstRun = false;
 
     private Vibrator vibrator = null;
 
@@ -308,6 +309,8 @@ public class MainActivity extends ListActivity {
         attachmentsDir.mkdirs();
 
         setupPreferences();
+
+
     }
 
     /**
@@ -465,27 +468,23 @@ public class MainActivity extends ListActivity {
     @Override 
     public void onStart() {
         super.onStart();
+        log.debug("in on start");
 
 
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         
-        //askForPassphrase();
-
         if ((bluetoothAdapter != null) && (askedBluetooth == false)) {
             if (!bluetoothAdapter.isEnabled()) {
                 Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
-            } else {
-                /*
-                if (networkService == null) {
-                    setupFluidNexusBluetoothService();
-                }
-                */
             }
         }
 
-        // Bind to the network service
-        doBindService();
+        if (firstRun == true) {
+            Intent i = new Intent(this, WelcomeActivity.class);
+            startActivityForResult(i, ACTIVITY_WELCOME_ACTIVITY);
+        } else {
+        }
     }
 
     @Override
@@ -577,6 +576,9 @@ public class MainActivity extends ListActivity {
         try {
             messagesProviderHelper.open(passphrase);
             fillListView(VIEW_MODE);
+
+            // Bind to the network service
+            doBindService();
         } catch (Exception e) {
             Toast.makeText(this, R.string.toast_unable_to_unlock, Toast.LENGTH_LONG).show();
             passphraseDialog().show();
@@ -599,6 +601,7 @@ public class MainActivity extends ListActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        log.debug("in on resume");
         
         /*
         SharedPreferences p = getSharedPreferences("SCROLL", 0);
@@ -611,9 +614,13 @@ public class MainActivity extends ListActivity {
 
         messagesProviderHelper = MessagesProviderHelper.getInstance(this);
         if (!messagesProviderHelper.isOpen()) {
-            showDialog(DIALOG_PASSPHRASE);
+            if (firstRun != true) {
+                showDialog(DIALOG_PASSPHRASE);
+            }
         } else {
             fillListView(VIEW_MODE);
+
+
         }
 
 
@@ -753,8 +760,7 @@ public class MainActivity extends ListActivity {
 
     private void setupPreferences() {
         prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        boolean firstRun = prefs.getBoolean("FirstRun", true);
-
+        firstRun = prefs.getBoolean("FirstRun", true);
         
         showMessages = prefs.getBoolean("showMessagesPref", true);
         sendBlacklist = prefs.getBoolean("sendBlacklistPref", false);
@@ -857,22 +863,6 @@ public class MainActivity extends ListActivity {
         };
         prefs.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
 
-        if (firstRun == true) {
-            Intent i = new Intent(this, WelcomeActivity.class);
-            startActivityForResult(i, ACTIVITY_WELCOME_ACTIVITY);
-            /*
-            prefsEditor = prefs.edit();
-            prefsEditor.putBoolean("FirstRun", false);
-            prefsEditor.commit();
-
-            showDialog(DIALOG_PASSPHRASE);
-
-            if (messagesProviderHelper != null) {
-                messagesProviderHelper.initialPopulate();            
-                fillListView(VIEW_MODE);
-            }
-            */
-        }
 
     }
 
@@ -1030,9 +1020,11 @@ public class MainActivity extends ListActivity {
                 fillListView(VIEW_MODE);
                 break;
             case(ACTIVITY_WELCOME_ACTIVITY):
-                //prefsEditor = prefs.edit();
-                //prefsEditor.putBoolean("FirstRun", false);
-                //prefsEditor.commit();
+                prefsEditor = prefs.edit();
+                prefsEditor.putBoolean("FirstRun", false);
+                prefsEditor.commit();
+
+                firstRun = false;
                 
                 //AlertDialog passphraseDialog = passphraseDialog();
                 //passphraseDialog.show();
@@ -1097,7 +1089,6 @@ public class MainActivity extends ListActivity {
 
 
         String[] from = new String[] {MessagesProviderHelper.KEY_TITLE, MessagesProviderHelper.KEY_CONTENT, MessagesProviderHelper.KEY_MINE, MessagesProviderHelper.KEY_ATTACHMENT_ORIGINAL_FILENAME, MessagesProviderHelper.KEY_TIME, MessagesProviderHelper.KEY_RECEIVED_TIME, MessagesProviderHelper.KEY_PRIORITY};
-        //String[] projection = new String[] {MessagesProviderHelper._ID, MessagesProviderHelper.KEY_TITLE, MessagesProviderHelper.KEY_CONTENT, MessagesProviderHelper.KEY_MINE, MessagesProviderHelper.KEY_ATTACHMENT_PATH, MessagesProviderHelper.KEY_ATTACHMENT_ORIGINAL_FILENAME, MessagesProviderHelper.KEY_PUBLIC};
         int[] to = new int[] {R.id.message_list_item, R.id.message_list_data, R.id.message_list_item_icon, R.id.message_list_attachment, R.id.message_list_created_time, R.id.message_list_received_time, R.id.message_list_item};
         
         if (viewType == VIEW_ALL) {

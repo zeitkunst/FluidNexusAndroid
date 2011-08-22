@@ -27,6 +27,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.RemoteException;
+import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -35,6 +36,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class WelcomeActivity extends Activity {
@@ -51,8 +53,8 @@ public class WelcomeActivity extends Activity {
     // Messages shown on each page
     private int messages[] = {
         R.string.welcome_welcome_message,
-        R.string.welcome_concept_message,
-        R.string.welcome_security_message,
+        R.string.about_text,
+        R.string.disclaimer_dialog,
         R.string.welcome_passphrase_message
     };
 
@@ -154,11 +156,16 @@ public class WelcomeActivity extends Activity {
     }
 
     private void showPage(int currentPage) {
+        ScrollView sv = (ScrollView) findViewById(R.id.welcome_scrollview);
+
         TextView title = (TextView) findViewById(R.id.welcome_title);
         title.setText(getString(titles[currentPage]));
 
         TextView message = (TextView) findViewById(R.id.welcome_text);
-        message.setText(getString(messages[currentPage]));
+        message.setText(Html.fromHtml(getString(messages[currentPage])));
+        
+        // Reset scroll
+        sv.scrollTo(0, 0);
 
         Button button1 = (Button) findViewById(R.id.welcome_button1);
         if (buttons[currentPage][0] != null) {

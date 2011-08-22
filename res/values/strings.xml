@@ -4,10 +4,10 @@
   <string name="welcome_concept_title">The Concept</string>
   <string name="welcome_security_title">Fluid Nexus Security</string>
   <string name="welcome_passphrase_title">Passphrase Selection</string>
-  <string name="welcome_welcome_message">Welcome</string>
+  <string name="welcome_welcome_message">Please read the following information carefully.  If you have questions or concerns, please contact fluidnexus@fluidnexus.net.</string>
   <string name="welcome_concept_message">Concept</string>
   <string name="welcome_security_message">Security</string>
-  <string name="welcome_passphrase_message">Passphrase</string>
+  <string name="welcome_passphrase_message">Messages you received are saved to your internal storage encrypted.  You must choose a strong passphrase to protect this storage.  If you forget the passphrase you will not be able to access these messages again; you will be required to uninstall and reinstall Fluid Nexus, losing all created and received messages and attachments.  Please choose something that is easy to remember; four (4) to six (6) random words in a row should be strong enough.  You can change this passphrase at any time from within the application.  Tap or click "Choose Passphrase" to set your passphrase.</string>
   <string name="button_back">Back</string>
   <string name="button_next">Next</string>
   <string name="button_choose_passphrase">Choose Passphrase</string>
@@ -55,7 +55,7 @@
   <string name="really_blacklist_dialog">Are you sure you want to blacklist this message?</string>
   <string name="really_unblacklist_dialog">Are you sure you want to remove this message from the blacklist?</string>
   <string name="no_key_dialog">No Nexus Key or Nexus Secret exists. These are necessary in order to request authorization. Please visit http://fluidnexus.net and create an account (or login to an existing one) and request a Nexus Key and Secret. If you already have a Key and Secret, please enter them into the Preferences.</string>
-  <string name="disclaimer_dialog">Fluid Nexus works on a broadcast model.  This means that any other device running the software can receive the messages you create.  Therefore, messages are sent unencrypted.  IT IS NOT DESIGNED FOR SECURE COMMUNICATIONS.  IT IS DESIGNED FOR SPREADING NECESSARY TEXT, AUDIO, IMAGES, AND VIDEO AS WIDE AS POSSIBLE, WHICH MIGHT INCLUDE ADVERSARIES.  You must choose for yourself what network modalities to enable.  You have been warned.</string>
+  <string name="disclaimer_dialog">Fluid Nexus works on a broadcast model.  This means that any other device running the software can receive the messages you create.  Therefore, messages are sent unencrypted.  IT IS NOT DESIGNED FOR SECURE COMMUNICATIONS.  IT IS DESIGNED FOR SPREADING NECESSARY TEXT, AUDIO, IMAGES, AND VIDEO AS WIDE AS POSSIBLE, WHICH MIGHT INCLUDE ADVERSARIES.  You must choose for yourself what network modalities to enable.</string>
   <string name="understand_answer">I understand</string>
   <string name="really_save_dialog">Do you want to save this message?</string>
   <string name="same_dialog">The message you are trying to save already exists in the database; please change the title and/or the content.</string>
