@@ -777,8 +777,10 @@ public class MainActivity extends ListActivity {
                         msg.arg1 = (prefs.getBoolean("enableBluetoothServicePref", false))? 1 : 0;
                         msg.arg2 = Integer.parseInt(prefs.getString("bluetoothScanFrequency", "300"));
                         msg.replyTo = messenger;
-                        networkService.send(msg);
-                        enableBluetoothServicePref = tmp;
+                        if (networkService != null) {
+                            networkService.send(msg);
+                            enableBluetoothServicePref = tmp;
+                        }
                     } catch (RemoteException e) {
                         log.error("Unable to send MSG_BLUETOOTH_ENABLED");
                     }
@@ -790,8 +792,10 @@ public class MainActivity extends ListActivity {
                         msg.arg1 = (prefs.getBoolean("enableZeroconfServicePref", false))? 1 : 0;
                         msg.arg2 = Integer.parseInt(prefs.getString("zeroconfScanFrequency", "300"));
                         msg.replyTo = messenger;
-                        networkService.send(msg);
-                        enableZeroconfServicePref = tmp;
+                        if (networkService != null) {
+                            networkService.send(msg);
+                            enableZeroconfServicePref = tmp;
+                        }
                     } catch (RemoteException e) {
                         log.error("Unable to send MSG_ZEROCONF_ENABLED");
                     }
@@ -805,8 +809,10 @@ public class MainActivity extends ListActivity {
                         // Add preference for this
                         msg.arg2 = Integer.parseInt(prefs.getString("nexusScanFrequency", "300"));
                         msg.replyTo = messenger;
-                        networkService.send(msg);
-                        enableNexusServicePref = tmp;
+                        if (networkService != null) {
+                            networkService.send(msg);
+                            enableNexusServicePref = tmp;
+                        }
                     } catch (RemoteException e) {
                         log.error("Unable to send MSG_NEXUS_ENABLED");
                     }
@@ -815,8 +821,9 @@ public class MainActivity extends ListActivity {
                         Message msg = Message.obtain(null, NetworkService.MSG_BLUETOOTH_SCAN_FREQUENCY);
                         msg.arg1 = Integer.parseInt(prefs.getString("bluetoothScanFrequency", "300"));
                         msg.replyTo = messenger;
-                        networkService.send(msg);
-
+                        if (networkService != null) {
+                            networkService.send(msg);
+                        }
                     } catch (RemoteException e) {
                         log.error("Unable to send scan frequency message: " + e);
                     }
@@ -825,7 +832,9 @@ public class MainActivity extends ListActivity {
                         Message msg = Message.obtain(null, NetworkService.MSG_BLUETOOTH_BONDED_ONLY_FLAG);
                         msg.arg1 = (prefs.getBoolean("bluetoothBondedOnlyFlag", true) ? 1:0);
                         msg.replyTo = messenger;
-                        networkService.send(msg);
+                        if (networkService != null) {
+                            networkService.send(msg);
+                        }
                     } catch (RemoteException e) {
                         log.error("Unable to send bonded only flag message: " + e);
                     }
@@ -834,8 +843,9 @@ public class MainActivity extends ListActivity {
                         Message msg = Message.obtain(null, NetworkService.MSG_ZEROCONF_SCAN_FREQUENCY);
                         msg.arg1 = Integer.parseInt(prefs.getString("zeroconfScanFrequency", "300"));
                         msg.replyTo = messenger;
-                        networkService.send(msg);
-
+                        if (networkService != null) {
+                            networkService.send(msg);
+                        }
                     } catch (RemoteException e) {
                         log.error("Unable to send scan frequency message: " + e);
                     }
@@ -851,7 +861,9 @@ public class MainActivity extends ListActivity {
                         Message msg = Message.obtain(null, NetworkService.MSG_SEND_BLACKLISTED);
                         msg.arg1 = (prefs.getBoolean("sendBlacklistPref", false) ? 1:0);
                         msg.replyTo = messenger;
-                        networkService.send(msg);
+                        if (networkService != null) {
+                            networkService.send(msg);
+                        }
                     } catch (RemoteException e) {
                         log.error("Unable to send bonded only flag message: " + e);
                     }
