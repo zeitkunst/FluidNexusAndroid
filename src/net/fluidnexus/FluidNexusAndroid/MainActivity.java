@@ -234,7 +234,7 @@ public class MainActivity extends ListActivity {
                 
                 // Send bonded only flag
                 msg = Message.obtain(null, NetworkService.MSG_BLUETOOTH_BONDED_ONLY_FLAG);
-                msg.arg1 = (prefs.getBoolean("bluetoothBondedOnlyFlag", false))? 1 : 0;
+                msg.arg1 = (prefs.getBoolean("bluetoothBondedOnlyFlag", true))? 1 : 0;
                 msg.replyTo = messenger;
                 networkService.send(msg);
 
@@ -823,7 +823,7 @@ public class MainActivity extends ListActivity {
                 } else if (key.equals("bluetoothBondedOnlyFlag")) {
                     try {
                         Message msg = Message.obtain(null, NetworkService.MSG_BLUETOOTH_BONDED_ONLY_FLAG);
-                        msg.arg1 = (prefs.getBoolean("bluetoothBondedOnlyFlag", false) ? 1:0);
+                        msg.arg1 = (prefs.getBoolean("bluetoothBondedOnlyFlag", true) ? 1:0);
                         msg.replyTo = messenger;
                         networkService.send(msg);
                     } catch (RemoteException e) {
@@ -1022,6 +1022,7 @@ public class MainActivity extends ListActivity {
             case(ACTIVITY_WELCOME_ACTIVITY):
                 prefsEditor = prefs.edit();
                 prefsEditor.putBoolean("FirstRun", false);
+                prefsEditor.putBoolean("bluetoothBondedOnlyFlag", true);
                 prefsEditor.commit();
 
                 firstRun = false;
