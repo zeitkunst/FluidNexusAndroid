@@ -265,10 +265,8 @@ public class NetworkService extends Service {
                         zeroconfServiceThread.updateData();
                     }
 
-                    log.debug("MSG_NEW_MESSAGE_CREATED received");
                     break;
                 case MainActivity.MSG_MESSAGE_DELETED:
-                    log.debug("MSG_MESSAGE_DELETED received");
                     if (bluetoothServiceThread != null) {
                         bluetoothServiceThread.updateHashes(sendBlacklist);
                         bluetoothServiceThread.updateData();
@@ -291,9 +289,7 @@ public class NetworkService extends Service {
     public void onCreate() {
         nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 
-
         // setup database object
-        //messagesProviderHelper = new MessagesProviderHelper(this);
         if (messagesProviderHelper == null) {
             messagesProviderHelper = MessagesProviderHelper.getInstance(getApplicationContext());
         }

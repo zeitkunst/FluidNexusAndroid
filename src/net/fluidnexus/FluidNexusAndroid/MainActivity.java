@@ -338,7 +338,6 @@ public class MainActivity extends ListActivity {
                 break;
             case DIALOG_PASSPHRASE:
                 dialog = passphraseDialog();
-                log.debug("showing dialog");
                 break;
             case DIALOG_CHANGE_PASSPHRASE:
                 dialog = changePassphraseDialog();
@@ -468,8 +467,6 @@ public class MainActivity extends ListActivity {
     @Override 
     public void onStart() {
         super.onStart();
-        log.debug("in on start");
-
 
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         
@@ -601,7 +598,6 @@ public class MainActivity extends ListActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        log.debug("in on resume");
         
         /*
         SharedPreferences p = getSharedPreferences("SCROLL", 0);
@@ -1035,6 +1031,7 @@ public class MainActivity extends ListActivity {
                 prefsEditor = prefs.edit();
                 prefsEditor.putBoolean("FirstRun", false);
                 prefsEditor.putBoolean("bluetoothBondedOnlyFlag", true);
+                prefsEditor.putBoolean("sendBlacklistPref", false);
                 prefsEditor.commit();
 
                 firstRun = false;
