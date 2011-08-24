@@ -207,7 +207,6 @@ public class MessagesProviderHelper {
     public MessagesProviderHelper open(String password) throws SQLException {
         mDbHelper = new DatabaseHelper(context);
         mDb = mDbHelper.getWritableDatabase(password);
-        System.gc();
         return this;
     }
 

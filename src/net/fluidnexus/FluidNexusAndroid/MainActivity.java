@@ -107,6 +107,11 @@ public class MainActivity extends ListActivity {
     private Cursor c = null;
     private MessagesProviderHelper messagesProviderHelper = null;
 
+    // This has to be attended to carefully
+    // We don't want to keep it around too long, but we need to send it to the service
+    // So immediately after sending it to the service, so that it can be used to open a database there, we set the instance variable to null
+    private String passphrase = null; 
+
     private Toast toast;
     
     private SharedPreferences prefs;
@@ -218,6 +223,17 @@ public class MainActivity extends ListActivity {
                 networkService.send(msg);
                 log.debug("Connected to service");
 
+                // Send database passphrase
+                // CAREFUL
+                // Be sure to take care that the passphrase is removed from memory as quickly as possible 
+                msg = Message.obtain(null, NetworkService.MSG_DATABASE_OPEN);
+                Bundle bundle = new Bundle();
+                bundle.putString("passphrase", passphrase);
+                msg.replyTo = messenger;
+                msg.setData(bundle);
+                networkService.send(msg);
+                passphrase = null;
+
                 // Send send_blacklist flag
                 // This needs to be sent before all others
                 msg = Message.obtain(null, NetworkService.MSG_SEND_BLACKLISTED);
@@ -238,8 +254,6 @@ public class MainActivity extends ListActivity {
                 msg.replyTo = messenger;
                 networkService.send(msg);
 
-
-
                 // Send zeroconf enabled bit on start
                 msg = Message.obtain(null, NetworkService.MSG_ZEROCONF_ENABLED);
                 msg.arg1 = (prefs.getBoolean("enableZeroconfServicePref", false)) ? 1 : 0;
@@ -251,7 +265,7 @@ public class MainActivity extends ListActivity {
                 msg = Message.obtain(null, NetworkService.MSG_NEXUS_ENABLED);
                 msg.arg1 = (prefs.getBoolean("enableNexusServicePref", false)) ? 1 : 0;
                 msg.arg2 = Integer.parseInt(prefs.getString("nexusScanFrequency", "300"));
-                Bundle bundle = new Bundle();
+                bundle = new Bundle();
                 bundle.putString("key", prefs.getString("nexusKeyPref", ""));
                 bundle.putString("secret", prefs.getString("nexusSecretPref", ""));
                 bundle.putString("token", prefs.getString("nexusTokenPref", ""));
@@ -259,6 +273,7 @@ public class MainActivity extends ListActivity {
                 msg.setData(bundle);
                 msg.replyTo = messenger;
                 networkService.send(msg);
+
 
 
             } catch (RemoteException e) {
@@ -516,7 +531,7 @@ public class MainActivity extends ListActivity {
             .setPositiveButton("ok", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
                     EditText et = ((EditText) textEntryView.findViewById(R.id.ask_for_passphrase_edit));
-                    String passphrase = et.getText().toString();
+                    passphrase = et.getText().toString();
                     unlockDatabase(passphrase);
 
                     et.setText("");
@@ -544,7 +559,7 @@ public class MainActivity extends ListActivity {
             .setPositiveButton("ok", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
                     EditText et = ((EditText) textEntryView.findViewById(R.id.ask_for_passphrase_edit));
-                    String passphrase = et.getText().toString();
+                    passphrase = et.getText().toString();
 
                     rekeyDatabase(passphrase);
 

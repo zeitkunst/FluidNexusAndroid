@@ -70,6 +70,7 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
 
+import info.guardianproject.database.sqlcipher.SQLiteDatabase;
 import net.fluidnexus.FluidNexusAndroid.provider.MessagesProviderHelper;
 import net.fluidnexus.FluidNexusAndroid.Logger;
 import net.fluidnexus.FluidNexusAndroid.MainActivity;
@@ -92,7 +93,6 @@ public class NetworkService extends Service {
     private HashSet<String> currentHashes = new HashSet<String>();
     private ArrayList<Vector> currentData = new ArrayList<Vector>();
 
-
     private BluetoothServiceThread bluetoothServiceThread = null;
     private ZeroconfServiceThread zeroconfServiceThread = null;
     private NexusServiceThread nexusServiceThread = null;
@@ -110,12 +110,19 @@ public class NetworkService extends Service {
     public static final int MSG_ZEROCONF_ENABLED = 0x60;
     public static final int MSG_NEXUS_ENABLED= 0x70;
     public static final int MSG_SEND_BLACKLISTED = 0x80;
+    public static final int MSG_DATABASE_OPEN = 0x90;
+
+    // Intent filters
+    private IntentFilter networkConnectivityFilter = null;
 
     private WifiManager wifiManager = null;
     private int bluetoothEnabled = 0;
     private int zeroconfEnabled = 0;
     private int nexusEnabled = 0;
     private boolean sendBlacklist = false;
+    private int bluetoothScanFrequency = 300;
+    private int zeroconfScanFrequency = 300;
+    private int nexusScanFrequency = 300;
 
     // masks for notification info
     private static final int NONE_FLAG = 0;
@@ -144,7 +151,27 @@ public class NetworkService extends Service {
     // TODO
     // implement timers :-)
     private Timer timer;
-    
+
+
+    /**
+     * BroadcastReceiver for network connectivity changes
+     */
+    private final BroadcastReceiver networkConnectivityReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+
+            if (WifiManager.WIFI_STATE_CHANGED_ACTION.equals(action)) {
+                int result = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, -1);
+                if (result == WifiManager.WIFI_STATE_DISABLING) {
+                    stopZeroconfServiceThread();
+                } else if (result == WifiManager.WIFI_STATE_ENABLED) {
+                    startZeroconfServiceThread();
+                }
+
+            }
+        }
+    };
+
     @Override
     public IBinder onBind(Intent intent) {
         return messenger.getBinder();
@@ -166,12 +193,14 @@ public class NetworkService extends Service {
                     log.debug("Changing bluetooth scan frequency to: " + msg.arg1);
                     if (bluetoothServiceThread != null) {
                         bluetoothServiceThread.setScanFrequency(msg.arg1);
+                        bluetoothScanFrequency = msg.arg1;
                     }
                     break;
                 case MSG_ZEROCONF_SCAN_FREQUENCY:
                     log.debug("Changing zeroconf scan frequency to: " + msg.arg1);
                     if (zeroconfServiceThread != null) {
                         zeroconfServiceThread.setScanFrequency(msg.arg1);
+                        zeroconfScanFrequency = msg.arg1;
                     }
                     break;
                 case MSG_BLUETOOTH_ENABLED:
@@ -180,6 +209,7 @@ public class NetworkService extends Service {
                         if ((msg.arg1 == 1) && (bluetoothServiceThread == null)) {
                             bluetoothServiceThread = new BluetoothServiceThread(getApplicationContext(), clients, sendBlacklist);
                             bluetoothServiceThread.setScanFrequency(msg.arg2);
+                            bluetoothScanFrequency = msg.arg2;
                             log.info("Starting our bluetooth service thread for discovered and paired devices...");
                             bluetoothServiceThread.start();
                             notificationFlags |= BLUETOOTH_FLAG;
@@ -215,6 +245,7 @@ public class NetworkService extends Service {
                             if (wifiManager.getWifiState() == wifiManager.WIFI_STATE_ENABLED) {
                                 zeroconfServiceThread = new ZeroconfServiceThread(getApplicationContext(), clients, sendBlacklist);
                                 zeroconfServiceThread.setScanFrequency(msg.arg2);
+                                zeroconfScanFrequency = msg.arg2;
                                 log.info("Starting our zeroconf service thread...");
                                 zeroconfServiceThread.start();
                                 notificationFlags |= ZEROCONF_FLAG;
@@ -239,8 +270,10 @@ public class NetworkService extends Service {
                             nexusServiceThread = new NexusServiceThread(getApplicationContext(), clients, key, secret, token, token_secret);
                             if (msg.arg2 == 0) {
                                 nexusServiceThread.setScanFrequency(300);
+                                nexusScanFrequency = 300;
                             } else {
                                 nexusServiceThread.setScanFrequency(msg.arg2);
+                                nexusScanFrequency = msg.arg2;
 
                             }
                             log.info("Starting our nexus service thread...");
@@ -252,6 +285,19 @@ public class NetworkService extends Service {
                         nexusEnabled = msg.arg1;
                     }
 
+
+                    break;
+                case MSG_DATABASE_OPEN:
+                    Bundle b = msg.getData();
+                    String passphrase = b.getString("passphrase");
+
+                    try {
+                        messagesProviderHelper.open(passphrase);
+                        passphrase = null;
+                        System.gc();
+                    } catch (Exception e) {
+                        log.error("Unable to open database with given passphrase; this shouldn't happen: " + e);
+                    }
 
                     break;
                 case MainActivity.MSG_NEW_MESSAGE_CREATED:
@@ -290,9 +336,16 @@ public class NetworkService extends Service {
         nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 
         // setup database object
+        SQLiteDatabase.loadLibs(this);
         if (messagesProviderHelper == null) {
             messagesProviderHelper = MessagesProviderHelper.getInstance(getApplicationContext());
         }
+
+
+        // Setup intent filters and receivers for network connectivity changes
+        networkConnectivityFilter = new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        //btFoundFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        getApplicationContext().registerReceiver(networkConnectivityReceiver, networkConnectivityFilter);
 
         // Show a notification regarding the service
         showNotification();
@@ -322,6 +375,31 @@ public class NetworkService extends Service {
             nexusServiceThread.cancel();
         }
 
+    }
+
+    /**
+     * Helper method for starting zeroconf service thread
+     */
+    private void startZeroconfServiceThread() {
+        if (zeroconfEnabled == 1) {
+            zeroconfServiceThread = new ZeroconfServiceThread(getApplicationContext(), clients, sendBlacklist);
+            zeroconfServiceThread.setScanFrequency(zeroconfScanFrequency);
+            log.info("Starting our zeroconf service thread...");
+            zeroconfServiceThread.start();
+            notificationFlags |= ZEROCONF_FLAG;
+            updateNotification();
+        }
+    }
+
+    /**
+     * Helper method for stopping zeroconf service thread
+     */
+    private void stopZeroconfServiceThread() {
+        if (zeroconfServiceThread != null) {
+            zeroconfServiceThread.unregisterService();
+            zeroconfServiceThread.cancel();
+            log.debug("Stopping zeroconf service thread");
+        }
     }
 
 
