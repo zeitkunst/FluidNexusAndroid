@@ -95,7 +95,7 @@ public class BluetoothServiceThread extends ServiceThread {
     private int state;
 
     // whether to look for bonded devices only
-    private boolean bondedOnly = false;
+    private boolean bondedOnly = true;
 
     // whether or not to send blacklisted messages
     private boolean sendBlacklist = false;

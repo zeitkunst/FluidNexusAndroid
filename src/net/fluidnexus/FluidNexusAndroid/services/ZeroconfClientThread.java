@@ -117,6 +117,10 @@ public class ZeroconfClientThread extends ProtocolThread {
 
         try {
             socket = new Socket(host, port);
+
+            // Set timeout to be 120s
+            // This is long because some connections may be rather slow
+            socket.setSoTimeout(120000);
         } catch (UnknownHostException e) {
             log.error("Unknown host.");
             cleanupConnection();

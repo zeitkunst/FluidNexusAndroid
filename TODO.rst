@@ -18,3 +18,5 @@ TODO
 * Add option to prevent reading of messages over a certain size.
 
 * Add broadcast receivers that listen to wifi disabled and bluetooth disabled intents to gracefully shutdown threads if they are running
+
+* Ensure socket timeouts are functioning as desired

@@ -20,37 +20,18 @@
 package net.fluidnexus.FluidNexusAndroid.services;
 
 import java.lang.reflect.Method;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.ByteBuffer;
 import java.util.UUID;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.Vector;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothServerSocket;
-import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -64,9 +45,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
-import android.os.Parcelable;
-import android.os.ParcelUuid;
-import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -147,12 +125,6 @@ public class NetworkService extends Service {
     private Notification notification = null;
     private int NOTIFICATION = R.string.service_started;
     
-    // Timers
-    // TODO
-    // implement timers :-)
-    private Timer timer;
-
-
     /**
      * BroadcastReceiver for network connectivity changes
      */
@@ -168,6 +140,16 @@ public class NetworkService extends Service {
                     startZeroconfServiceThread();
                 }
 
+            }
+
+            if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
+                int result = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1);
+
+                if (result == BluetoothAdapter.STATE_TURNING_OFF) {
+                    stopBluetoothServiceThread();
+                } else if (result == BluetoothAdapter.STATE_ON) {
+                    startBluetoothServiceThread();
+                }
             }
         }
     };
@@ -207,13 +189,8 @@ public class NetworkService extends Service {
                     if (msg.arg1 != bluetoothEnabled) {
                         // If the received value is not what we currently have, then we need to start or stop the service
                         if ((msg.arg1 == 1) && (bluetoothServiceThread == null)) {
-                            bluetoothServiceThread = new BluetoothServiceThread(getApplicationContext(), clients, sendBlacklist);
-                            bluetoothServiceThread.setScanFrequency(msg.arg2);
                             bluetoothScanFrequency = msg.arg2;
-                            log.info("Starting our bluetooth service thread for discovered and paired devices...");
-                            bluetoothServiceThread.start();
-                            notificationFlags |= BLUETOOTH_FLAG;
-                            updateNotification();
+                            startBluetoothServiceThread();
                         } 
                         /*
                         else {
@@ -243,13 +220,8 @@ public class NetworkService extends Service {
                             wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 
                             if (wifiManager.getWifiState() == wifiManager.WIFI_STATE_ENABLED) {
-                                zeroconfServiceThread = new ZeroconfServiceThread(getApplicationContext(), clients, sendBlacklist);
-                                zeroconfServiceThread.setScanFrequency(msg.arg2);
                                 zeroconfScanFrequency = msg.arg2;
-                                log.info("Starting our zeroconf service thread...");
-                                zeroconfServiceThread.start();
-                                notificationFlags |= ZEROCONF_FLAG;
-                                updateNotification();
+                                startZeroconfServiceThread();
                             } else {
                                 Toast.makeText(getApplicationContext(), R.string.toast_wifi_not_enabled, Toast.LENGTH_SHORT).show();
                                 log.warn("Wifi not enabled; zeroconf service cannot start.");
@@ -344,7 +316,7 @@ public class NetworkService extends Service {
 
         // Setup intent filters and receivers for network connectivity changes
         networkConnectivityFilter = new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION);
-        //btFoundFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        networkConnectivityFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         getApplicationContext().registerReceiver(networkConnectivityReceiver, networkConnectivityFilter);
 
         // Show a notification regarding the service
@@ -375,6 +347,31 @@ public class NetworkService extends Service {
             nexusServiceThread.cancel();
         }
 
+    }
+
+    /**
+     * Helper method for starting bluetooth service thread
+     */
+    private void startBluetoothServiceThread() {
+        if (bluetoothEnabled == 1) {
+            bluetoothServiceThread = new BluetoothServiceThread(getApplicationContext(), clients, sendBlacklist);
+            bluetoothServiceThread.setScanFrequency(bluetoothScanFrequency);
+            log.info("Starting our bluetooth service thread for discovered and paired devices...");
+            bluetoothServiceThread.start();
+            notificationFlags |= BLUETOOTH_FLAG;
+            updateNotification();
+        }
+    }
+
+    /**
+     * Helper method for stopping bluetooth service thread
+     */
+    private void stopBluetoothServiceThread() {
+        if (bluetoothServiceThread != null) {
+            // TODO
+            // Likely need to be more fine-grained than this
+            bluetoothServiceThread.cancel();
+        }
     }
 
     /**
