@@ -101,6 +101,10 @@ public class NetworkService extends Service {
     private int bluetoothScanFrequency = 300;
     private int zeroconfScanFrequency = 300;
     private int nexusScanFrequency = 300;
+    private String key = null;
+    private String secret = null;
+    private String token = null;
+    private String token_secret = null;
 
     // masks for notification info
     private static final int NONE_FLAG = 0;
@@ -190,8 +194,12 @@ public class NetworkService extends Service {
                         // If the received value is not what we currently have, then we need to start or stop the service
                         if ((msg.arg1 == 1) && (bluetoothServiceThread == null)) {
                             bluetoothScanFrequency = msg.arg2;
+                            bluetoothEnabled = 1;
                             startBluetoothServiceThread();
-                        } 
+                        } else {
+                            bluetoothEnabled = 0;
+                            stopBluetoothServiceThread();
+                        }
                         /*
                         else {
                             // TODO
@@ -220,6 +228,7 @@ public class NetworkService extends Service {
                             wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 
                             if (wifiManager.getWifiState() == wifiManager.WIFI_STATE_ENABLED) {
+                                zeroconfEnabled = 1;
                                 zeroconfScanFrequency = msg.arg2;
                                 startZeroconfServiceThread();
                             } else {
@@ -234,24 +243,23 @@ public class NetworkService extends Service {
                 case MSG_NEXUS_ENABLED:
                     if (msg.arg1 != nexusEnabled) {
                         if ((msg.arg1 == 1) && (nexusServiceThread == null)) {
-                            Bundle b = msg.getData();
-                            String key = b.getString("key");
-                            String secret = b.getString("secret");
-                            String token = b.getString("token");
-                            String token_secret = b.getString("token_secret");
-                            nexusServiceThread = new NexusServiceThread(getApplicationContext(), clients, key, secret, token, token_secret);
+                            // First set scan frequency value
                             if (msg.arg2 == 0) {
-                                nexusServiceThread.setScanFrequency(300);
                                 nexusScanFrequency = 300;
                             } else {
-                                nexusServiceThread.setScanFrequency(msg.arg2);
+                                //nexusServiceThread.setScanFrequency(msg.arg2);
                                 nexusScanFrequency = msg.arg2;
-
                             }
-                            log.info("Starting our nexus service thread...");
-                            nexusServiceThread.start();
-                            notificationFlags |= NEXUS_FLAG;
-                            updateNotification();
+
+                            // Then get oauth values from bundle
+                            Bundle b = msg.getData();
+                            key = b.getString("key");
+                            secret = b.getString("secret");
+                            token = b.getString("token");
+                            token_secret = b.getString("token_secret");
+
+                            // Finally, start thread
+                            startNexusServiceThread();
                         }
 
                         nexusEnabled = msg.arg1;
@@ -296,6 +304,13 @@ public class NetworkService extends Service {
                     }
 
                     break;
+                case MainActivity.STOP_SERVICE:
+                    stopBluetoothServiceThread();
+                    stopZeroconfServiceThread();
+                    stopNexusServiceThread();
+                    nm.cancel(NOTIFICATION);
+
+                    break;
                 default:
                     super.handleMessage(msg);
                     break;
@@ -334,19 +349,9 @@ public class NetworkService extends Service {
     public void onDestroy() {
         super.onDestroy();
         nm.cancel(NOTIFICATION);
-        if (bluetoothServiceThread != null) {
-            bluetoothServiceThread.cancel();
-        }
-
-        if (zeroconfServiceThread != null) {
-            zeroconfServiceThread.unregisterService();
-            zeroconfServiceThread.cancel();
-        }
-
-        if (nexusServiceThread != null) {
-            nexusServiceThread.cancel();
-        }
-
+        stopBluetoothServiceThread();
+        stopZeroconfServiceThread();
+        stopNexusServiceThread();
     }
 
     /**
@@ -368,9 +373,11 @@ public class NetworkService extends Service {
      */
     private void stopBluetoothServiceThread() {
         if (bluetoothServiceThread != null) {
+            log.info("Stopping bluetooth service thread");
             // TODO
             // Likely need to be more fine-grained than this
             bluetoothServiceThread.cancel();
+            bluetoothServiceThread = null;
         }
     }
 
@@ -393,12 +400,35 @@ public class NetworkService extends Service {
      */
     private void stopZeroconfServiceThread() {
         if (zeroconfServiceThread != null) {
+            log.debug("Stopping zeroconf service thread");
             zeroconfServiceThread.unregisterService();
             zeroconfServiceThread.cancel();
-            log.debug("Stopping zeroconf service thread");
+            zeroconfServiceThread = null;
         }
     }
 
+    /**
+     * Helper method for starting nexus service thread
+     */
+    private void startNexusServiceThread() {
+        log.info("Starting our nexus service thread...");
+        nexusServiceThread = new NexusServiceThread(getApplicationContext(), clients, key, secret, token, token_secret);
+        nexusServiceThread.setScanFrequency(nexusScanFrequency);
+        nexusServiceThread.start();
+        notificationFlags |= NEXUS_FLAG;
+        updateNotification();
+    }
+
+    /**
+     * Helper method for stopping nexus service thread
+     */
+    private void stopNexusServiceThread() {
+        if (nexusServiceThread != null) {
+            log.info("Stopping nexus service thread");
+            nexusServiceThread.cancel();
+            nexusServiceThread = null;
+        }
+    }
 
     /**
      * Show a notification while the service is running

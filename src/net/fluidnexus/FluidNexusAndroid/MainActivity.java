@@ -163,9 +163,10 @@ public class MainActivity extends ListActivity {
     final Messenger messenger = new Messenger(new IncomingHandler());
     private boolean bound = false;
 
-    // Messages to the bluetooth service
+    // Messages to network service
     public static final int MSG_NEW_MESSAGE_CREATED = 0xF0;
     public static final int MSG_MESSAGE_DELETED = 0xF1;
+    public static final int STOP_SERVICE = 0xF2;
 
     private boolean showMessages = true;
     private boolean sendBlacklist = true;
@@ -593,6 +594,7 @@ public class MainActivity extends ListActivity {
             doBindService();
         } catch (Exception e) {
             Toast.makeText(this, R.string.toast_unable_to_unlock, Toast.LENGTH_LONG).show();
+            log.error("Error opening database: " + e);
             passphraseDialog().show();
         }
 
@@ -743,17 +745,23 @@ public class MainActivity extends ListActivity {
      * Unbind to the service
      */
     private void doUnbindService() {
-        if (networkService != null) {
+        if ((networkService != null) && (bound == true)) {
             try {
                 Message msg = Message.obtain(null, NetworkService.MSG_UNREGISTER_CLIENT);
                 msg.replyTo = messenger;
                 networkService.send(msg);
+
+                msg = Message.obtain(null, STOP_SERVICE);
+                msg.replyTo = messenger;
+                networkService.send(msg);
+
             } catch (RemoteException e) {
                 // nothing special to do if the service has already stopped for some reason
             }
 
             unbindService(networkServiceConnection);
-            log.info("Unbound to the Fluid Nexus Bluetooth Service");
+            bound = false;
+            log.info("Unbound to the Fluid Nexus Service");
         }
     }
 
@@ -1008,6 +1016,9 @@ public class MainActivity extends ListActivity {
                     i.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
                     startActivityForResult(i, REQUEST_DISCOVERABLE_RESULT);
                 }
+                return true;
+            case R.id.menu_stop_service:
+                doUnbindService();
                 return true;
             case R.id.menu_help:
                 i = new Intent(this, Help.class);

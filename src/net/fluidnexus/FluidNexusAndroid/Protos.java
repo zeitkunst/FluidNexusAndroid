@@ -362,7 +362,7 @@ public final class Protos {
     public enum MessagePriority
         implements com.google.protobuf.Internal.EnumLite {
       NORMAL(0, 0),
-      LIFE_OR_DEATH(1, 1),
+      HIGH(1, 1),
       ;
       
       
@@ -371,7 +371,7 @@ public final class Protos {
       public static MessagePriority valueOf(int value) {
         switch (value) {
           case 0: return NORMAL;
-          case 1: return LIFE_OR_DEATH;
+          case 1: return HIGH;
           default: return null;
         }
       }

@@ -134,19 +134,24 @@ a:hover {
 <h1><a class="toc-backref" href="#id9">2&nbsp;&nbsp;&nbsp;Introduction</a></h1>
 <p>In the second decade of the twenty-first century, networks continue to be defined by their stable topology represented in an image or graph.  Peer-to-peer technologies promised new arrangements absent centralized control, but they still rely on stationary devices.  Mobile phones remain wedded to conventional network providers.</p>
 <p>Instead, the combination of peer-to-peer with mobility enables a new concept of an information transfer infrastructure that relies on fluid, temporary, ad-hoc networks.  People and devices are at once implicated as mobile nodes in this network (known in computer science as a <a class="reference external" href="http://en.wikipedia.org/wiki/Sneakernet">sneakernet</a>).</p>
-<p>Fluid Nexus bypasses Internet intermediaries' control over the identification and circulation of messages.  This makes Fluid Nexus an important tool for activists.  Access to the data stored by Fluid Nexus requires a search warrant for <em>your own</em> devices---or another device running the software.  No identifying information regarding the sender is attached to a message, putting the sender in control.  And in conjunction with other software such as <a class="reference external" href="https://guardianproject.info/apps/securecam/">ObscuraCam</a> identities can be further obfuscated as desired or necessary.</p>
+<p>Fluid Nexus is a demonstration of how one might design software to bypass Internet intermediaries' control over the identification and circulation of messages.  It is a piece of interrogative software art, of a piece with other attempts to rework network topology such as the Eternal Network used by mail artists or projects such as Dead Swap or netless.  We draw partial inspiration from the potential activist re-purposing of digital technologies without being subsumed by the same goals.</p>
 <p>In the event that information needs to reach a broad audience, we've added another feature called the <a class="reference external" href="http://fluidnexus.net/nexus">Nexus</a>.  The Nexus is a space on this site for &quot;public&quot; messages to be automatically uploaded by any Fluid Nexus user.  The Nexus includes text, audio, images, and video capabilities.  The sender has control whether the message will become public or not.</p>
+<p>While Fluid Nexus is designed for non-Internet-based communications, we have also developed the <a class="reference external" href="http://fluidnexus.net/nexus">Nexus</a>, a space on this site for &quot;public&quot; messages to be automatically uploaded by any Fluid Nexus user.  The Nexus includes text, audio, images, and video capabilities, and the original sender has control whether the message will become public or not.  The Nexus extends the reach of the Fluid Nexus non-network beyond those using the software on their phone or laptop/desktop.</p>
 <p>For more information on Fluid Nexus, see the paper &quot;<a class="reference external" href="http://fluidnexus.net/static/pdfs/DCM2009Submitted.pdf">Transnetworks and the Fluid Nexus Project</a>&quot;, forthcoming in Fall 2011 in the proceedings of dis/connecting/media 2009.</p>
 <div class="section" id="articles-of-interest">
 <h2><a class="toc-backref" href="#id10">2.1&nbsp;&nbsp;&nbsp;Articles of Interest</a></h2>
 <ul class="simple">
+<li><a class="reference external" href="http://www.actlab.utexas.edu/emma/Library/eternalnetwork.html">Eternal Network: A Mail Art Anthology</a></li>
+<li><a class="reference external" href="http://www.stewarthomesociety.org/ass/ma.htm">Stewart Home, &quot;Mail Art&quot;, in _The Assault on Culture_</a></li>
 <li><a class="reference external" href="https://www.nytimes.com/2011/06/12/world/12internet.html?pagewanted=1&amp;_r=1&amp;hp">U.S. Underwrites Internet Detour Around Censors</a></li>
-<li><a class="reference external" href="http://www.cbc.ca/news/technology/story/2011/01/28/f-egypt-web-blackout.html">Busting Egypt's web blackout: Savvy Egyptians using dial-up connections, unused ports to stay connected</a></li>
+</ul>
+<!-- * `Busting Egypt's web blackout: Savvy Egyptians using dial-up connections, unused ports to stay connected <http://www.cbc.ca/news/technology/story/2011/01/28/f-egypt-web-blackout.html>`_ -->
+<ul class="simple">
 <li><a class="reference external" href="http://techcrunch.com/2011/02/27/humans-are-the-routers/">Humans Are The Routers</a></li>
 <li><a class="reference external" href="http://www.physorg.com/news198298057.html">New project enables mobile phone use in areas with no reception</a></li>
 <li><a class="reference external" href="http://www.guardian.co.uk/world/2009/oct/04/man-arrested-twitter-g20-us?INTCMP=SRCH">New York man accused of using Twitter to direct protesters during G20 summit</a></li>
-<li><a class="reference external" href="http://www.techdirt.com/articles/20080330/234737699.shtml">New York City Subpoenas TXTmob For All Text Messages Sent At Republican Convention</a></li>
 </ul>
+<!-- * `New York City Subpoenas TXTmob For All Text Messages Sent At Republican Convention <http://www.techdirt.com/articles/20080330/234737699.shtml>`_ -->
 </div>
 </div>
 <div class="section" id="terminology-icons">
@@ -159,7 +164,7 @@ a:hover {
 </dl>
 <dl class="docutils">
 <dt><img alt="High priority messages" src="images/menu_high_priority.png" style="width: 48px;" /> High priority messages</dt>
-<dd>Messages that have been marked as high priority; these can be considered <em>life or death</em> messages.</dd>
+<dd>Messages that have been marked as high priority.</dd>
 </dl>
 <dl class="docutils">
 <dt><img alt="Public messages created by you" src="images/menu_public.png" style="width: 48px;" /> Public messages created by you</dt>
@@ -186,21 +191,21 @@ a:hover {
 <h1><a class="toc-backref" href="#id12">4&nbsp;&nbsp;&nbsp;Security</a></h1>
 <div class="section" id="identifying-information">
 <h2><a class="toc-backref" href="#id13">4.1&nbsp;&nbsp;&nbsp;Identifying Information</a></h2>
-<p>Data is stored unencrypted in a local sqlite database.  It is best that you     take care of encryption yourself, such as by using ecryptfs home directories or LUKS encrypted devices on Linux.  For Android we plan on implementing <a class="reference external" href="https://guardianproject.info/code/sqlcipher/">SQLCipher</a> in the near future.</p>
-<p>Data is sent over <a class="reference external" href="https://secure.wikimedia.org/wikipedia/en/wiki/Bluetooth">Bluetooth</a> without any transport layer encryption.  This is    something we plan on implementing in the future.</p>
-<p>Data is sent over link-local wifi using zeroconf for service discovery without  any transport layer encryption.  This is something we plan on implementing in   the future.</p>
+<p>Messages are stored on Android in an encrypted <a class="reference external" href="https://guardianproject.info/code/sqlcipher/">SQLCipher</a> database; received attachments are currently stored unencrypted.  On Linux and Windows you will need to use local forms of encryption such as by using ecryptfs home directories or LUKS encrypted devices on Linux or TrueCrypt volumes on Windows.</p>
+<!-- Data is sent over Bluetooth_ without any transport layer encryption.  This is something we plan on implementing in the future. -->
+<!-- Data is sent over link-local wifi using zeroconf for service discovery without  any transport layer encryption.  This is something we plan on implementing in   the future. -->
 <p>While we do not save any identifying information, it is possible that you may inadvertently identify yourself through something you write or share using Fluid Nexus.  Please take this into account when using the software.  On Android, we suggest the use of <a class="reference external" href="https://guardianproject.info/apps/securecam/">ObscuraCam</a> to anonymize any photos that you decide to share.</p>
 </div>
 <div class="section" id="data-sharing">
 <h2><a class="toc-backref" href="#id14">4.2&nbsp;&nbsp;&nbsp;Data Sharing</a></h2>
 <div class="section" id="bluetooth">
 <h3><a class="toc-backref" href="#id15">4.2.1&nbsp;&nbsp;&nbsp;Bluetooth</a></h3>
-<p>On Android, devices must be paired before any data sharing can occur.  This should happen in a safe location prior to an event.  Because of this need for pairing it is less likely that those unknown to you will be able to access Fluid Nexus messages <em>when you are using the Bluetooth_ network modality alone</em>; however, it is still possible that someone can sniff your Bluetooth traffic and thus see what messages are being sent.</p>
+<p>On Android, devices must be paired before any data sharing can occur.  Because of this need for pairing it is less likely that those unknown to you will be able to access Fluid Nexus messages <em>when you are using the Bluetooth_ network modality alone</em>; however, it is still possible that someone can sniff your Bluetooth traffic and thus see what messages are being sent.</p>
 <p>On the Desktop in our testing we have not needed to pair devices ahead of time to share data amongst Linux and Windows clients.  Reports from other uses would be welcome.</p>
 </div>
 <div class="section" id="zeroconf">
 <h3><a class="toc-backref" href="#id16">4.2.2&nbsp;&nbsp;&nbsp;Zeroconf</a></h3>
-<p>On Android and the Desktop, devices will share messages with <em>any other device running Fluid Nexus</em>.  This means that others, whom you do not know, will be able to receive Fluid Nexus message (but Fluid Nexus Messages alone) from your device.  This is by design, as Fluid Nexus is a broadcast flooding protocol, meant to spread messages as far and as wide as possible.  Please take care to remove identifying information if you deem this to be a risk.</p>
+<p>On Android and the Desktop, devices will share messages with <em>any other device running Fluid Nexus</em>.  This means that others, whom you do not know, will be able to receive Fluid Nexus message (but Fluid Nexus Messages alone) from your device.  This is by design, as Fluid Nexus is a broadcast flooding protocol, meant to spread messages as far and as wide as possible.</p>
 </div>
 </div>
 </div>
@@ -251,7 +256,7 @@ a:hover {
 <p class="caption">Desktop new message window</p>
 </div>
 <p>Fill out the desired title and message.  Messages can be marked as potentially being sent to the Nexus by checking &quot;Public (push to Nexus?)&quot;.  Attachments can be added as well.  In the Desktop application simply press &quot;Choose File...&quot; to open up a file dialog and select the desired attachment.  On Android, select the type of attachment (audio, image, video) and then tap &quot;Add Attachment...&quot; to open up the native file choosing application.</p>
-<p>You can also set the &quot;priority&quot; of the message.  Currently there are two options: &quot;Normal&quot; and &quot;Life or Death&quot;.  <em>Only use the &quot;Life or Death&quot; option if someone's life depends on receiving the message</em>.</p>
+<p>You can also set the &quot;priority&quot; of the message.  Currently there are two options: &quot;Normal&quot; and &quot;High&quot;.</p>
 <div class="figure">
 <img alt="android new message attachment type" src="images/android_new_message_attachment_type.png" style="width: 400px;" />
 <p class="caption">Selecting an attachment type on Android</p>
@@ -390,7 +395,13 @@ message FluidNexusMessage {
         VIDEO = 3;
     }
 
+    enum MessagePriority {
+        NORMAL = 0;
+        HIGH = 1;
+    }
+
     optional MessageType message_type = 7;
+    optional MessagePriority message_priority = 18;
     optional bytes message_attachment = 8;
     optional string message_attachment_original_filename = 9;
 }
@@ -414,7 +425,7 @@ message FluidNexusMessages {
 <div class="footer">
 <hr class="footer" />
 Document generated from <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> plaintext markup source
-on 2011-08-16 at 19:42:20.
+on 2011-11-13 at 23:59:32.
 </div>
 </body>
 </html>

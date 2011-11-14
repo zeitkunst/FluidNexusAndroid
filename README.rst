@@ -7,18 +7,22 @@ fluidnexus at fluidnexus dot net
 
 http://fluidnexus.net
 
-version 0.2.4.1
+version 0.3.0
 
-Fluid Nexus is an application for mobile phones that is primarily designed to enable activists or relief workers to send messages and data amongst themselves independent of a centralized cellular network.  The idea is to provide a means of communication between people when the centralized network has been shut down, either by the government during a time of unrest, or by nature due to a massive disaster.  During such times the use of the centralized network for voice or SMS is not possible.  Yet, if we can use the fact that people still must move about the world, then we can use ideas from sneaker-nets to turn people into carriers of data.  Given enough people, we can create fluid, temporary, ad-hoc networks that pass messages one person at a time, spreading out as a contagion and eventually reaching members of the group.  This enables surreptitious communication via daily activity and relies on a fluid view of reality.  Additionally, Fluid Nexus can be used as a hyperlocal message board, loosely attached to physical locations.
+In the second decade of the twenty-first century, networks continue to be defined by their stable topology represented in an image or graph. Peer-to-peer technologies promised new arrangements absent centralized control, but they still rely on stationary devices. Mobile phones remain wedded to conventional network providers.
+
+Instead, the combination of peer-to-peer with mobility enables a new concept of an information transfer infrastructure that relies on fluid, temporary, ad-hoc networks. People and devices are at once implicated as mobile nodes in this network (known in computer science as a sneakernet).
+
+Fluid Nexus is a demonstration of how one might design software to bypass Internet intermediaries' control over the identification and circulation of messages. It is a piece of interrogative software art, of a piece with other attempts to rework network topology such as the Eternal Network used by mail artists or projects such as Dead Swap or netless. We draw partial inspiration from the potential activist re-purposing of digital technologies without being subsumed by the same goals.
+
+While Fluid Nexus is designed for non-Internet-based communications, we have also developed the Nexus, a space on this site for "public" messages to be automatically uploaded by any Fluid Nexus user. The Nexus includes text, audio, images, and video capabilities, and the original sender has control whether the message will become public or not. The Nexus extends the reach of the Fluid Nexus non-network beyond those using the software on their phone or laptop/desktop.
 
 SECURITY NOTE
 =============
 
-This version is incomplete and lacks many security features that are currently in development.
+Messages sent or received are stored in a local, encrypted SQLCipher database.  Received attachments are currently stored unencrypted; of course any attachments you decide to include are stored unencrypted as well (unless you have installed some other form of filesystem encryption for Anddroid).
 
-This version stores messages in an unencrypted database on the phone.  We plan to move this to SQLCipher in the near future.  Additionally, attachments (files sent with a message) are stored unencrypted on your SD card.  We are looking into possibilities for encryption of these files, but until then, you have been warned.
-
-Data are sent over bluetooth without any transport-layer security.  We are looking into implementing SSL/TLS for each of the network modalities.  You have been warned.
+Data are sent over Bluetooth using the standard encryption facilities of the Bluetooth stack; other modalities are sent unencrypted.
 
 BLUETOOTH NOTE
 --------------
@@ -44,6 +48,4 @@ TODO
 * Implement wake locks so that the service can run even when the device is sleeping; create it so that we run an alarm, run the code, then "sleep" until the next alarm (thus getting rid of the thread sleep code).  Does this only happen when we're on battery power?
 * Fix cursor leak issue (even though I'm positive we close all cursors when we need to...)
 * Figure out good way to stop the threads safely
-* Implement SQLCipher database encryption
-* Implement SSL/TLS over network modalities
 * Implement wifi ad-hoc networking

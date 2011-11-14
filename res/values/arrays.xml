@@ -24,7 +24,7 @@
     </string-array>
     <string-array name="set_priority_array">
         <item>Normal</item>
-        <item>Life or Death</item>
+        <item>High</item>
     </string-array>
 
     <string-array name="hash_rate_priorities_names">
